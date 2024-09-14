@@ -10,6 +10,7 @@ interface AuthContextType {
   signIn: (data: z.infer<typeof signInSchema>) => Promise<void>;
   signUp: (data: z.infer<typeof signUpSchema>) => Promise<void>;
   signOut: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,7 +20,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [session, setSession] = useState<UserPayload | null>(null);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const signIn = async (data: z.infer<typeof signInSchema>) => {
     const res = await f("/api/user/session", {
       method: "POST",
@@ -43,11 +44,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchSession = async () => {
     try {
+      setLoading(true)
       const res = await f("/api/user/session");
       setSession(res);
     } catch (err) {
       setSession(null);
       console.error('fetchSession', err);
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -56,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   return (
-    <AuthContext.Provider value={{ session, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ session, signIn, signUp, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   );
