@@ -57,6 +57,15 @@ export const CollectWebpageForm = ({
       if (form.getValues("tags").length === 0 && response.tags.length > 0) {
         form.setValue("tags", response.tags.map((tag: Tag) => tag.id));
       }
+      if (form.getValues("title") === "" && response.title) {
+        form.setValue("title", response.title);
+      }
+      if (form.getValues("description") === "" && response.description) {
+        form.setValue("description", response.description);
+      }
+      if (form.getValues("icon") === "" && response.icon) {
+        form.setValue("icon", response.icon);
+      }
     } else {
       setWebpageId("");
     }
