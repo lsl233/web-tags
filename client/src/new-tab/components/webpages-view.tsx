@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/lib/ui/tooltip";
+import { Image } from "@/lib/ui/image";
 
 interface WebpagesViewProps {
   webpages: WebpageWithTags[];
@@ -50,7 +51,12 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
               title={webpage.title + " \n" + webpage.url}
               onClick={() => handleOpenTab(webpage.url)}
             >
-              <img className="w-4 h-4 mr-1" src={getIconURL(webpage)} alt={webpage.icon} />
+              <Image
+                className="w-4 h-4 mr-1 flex-shrink-0"
+                src={getIconURL(webpage)}
+                defaultSrc="/default-webpage-icon.png"
+                alt={webpage.icon}
+              />
               <div className="w-full truncate text-sm font-bold">
                 {webpage.title}
               </div>

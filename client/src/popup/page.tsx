@@ -55,27 +55,22 @@ const Popup = () => {
     <div className="w-96 p-4">
       {loading ? (
         <SkeletonList />
+      ) : session ? (
+        <CollectWebpageForm
+          defaultForm={defaultWebpageInfo}
+          submitSuccess={() => {}}
+          visibleButton
+        />
       ) : (
-        <>
-          {session ? (
-            <CollectWebpageForm
-              defaultForm={defaultWebpageInfo}
-              submitSuccess={() => {}}
-              visibleButton
-            />
-          ) : (
-            <div className="text-center">
-              <Button
-                onClick={() => {
-                  const newTabURL = chrome.runtime.getURL("new-tab.html");
-                  chrome.tabs.create({ url: newTabURL });
-                }}
-              >
-                Sign in
-              </Button>
-            </div>
-          )}
-        </>
+        <div className="text-center">
+          <Button
+            onClick={() => {
+              chrome.tabs.create({ url: chrome.runtime.getURL("new-tab.html") });
+            }}
+          >
+            Sign in
+          </Button>
+        </div>
       )}
     </div>
   );
