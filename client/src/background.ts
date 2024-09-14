@@ -1,10 +1,9 @@
-import { ScrapedWebpage } from "shared/spider";
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
   // background.js
 
-
+  // TODO 当插件安装，自动为已打开页面注入 content-script
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

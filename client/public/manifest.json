@@ -20,7 +20,7 @@
       ],
       "js": [
         "js/vendor.js",
-        "js/background.js"
+        "js/content-script.js"
       ]
     }
   ],
