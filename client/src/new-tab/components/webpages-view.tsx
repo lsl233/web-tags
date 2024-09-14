@@ -1,0 +1,89 @@
+import { Button } from "@/lib/ui/button";
+import { Badge } from "@/lib/ui/badge";
+import { WebpageWithTags } from "shared/webpage";
+import { Tags } from "lucide-react";
+import { CollectWebpageDialog } from "@/lib/components/collect-webpage-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/lib/ui/tooltip";
+// import { Webpage } frowm "shared/webpage";
+
+interface WebpagesViewProps {
+  webpages: WebpageWithTags[];
+}
+
+export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
+  const handleOpenTab = (url: string) => {
+    chrome.tabs.create({ url, active: false });
+  };
+  return (
+    <>
+      <div className="h-[52px] flex items-center px-4 border-b border-gray-300">
+        <CollectWebpageDialog>
+          <Button size="sm">
+            <Tags size={16} className="mr-1" />
+            Collect Webpage
+          </Button>
+        </CollectWebpageDialog>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-4 p-4 content-start">
+        {webpages.map((webpage) => (
+          <div
+            key={webpage.id}
+            className="border border-gray-300 rounded-lg p-2"
+          >
+            <Button
+              variant="link"
+              className="p-0 h-auto justify-start w-full text-left"
+              title={webpage.title + " \n" + webpage.url}
+              onClick={() => handleOpenTab(webpage.url)}
+            >
+              <div className="w-full truncate text-sm font-bold">
+                {webpage.title}
+              </div>
+            </Button>
+
+            <div
+              className="text-sm text-gray-500 truncate w-full mt-2"
+              title={webpage.description}
+            >
+              {webpage.description}
+            </div>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="max-w-full">
+                  <div className="flex max-w-full gap-2 mt-2 flex-nowrap truncate">
+                    {webpage?.tags.map((tag) => (
+                      <Badge
+                        key={tag.id}
+                        variant="outline"
+                        className="text-xs px-1.5 flex-shrink-0"
+                      >
+                        {tag.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="flex flex-wrap gap-1 p-2">
+                  {webpage?.tags.map((tag) => (
+                    <Badge
+                      key={tag.id}
+                      variant="outline"
+                      className="text-xs px-1.5 flex-shrink-0"
+                    >
+                      {tag.name}
+                    </Badge>
+                  ))}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};

@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "ESNext",
+        "moduleResolution": "bundler",
+        "module": "ES6",
+        "esModuleInterop": true,
+        "sourceMap": false,
+        "rootDir": "../",
+        "outDir": "dist/js",
+        "noEmitOnError": true,
+        "jsx": "react-jsx",
+        "typeRoots": [ "node_modules/@types", "node" ],
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./src/*"],
+            "shared/*": ["../shared/*"]
+        }
+    },
+    "include": ["src", "../shared/**/*"],
+}
