@@ -1,7 +1,7 @@
 import { Button } from "@/lib/ui/button";
 import { Badge } from "@/lib/ui/badge";
 import { WebpageWithTags } from "shared/webpage";
-import { Tags } from "lucide-react";
+import { SquareArrowOutUpRight, Tags } from "lucide-react";
 import { CollectWebpageDialog } from "@/lib/components/collect-webpage-dialog";
 import {
   Tooltip,
@@ -29,15 +29,22 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
     return '/default-webpage-icon.png'
   };
 
+  const handleOpenAllTabs = (webpages: WebpageWithTags[]) => {
+    webpages.forEach((webpage) => {
+      chrome.tabs.create({ url: webpage.url, active: false });
+    });
+  };
+
   return (
     <>
-      <div className="h-[52px] flex items-center px-4 border-b border-gray-300">
+      <div className="h-[52px] flex justify-between items-center px-4 border-b border-gray-300">
         <CollectWebpageDialog>
           <Button size="sm">
             <Tags size={16} className="mr-1" />
             Collect Webpage
           </Button>
         </CollectWebpageDialog>
+        <Button variant="outline" onClick={() => handleOpenAllTabs(webpages)} size="sm">Open All <SquareArrowOutUpRight size={16} className="ml-1" /></Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-4 p-4 content-start">
         {webpages.map((webpage) => (
