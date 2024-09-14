@@ -9,7 +9,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/lib/ui/tooltip";
-// import { Webpage } frowm "shared/webpage";
 
 interface WebpagesViewProps {
   webpages: WebpageWithTags[];
@@ -19,6 +18,16 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
   const handleOpenTab = (url: string) => {
     chrome.tabs.create({ url, active: false });
   };
+
+  const getIconURL = (webpage: WebpageWithTags) => {
+    if (webpage.icon.startsWith("http")) return webpage.icon
+    if (webpage.url.startsWith("http")) {
+      const urlObj = new URL(webpage.url)
+      return `${urlObj.protocol}//${urlObj.hostname}${urlObj.port ? ':' + urlObj.port : ''}/favicon.ico`
+    }
+    return '/default-webpage-icon.png'
+  };
+
   return (
     <>
       <div className="h-[52px] flex items-center px-4 border-b border-gray-300">
@@ -41,6 +50,7 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
               title={webpage.title + " \n" + webpage.url}
               onClick={() => handleOpenTab(webpage.url)}
             >
+              <img className="w-4 h-4 mr-1" src={getIconURL(webpage)} alt={webpage.icon} />
               <div className="w-full truncate text-sm font-bold">
                 {webpage.title}
               </div>
