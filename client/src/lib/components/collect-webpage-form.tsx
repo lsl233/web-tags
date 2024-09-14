@@ -34,6 +34,7 @@ export const CollectWebpageForm = ({
   visibleButton = false,
 }: CollectWebpageFormProps) => {
   const { tags, setTags, webpages, setWebpages } = useStore();
+  const [webpageId, setWebpageId] = useState<string>('');
 
   const form = useForm({
     resolver: zodResolver(collectWebSchema),
@@ -45,6 +46,27 @@ export const CollectWebpageForm = ({
       tags: [],
     },
   });
+
+  const formURL = form.watch("url");
+
+  const checkWebpageExist = async () => {
+    const response = await f(`/api/webpage/exist?url=${formURL}`);
+    if (response) {
+      console.log("webpage exist", response);
+      setWebpageId(response.id);
+      if (form.getValues("tags").length === 0 && response.tags.length > 0) {
+        form.setValue("tags", response.tags.map((tag: Tag) => tag.id));
+      }
+    } else {
+      setWebpageId("");
+    }
+  };
+
+  useEffect(() => {
+    if (formURL) {
+      checkWebpageExist();
+    }
+  }, [formURL]);
 
   useEffect(() => {
     if (defaultForm) {
@@ -58,15 +80,18 @@ export const CollectWebpageForm = ({
   const onSubmit = async (data: z.infer<typeof collectWebSchema>) => {
     const response = await f("/api/webpage", {
       method: "POST",
-      body: data,
+      body: {
+        ...data,
+        id: webpageId,
+      },
     });
     if (!response) return;
     setWebpages([response, ...webpages]);
+    setWebpageId(response.id);
     submitSuccess();
   };
 
   const handleFetchWebpageInfo = async () => {
-    console.log("fetching web info");
     const url = form.getValues("url");
     if (!url) return;
     const response = await f<ScrapedWebpage>("/api/spider/webpage", {
@@ -74,7 +99,6 @@ export const CollectWebpageForm = ({
       body: { url },
     });
     if (!response) return;
-    console.log(response);
     form.setValue("title", response.title);
     form.setValue("description", response.description);
     form.setValue("icon", response.icon);
@@ -164,7 +188,7 @@ export const CollectWebpageForm = ({
         />
         {visibleButton && (
           <DialogFooter>
-            <Button type="submit">Submit</Button>
+            <Button type="submit">{webpageId ? "Update" : "Submit"}</Button>
           </DialogFooter>
         )}
       </form>

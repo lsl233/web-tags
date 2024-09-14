@@ -32,16 +32,27 @@ router.post("/", async (req, res, next) => {
   }
 
   const { url, title, description, tags, icon } = req.body;
+
+  const data = {
+    url,
+    title,
+    description,
+    userId: req.user.id,
+    icon,
+    tags: {
+      set: tags.map((tag: string) => ({ id: tag })),
+    },
+  };
   // TODO url 唯一性判断
-  const createdWebpage = await db.webPage.create({
-    data: {
-      url,
-      title,
-      description,
-      userId: req.user.id,
-      icon,
+  const createdWebpage = await db.webPage.upsert({
+    where: {
+      id: req.body.id as string,
+    },
+    update: data,
+    create: {
+      ...data,
       tags: {
-        connect: tags.map((tag: string) => ({ id: tag })),
+        connect: data.tags.set,
       },
     },
     include: {
@@ -51,5 +62,23 @@ router.post("/", async (req, res, next) => {
 
   res.json(createdWebpage);
 });
+
+router.get("/exist", async (req, res, next) => {
+  if (!req.user) {
+    return next(ServerError.Unauthorized("Unauthorized"));
+  }
+  const { url } = req.query;
+  const foundWebpage = await db.webPage.findFirst({
+    where: {
+      url: url as string,
+      userId: req.user.id,
+    },
+    include: {
+      tags: true,
+    },
+  });
+  res.json(foundWebpage);
+});
+
 
 export default router;

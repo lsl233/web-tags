@@ -45,6 +45,10 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
     search: "",
     count: 0,
   });
+  
+  useEffect(() => {
+    setValues(value);
+  }, [value]);
 
   useEffect(() => {
     onChange(values);

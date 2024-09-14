@@ -36,6 +36,15 @@ router.post("/", async (req, res, next) => {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
   const { name } = req.body;
+  const existingTag = await db.tag.findFirst({
+    where: {
+      name,
+      userId: req.user.id,
+    },
+  });
+  if (existingTag) {
+    return next(ServerError.BadRequest("Tag already exists"));
+  }
   // TODO 唯一性判断
   const createdTag = await db.tag.create({
     data: {
