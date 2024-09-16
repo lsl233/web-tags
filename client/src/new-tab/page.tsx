@@ -9,10 +9,6 @@ import { WebpagesView } from "./components/webpages-view";
 import { useStore } from "@/lib/hooks/store.hook";
 
 const Options = () => {
-  // const [tags, setTags] = useState<TagWithWebpagesAndTags[]>([]);
-  // const [activeTag, setActiveTag] = useState<TagWithWebpagesAndTags | null>(
-  //   null
-  // );
   const { session } = useAuth();
   const { tags, setTags, activeTag, setActiveTag, webpages, setWebpages } = useStore();
   

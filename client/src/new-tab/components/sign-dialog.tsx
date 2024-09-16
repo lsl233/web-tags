@@ -49,15 +49,11 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
     if (signType === "in") {
-      try {
-        await signIn(data);
-        setSignDialogOpen(false);
-      } catch (error) {
-        debugger
-      }
+      await signIn(data);
+      setSignDialogOpen(false);
     } else {
       await signUp(data as z.infer<typeof signUpSchema>);
-      debugger
+      debugger;
       setSignType("in");
       // TODO toast
     }
@@ -112,17 +108,17 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
               )}
             />
             {signType === "up" && (
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage></FormMessage>
-                </FormItem>
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" {...field} />
+                    </FormControl>
+                    <FormMessage></FormMessage>
+                  </FormItem>
                 )}
               />
             )}
