@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "@/global.css";
 import { f } from "@/lib/f";
@@ -17,21 +17,28 @@ const Options = () => {
   const { tags, setTags, activeTag, setActiveTag, webpages, setWebpages } = useStore();
   
   const fetchTags = async () => {
-    const res = await f("/api/tag?includeWebPagesAndTags=true");
-    setTags(res);
-    if (res.length > 0) {
-      setActiveTag({ ...res[0] });
-    }
+      const res = await f("/api/tag?includeWebPagesAndTags=true");
+      setTags(res);
+      return res;
   };
 
   const fetchWebpages = async () => {
-    const res = await f(`/api/webpage?tagId=${activeTag?.id}`);
-    setWebpages(res);
+    try {
+      const res = await f(`/api/webpage?tagId=${activeTag?.id}`);
+      setWebpages(res);
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   };
 
   useEffect(() => {
     if (session) {
-      fetchTags();
+      fetchTags().then((res) => {
+        if (res.length > 0) {
+          setActiveTag({ ...res[0] });
+        }
+      })
     }
   }, [session]);
 
@@ -40,6 +47,15 @@ const Options = () => {
       fetchWebpages();
     }
   }, [activeTag]);
+
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.type === 'active-new-tab') {
+        fetchTags();
+        fetchWebpages();
+      }
+    });
+  }, []);
 
   return (
     <main className="flex h-screen">

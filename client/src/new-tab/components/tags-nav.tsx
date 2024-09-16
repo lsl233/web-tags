@@ -1,10 +1,11 @@
 import { Button } from "@/lib/ui/button";
-import { Hash } from "lucide-react";
+import { Hash, LogOut } from "lucide-react";
 import { Tags } from "lucide-react";
 import { Tag } from "shared/tag";
 import { useAuth } from "./auth-provider";
 import { SignDialog } from "./sign-dialog";
 import { Avatar, AvatarFallback } from "@/lib/ui/avatar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/lib/ui/popover";
 
 interface TagsNavProps {
   tags: Tag[];
@@ -13,8 +14,9 @@ interface TagsNavProps {
 }
 
 export const TagsNav = ({ tags, activeTag, setActiveTag }: TagsNavProps) => {
-  const { session } = useAuth();
-  console.log('session', session);
+  const { session, signOut } = useAuth();
+ 
+  console.log("session", session);
 
   return (
     <div className="flex flex-col h-full">
@@ -36,14 +38,17 @@ export const TagsNav = ({ tags, activeTag, setActiveTag }: TagsNavProps) => {
       </div>
       <div className="flex items-center justify-center px-4 h-[52px] border-t border-gray-300">
         {session ? (
-          <>
-            <Avatar>
-              {/* <AvatarImage src={session.avatar} /> */}
-              <AvatarFallback>
-                {session.email.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          </>
+          <Popover>
+            <PopoverTrigger>
+              <Avatar>
+                {/* <AvatarImage src={session.avatar} /> */}
+                <AvatarFallback>
+                  {session.email.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            </PopoverTrigger>
+            <PopoverContent className="p-2 w-auto"><Button onClick={signOut} variant="ghost"><LogOut className="w-4 h-4 mr-1" />Sign out</Button></PopoverContent>
+          </Popover>
         ) : (
           <SignDialog type="in">
             <Button size="sm">Sign in</Button>

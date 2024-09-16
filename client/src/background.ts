@@ -25,3 +25,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // 向 popup 发送页面内容
   }
 });
+
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  // 获取当前激活的标签页
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    // 检查标签页是否是 new-tab 页面
+    if (tab.url === 'chrome://newtab/') {
+      console.log('New Tab page is active.');
+      const messageType = "active-new-tab";
+      chrome.tabs.sendMessage(activeInfo.tabId, { type: messageType });
+    }
+  });
+});

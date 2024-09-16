@@ -1,4 +1,5 @@
 import { f } from "@/lib/f";
+import { useStore } from "@/lib/hooks/store.hook";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { signInSchema, signUpSchema } from "shared/auth";
 import { UserPayload } from "shared/user";
@@ -29,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     await chrome.storage.local.set({ token: res });
     await fetchSession()
   };
+  const { setSignDialogOpen } = useStore();
 
   const signUp = async (data: z.infer<typeof signUpSchema>) => {
     await f("/api/user", {
@@ -40,6 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signOut = async () => {
     await chrome.storage.local.remove("token");
     setSession(null);
+    setSignDialogOpen(true);
   };
 
   const fetchSession = async () => {

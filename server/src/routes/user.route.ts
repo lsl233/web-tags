@@ -24,7 +24,7 @@ router.post("/session", async (req, res, next) => {
   });
 
   if (!foundUser) {
-    return next(ServerError.Unauthorized("Unauthorized"));
+    return next(ServerError.BadRequest("Invalid email or password"));
   }
 
   // TODO use bcrypt

@@ -49,8 +49,12 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
     if (signType === "in") {
-      await signIn(data);
-      setSignDialogOpen(false);
+      try {
+        await signIn(data);
+        setSignDialogOpen(false);
+      } catch (error) {
+        debugger
+      }
     } else {
       await signUp(data as z.infer<typeof signUpSchema>);
       debugger
