@@ -9,6 +9,10 @@ router.get("/", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
+
+  if (!req.query.tagId || req.query.tagId === "" || req.query.tagId === "undefined") {
+    return next(ServerError.BadRequest("tagId is required"));
+  }
  
   const foundWebpages = await db.webPage.findMany({
     where: {

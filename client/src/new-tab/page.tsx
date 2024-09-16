@@ -8,14 +8,15 @@ import { TagsNav } from "./components/tags-nav";
 import { WebpagesView } from "./components/webpages-view";
 import { useStore } from "@/lib/hooks/store.hook";
 
-const Options = () => {
+const NewTab = () => {
   const { session } = useAuth();
-  const { tags, setTags, activeTag, setActiveTag, webpages, setWebpages } = useStore();
-  
+  const { tags, setTags, activeTag, setActiveTag, webpages, setWebpages } =
+    useStore();
+
   const fetchTags = async () => {
-      const res = await f("/api/tag?includeWebPagesAndTags=true");
-      setTags(res);
-      return res;
+    const res = await f("/api/tag?includeWebPagesAndTags=true");
+    setTags(res);
+    return res;
   };
 
   const fetchWebpages = async () => {
@@ -34,7 +35,7 @@ const Options = () => {
         if (res.length > 0) {
           setActiveTag({ ...res[0] });
         }
-      })
+      });
     }
   }, [session]);
 
@@ -45,13 +46,19 @@ const Options = () => {
   }, [activeTag]);
 
   useEffect(() => {
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (request.type === 'active-new-tab') {
+    const messageListener = (request: any) => {
+      if (request.type === "active-new-tab") {
         fetchTags();
         fetchWebpages();
       }
-    });
-  }, []);
+    };
+
+    chrome.runtime.onMessage.addListener(messageListener);
+
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener);
+    };
+  }, [activeTag]);
 
   return (
     <main className="flex h-screen">
@@ -74,8 +81,7 @@ const root = createRoot(document.getElementById("root")!);
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <Options />
+      <NewTab />
     </AuthProvider>
   </React.StrictMode>
 );
-
