@@ -36,17 +36,21 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
   };
 
   return (
-    <>
-      <div className="h-[52px] flex justify-between items-center px-4 border-b border-gray-300">
+    <div className="flex flex-col h-full">
+      <div className="shrink-0 h-[52px] flex justify-between items-center px-4 border-b border-gray-300">
         <CollectWebpageDialog>
           <Button size="sm">
             <Tags size={16} className="mr-1" />
             Collect Webpage
           </Button>
         </CollectWebpageDialog>
-        <Button variant="outline" onClick={() => handleOpenAllTabs(webpages)} size="sm">Open All <SquareArrowOutUpRight size={16} className="ml-1" /></Button>
+        {
+          webpages.length > 0 && (
+            <Button variant="outline" onClick={() => handleOpenAllTabs(webpages)} size="sm">Open All <SquareArrowOutUpRight size={16} className="ml-1" /></Button>
+          )
+        }
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-4 p-4 content-start">
+      <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-4 p-4 content-start">
         {webpages.map((webpage) => (
           <div
             key={webpage.id}
@@ -107,6 +111,6 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 };

@@ -10,10 +10,14 @@ router.get("/", async (req, res, next) => {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
 
-  if (!req.query.tagId || req.query.tagId === "" || req.query.tagId === "undefined") {
+  if (
+    !req.query.tagId ||
+    req.query.tagId === "" ||
+    req.query.tagId === "undefined"
+  ) {
     return next(ServerError.BadRequest("tagId is required"));
   }
- 
+
   const foundWebpages = await db.webPage.findMany({
     where: {
       userId: req.user.id,
@@ -47,7 +51,7 @@ router.post("/", async (req, res, next) => {
       set: tags.map((tag: string) => ({ id: tag })),
     },
   };
-  // TODO url 唯一性判断
+
   const createdWebpage = await db.webPage.upsert({
     where: {
       id: req.body.id as string,
@@ -83,6 +87,5 @@ router.get("/exist", async (req, res, next) => {
   });
   res.json(foundWebpage);
 });
-
 
 export default router;

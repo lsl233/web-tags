@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "./components/auth-provider";
 import { TagsNav } from "./components/tags-nav";
 import { WebpagesView } from "./components/webpages-view";
 import { useStore } from "@/lib/hooks/store.hook";
+import { SignDialog } from "./components/sign-dialog";
 
 const NewTab = () => {
   const { session } = useAuth();
@@ -72,6 +73,7 @@ const NewTab = () => {
       <div className="h-full w-5/6 border-b border-gray-300 ">
         <WebpagesView webpages={webpages} />
       </div>
+      <SignDialog children={undefined} type={"in"} />
     </main>
   );
 };
