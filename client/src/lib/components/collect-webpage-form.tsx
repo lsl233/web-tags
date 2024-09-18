@@ -54,33 +54,33 @@ export const CollectWebpageForm = ({
 
   const formURL = form.watch("url");
 
-  // const checkWebpageExist = useCallback(async () => {
-  //   if (!formURL) return;
-  //   const response = await f(`/api/webpage/exist?url=${formURL}`);
-  //   if (response) {
-  //     setWebpageId(response.id);
-  //     form.reset(
-  //       {
-  //         ...form.getValues(),
-  //         tags:
-  //           response.tags.length > 0
-  //             ? response.tags.map((tag: Tag) => tag.id)
-  //             : form.getValues("tags"),
-  //         title: response.title || form.getValues("title"),
-  //         description: response.description || form.getValues("description"),
-  //         icon: response.icon || form.getValues("icon"),
-  //       },
-  //       { keepDefaultValues: true }
-  //     );
-  //   } else {
-  //     setWebpageId("");
-  //   }
-  // }, [formURL, form]);
+  const checkWebpageExist = useCallback(async () => {
+    if (!formURL) return;
+    const response = await f(`/api/webpage/exist?url=${formURL}`);
+    if (response) {
+      setWebpageId(response.id);
+      form.reset(
+        {
+          ...form.getValues(),
+          tags:
+            response.tags.length > 0
+              ? response.tags.map((tag: Tag) => tag.id)
+              : form.getValues("tags"),
+          title: response.title || form.getValues("title"),
+          description: response.description || form.getValues("description"),
+          icon: response.icon || form.getValues("icon"),
+        },
+        { keepDefaultValues: true }
+      );
+    } else {
+      setWebpageId("");
+    }
+  }, [formURL, form]);
 
-  // useEffect(() => {
-  //   const debounceTimer = setTimeout(checkWebpageExist, 300);
-  //   return () => clearTimeout(debounceTimer);
-  // }, [checkWebpageExist]);
+  useEffect(() => {
+    const debounceTimer = setTimeout(checkWebpageExist, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [checkWebpageExist]);
 
   // useEffect(() => {
   //   if (defaultForm) {
