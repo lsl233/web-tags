@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { WebpageWithTags } from "shared/webpage";
 import { Tag } from "shared/tag";
+import { ScrapedWebpage } from "shared/spider";
 
 type Store = {
     webpages: WebpageWithTags[],
@@ -14,6 +15,11 @@ type Store = {
 
     signDialogOpen: boolean,
     setSignDialogOpen: (open: boolean) => void
+
+    collectDialogOpen: boolean,
+    setCollectDialogOpen: (open: boolean) => void
+    defaultCollectForm: Partial<ScrapedWebpage>
+    setDefaultCollectForm: (form: Partial<ScrapedWebpage>) => void
 }
 
 export const useStore = create<Store>(set => ({
@@ -29,4 +35,9 @@ export const useStore = create<Store>(set => ({
 
     signDialogOpen: false,
     setSignDialogOpen: (open) => set({signDialogOpen: open}),
+
+    collectDialogOpen: false,
+    setCollectDialogOpen: (open) => set({collectDialogOpen: open}),
+    defaultCollectForm: {},
+    setDefaultCollectForm: (form) => set({defaultCollectForm: form}),
 }))

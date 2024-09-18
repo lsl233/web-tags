@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "@/lib/ui/dialog";
 import { CollectWebpageForm } from "./collect-webpage-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "../hooks/store.hook";
 import { ScrapedWebpage } from "shared/spider";
 
@@ -22,14 +22,14 @@ export const CollectWebpageDialog = ({
   submitSuccess,
   defaultForm,
 }: CollectWebpageDialogProps) => {
-  const [open, setOpen] = useState(false);
+  const { collectDialogOpen, setCollectDialogOpen, defaultCollectForm } = useStore();
   const handleSubmitSuccess = () => {
     submitSuccess?.();
-    setOpen(false);
+    setCollectDialogOpen(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={collectDialogOpen} onOpenChange={setCollectDialogOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -37,7 +37,7 @@ export const CollectWebpageDialog = ({
           <DialogDescription>Input the url of the webpage</DialogDescription>
         </DialogHeader>
         <CollectWebpageForm
-          defaultForm={defaultForm}
+          defaultForm={defaultCollectForm}
           submitSuccess={handleSubmitSuccess}
           visibleButton
         />

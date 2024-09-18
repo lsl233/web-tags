@@ -11,26 +11,18 @@ import {
 } from "@/lib/ui/tooltip";
 import { Image } from "@/lib/ui/image";
 import { useStore } from "@/lib/hooks/store.hook";
+import { WebpageCard } from "./webpage-card";
+import { useEffect } from "react";
 interface WebpagesViewProps {
   webpages: WebpageWithTags[];
 }
 
 export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
-  const { activeTag } = useStore();
-  const handleOpenTab = (url: string) => {
-    chrome.tabs.create({ url, active: false });
-  };
+  const { activeTag, setDefaultCollectForm } = useStore();
 
-  const getIconURL = (webpage: WebpageWithTags) => {
-    if (webpage.icon.startsWith("http")) return webpage.icon;
-    if (webpage.url.startsWith("http")) {
-      const urlObj = new URL(webpage.url);
-      return `${urlObj.protocol}//${urlObj.hostname}${
-        urlObj.port ? ":" + urlObj.port : ""
-      }/favicon.ico`;
-    }
-    return "/default-webpage-icon.png";
-  };
+  useEffect(() => {
+    setDefaultCollectForm({ tags: activeTag?.id ? [activeTag.id] : [] });
+  }, [activeTag]);
 
   const handleOpenAllTabs = (webpages: WebpageWithTags[]) => {
     webpages.forEach((webpage) => {
@@ -41,9 +33,7 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
   return (
     <div className="flex flex-col h-full">
       <div className="shrink-0 h-[52px] flex justify-between items-center px-4 border-b border-gray-300">
-        <CollectWebpageDialog
-          defaultForm={{ tags: activeTag?.id ? [activeTag.id] : [] }}
-        >
+        <CollectWebpageDialog>
           <Button size="sm">
             <PanelsTopLeft size={16} className="mr-1" />
             Collect Webpage
@@ -61,63 +51,7 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
       </div>
       <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-4 p-4 content-start">
         {webpages.map((webpage) => (
-          <div
-            key={webpage.id}
-            className="border border-gray-300 rounded-lg p-2"
-          >
-            <Button
-              variant="link"
-              className="p-0 h-auto justify-start w-full text-left"
-              title={webpage.title + " \n" + webpage.url}
-              onClick={() => handleOpenTab(webpage.url)}
-            >
-              <Image
-                className="w-4 h-4 mr-1 flex-shrink-0"
-                src={getIconURL(webpage)}
-                defaultSrc="/default-webpage-icon.png"
-                alt={webpage.icon}
-              />
-              <div className="w-full truncate text-sm font-bold">
-                {webpage.title}
-              </div>
-            </Button>
-
-            <div
-              className="text-sm text-gray-500 truncate w-full mt-2"
-              title={webpage.description}
-            >
-              {webpage.description}
-            </div>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger className="max-w-full">
-                  <div className="flex max-w-full gap-2 mt-2 flex-nowrap truncate">
-                    {webpage?.tags.map((tag) => (
-                      <Badge
-                        key={tag.id}
-                        variant="outline"
-                        className="text-xs px-1.5 flex-shrink-0"
-                      >
-                        {tag.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent className="flex flex-wrap gap-1 p-2">
-                  {webpage?.tags.map((tag) => (
-                    <Badge
-                      key={tag.id}
-                      variant="outline"
-                      className="text-xs px-1.5 flex-shrink-0"
-                    >
-                      {tag.name}
-                    </Badge>
-                  ))}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <WebpageCard key={webpage.id} webpage={webpage} />
         ))}
       </div>
     </div>

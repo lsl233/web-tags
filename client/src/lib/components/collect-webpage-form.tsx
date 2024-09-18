@@ -38,7 +38,8 @@ export const CollectWebpageForm = ({
   const setTags = useStore((state) => state.setTags);
   const webpages = useStore((state) => state.webpages);
   const setWebpages = useStore((state) => state.setWebpages);
-  const [webpageId, setWebpageId] = useState<string>("");
+  const setDefaultCollectForm = useStore((state) => state.setDefaultCollectForm);
+  const [webpageId, setWebpageId] = useState<string>(defaultForm.id ?? "");
 
   const form = useForm({
     resolver: zodResolver(collectWebSchema),
@@ -53,9 +54,12 @@ export const CollectWebpageForm = ({
   });
 
   const formURL = form.watch("url");
+  const formTitle = form.watch("title");
 
   const checkWebpageExist = useCallback(async () => {
-    if (!formURL) return;
+    // if title is not empty, it means the user has already input the title
+    if (!formURL || formTitle) return;
+
     const response = await f(`/api/webpage/exist?url=${formURL}`);
     if (response) {
       setWebpageId(response.id);
@@ -82,6 +86,19 @@ export const CollectWebpageForm = ({
     return () => clearTimeout(debounceTimer);
   }, [checkWebpageExist]);
 
+  useEffect(() => {
+    return () => {
+      console.log("reset");
+      setDefaultCollectForm({
+        url: "",
+        title: "",
+        description: "",
+        icon: "",
+        tags: [] as string[],
+      });
+    };
+  }, []);
+
   // useEffect(() => {
   //   if (defaultForm) {
   //     form.reset({
@@ -92,10 +109,9 @@ export const CollectWebpageForm = ({
   //       tags: defaultForm.tags ?? [],
   //     }, { keepDefaultValues: true });
   //   }
-  // }, [defaultForm]); 
+  // }, [defaultForm]);
 
   const handleFetchWebpageInfo = async () => {
-    console.log(form.getValues("tags"), form.getValues("url"));
     const url = form.getValues("url");
     if (!url) return;
     const response = await f<ScrapedWebpage>("/api/spider/webpage", {
@@ -120,12 +136,14 @@ export const CollectWebpageForm = ({
       },
     });
     if (!response) return;
-    setWebpages([response, ...webpages]);
+    if (webpageId) {
+      setWebpages(webpages.map((webpage) => (webpage.id === response.id ? response : webpage)));
+    } else {
+      setWebpages([response, ...webpages]);
+    }
     setWebpageId(response.id);
     submitSuccess();
   };
-
-
 
   const handleCreateTag = async (name: string) => {
     const response = await f("/api/tag", {
