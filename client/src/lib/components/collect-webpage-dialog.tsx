@@ -8,18 +8,21 @@ import {
 } from "@/lib/ui/dialog";
 import { CollectWebpageForm } from "./collect-webpage-form";
 import { useState } from "react";
+import { useStore } from "../hooks/store.hook";
+import { ScrapedWebpage } from "shared/spider";
 
 interface CollectWebpageDialogProps {
   children: React.ReactNode;
   submitSuccess?: () => void;
+  defaultForm?: Partial<ScrapedWebpage>;
 }
 
 export const CollectWebpageDialog = ({
   children,
   submitSuccess,
+  defaultForm,
 }: CollectWebpageDialogProps) => {
   const [open, setOpen] = useState(false);
-
   const handleSubmitSuccess = () => {
     submitSuccess?.();
     setOpen(false);
@@ -33,7 +36,11 @@ export const CollectWebpageDialog = ({
           <DialogTitle>Collect Webpage</DialogTitle>
           <DialogDescription>Input the url of the webpage</DialogDescription>
         </DialogHeader>
-        <CollectWebpageForm submitSuccess={handleSubmitSuccess} visibleButton />
+        <CollectWebpageForm
+          defaultForm={defaultForm}
+          submitSuccess={handleSubmitSuccess}
+          visibleButton
+        />
       </DialogContent>
     </Dialog>
   );

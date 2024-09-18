@@ -40,38 +40,48 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
   onCreate
 }, ref) => {
   const [open, setOpen] = React.useState(false);
-  const [values, setValues] = React.useState<string[]>(value);
+  const [internalValues, setInternalValues] = React.useState<string[]>(value);
   const [commandState, setCommandState] = React.useState({
     search: "",
     count: 0,
   });
   
-  useEffect(() => {
-    setValues(value);
+  // Update internal state when prop changes
+  React.useEffect(() => {
+    setInternalValues(value);
   }, [value]);
 
-  useEffect(() => {
-    onChange(values);
-  }, [onChange, values]);
+  // Notify parent component of changes
+  const notifyChange = React.useCallback((newValues: string[]) => {
+    if (JSON.stringify(newValues) !== JSON.stringify(value)) {
+      onChange(newValues);
+    }
+  }, [onChange, value]);
 
-  const handleSelect = (currentValue: string) => {
-    setValues((prev) =>
-      prev.includes(currentValue)
-        ? prev.filter((value) => value !== currentValue)
-        : [...prev, currentValue]
-    );
-  };
-
+  // Handle selection
+  const handleSelect = React.useCallback((currentValue: string) => {
+    setInternalValues((prev) => {
+      const newValues = prev.includes(currentValue)
+        ? prev.filter((v) => v !== currentValue)
+        : [...prev, currentValue];
+      notifyChange(newValues);
+      return newValues;
+    });
+  }, [notifyChange]);
 
   const handleStateChange = useCallback((count: number, search: string) => {
     setCommandState({ count, search });
   }, []);
 
-  const handleCreateOption = async () => {
+  const handleCreateOption = React.useCallback(async () => {
     const createdOption = await onCreate?.(commandState.search);
-    setValues((prev) => [...prev, createdOption.id]);
+    setInternalValues((prev) => {
+      const newValues = [...prev, createdOption.id];
+      notifyChange(newValues);
+      return newValues;
+    });
     setOpen(false);
-  };
+  }, [commandState.search, onCreate, notifyChange]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -82,9 +92,9 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
           aria-expanded={open}
           className="justify-between h-auto w-full px-3 py-1 min-h-9"
         >
-          {values.length > 0 ? (
+          {internalValues.length > 0 ? (
             <div className="flex flex-wrap gap-1">
-              {values.map((value) => (
+              {internalValues.map((value) => (
                 <Badge variant="outline" key={value}>
                   {
                     options.find((option) => option.id === value)?.name
@@ -126,7 +136,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
                   <CheckIcon
                     className={cn(
                       "mr-2 h-4 w-4",
-                      values.includes(option.id) ? "opacity-100" : "opacity-0"
+                      internalValues.includes(option.id) ? "opacity-100" : "opacity-0"
                     )}
                   />
                   {option.name}

@@ -1,7 +1,7 @@
 import { Button } from "@/lib/ui/button";
 import { Badge } from "@/lib/ui/badge";
 import { WebpageWithTags } from "shared/webpage";
-import { SquareArrowOutUpRight, Tags } from "lucide-react";
+import { PanelsTopLeft, SquareArrowOutUpRight } from "lucide-react";
 import { CollectWebpageDialog } from "@/lib/components/collect-webpage-dialog";
 import {
   Tooltip,
@@ -10,23 +10,26 @@ import {
   TooltipTrigger,
 } from "@/lib/ui/tooltip";
 import { Image } from "@/lib/ui/image";
-
+import { useStore } from "@/lib/hooks/store.hook";
 interface WebpagesViewProps {
   webpages: WebpageWithTags[];
 }
 
 export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
+  const { activeTag } = useStore();
   const handleOpenTab = (url: string) => {
     chrome.tabs.create({ url, active: false });
   };
 
   const getIconURL = (webpage: WebpageWithTags) => {
-    if (webpage.icon.startsWith("http")) return webpage.icon
+    if (webpage.icon.startsWith("http")) return webpage.icon;
     if (webpage.url.startsWith("http")) {
-      const urlObj = new URL(webpage.url)
-      return `${urlObj.protocol}//${urlObj.hostname}${urlObj.port ? ':' + urlObj.port : ''}/favicon.ico`
+      const urlObj = new URL(webpage.url);
+      return `${urlObj.protocol}//${urlObj.hostname}${
+        urlObj.port ? ":" + urlObj.port : ""
+      }/favicon.ico`;
     }
-    return '/default-webpage-icon.png'
+    return "/default-webpage-icon.png";
   };
 
   const handleOpenAllTabs = (webpages: WebpageWithTags[]) => {
@@ -38,17 +41,23 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
   return (
     <div className="flex flex-col h-full">
       <div className="shrink-0 h-[52px] flex justify-between items-center px-4 border-b border-gray-300">
-        <CollectWebpageDialog>
+        <CollectWebpageDialog
+          defaultForm={{ tags: activeTag?.id ? [activeTag.id] : [] }}
+        >
           <Button size="sm">
-            <Tags size={16} className="mr-1" />
+            <PanelsTopLeft size={16} className="mr-1" />
             Collect Webpage
           </Button>
         </CollectWebpageDialog>
-        {
-          webpages.length > 0 && (
-            <Button variant="outline" onClick={() => handleOpenAllTabs(webpages)} size="sm">Open All <SquareArrowOutUpRight size={16} className="ml-1" /></Button>
-          )
-        }
+        {webpages.length > 0 && (
+          <Button
+            variant="outline"
+            onClick={() => handleOpenAllTabs(webpages)}
+            size="sm"
+          >
+            Open All <SquareArrowOutUpRight size={16} className="ml-1" />
+          </Button>
+        )}
       </div>
       <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-4 p-4 content-start">
         {webpages.map((webpage) => (

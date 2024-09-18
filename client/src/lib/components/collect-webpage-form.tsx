@@ -21,20 +21,24 @@ import { useEffect, useState } from "react";
 import { f } from "../f";
 import { ScrapedWebpage } from "shared/spider";
 import { useStore } from "../hooks/store.hook";
+import { useCallback } from "react";
 
 interface CollectWebpageFormProps {
   submitSuccess: () => void;
   visibleButton: boolean;
-  defaultForm?: ScrapedWebpage;
+  defaultForm?: Partial<ScrapedWebpage>;
 }
 
 export const CollectWebpageForm = ({
-  defaultForm,
+  defaultForm = {},
   submitSuccess,
   visibleButton = false,
 }: CollectWebpageFormProps) => {
-  const { tags, setTags, webpages, setWebpages } = useStore();
-  const [webpageId, setWebpageId] = useState<string>('');
+  const tags = useStore((state) => state.tags);
+  const setTags = useStore((state) => state.setTags);
+  const webpages = useStore((state) => state.webpages);
+  const setWebpages = useStore((state) => state.setWebpages);
+  const [webpageId, setWebpageId] = useState<string>("");
 
   const form = useForm({
     resolver: zodResolver(collectWebSchema),
@@ -43,48 +47,69 @@ export const CollectWebpageForm = ({
       title: "",
       description: "",
       icon: "",
-      tags: [],
+      tags: [] as string[],
+      ...defaultForm,
     },
   });
 
   const formURL = form.watch("url");
 
-  const checkWebpageExist = async () => {
-    const response = await f(`/api/webpage/exist?url=${formURL}`);
-    if (response) {
-      console.log("webpage exist", response);
-      setWebpageId(response.id);
-      if (form.getValues("tags").length === 0 && response.tags.length > 0) {
-        form.setValue("tags", response.tags.map((tag: Tag) => tag.id));
-      }
-      if (form.getValues("title") === "" && response.title) {
-        form.setValue("title", response.title);
-      }
-      if (form.getValues("description") === "" && response.description) {
-        form.setValue("description", response.description);
-      }
-      if (form.getValues("icon") === "" && response.icon) {
-        form.setValue("icon", response.icon);
-      }
-    } else {
-      setWebpageId("");
-    }
+  // const checkWebpageExist = useCallback(async () => {
+  //   if (!formURL) return;
+  //   const response = await f(`/api/webpage/exist?url=${formURL}`);
+  //   if (response) {
+  //     setWebpageId(response.id);
+  //     form.reset(
+  //       {
+  //         ...form.getValues(),
+  //         tags:
+  //           response.tags.length > 0
+  //             ? response.tags.map((tag: Tag) => tag.id)
+  //             : form.getValues("tags"),
+  //         title: response.title || form.getValues("title"),
+  //         description: response.description || form.getValues("description"),
+  //         icon: response.icon || form.getValues("icon"),
+  //       },
+  //       { keepDefaultValues: true }
+  //     );
+  //   } else {
+  //     setWebpageId("");
+  //   }
+  // }, [formURL, form]);
+
+  // useEffect(() => {
+  //   const debounceTimer = setTimeout(checkWebpageExist, 300);
+  //   return () => clearTimeout(debounceTimer);
+  // }, [checkWebpageExist]);
+
+  // useEffect(() => {
+  //   if (defaultForm) {
+  //     form.reset({
+  //       url: defaultForm.url ?? "",
+  //       title: defaultForm.title ?? "",
+  //       description: defaultForm.description ?? "",
+  //       icon: defaultForm.icon ?? "",
+  //       tags: defaultForm.tags ?? [],
+  //     }, { keepDefaultValues: true });
+  //   }
+  // }, [defaultForm]); 
+
+  const handleFetchWebpageInfo = async () => {
+    console.log(form.getValues("tags"), form.getValues("url"));
+    const url = form.getValues("url");
+    if (!url) return;
+    const response = await f<ScrapedWebpage>("/api/spider/webpage", {
+      method: "POST",
+      body: { url },
+    });
+    if (!response) return;
+    form.setValue("title", response.title);
+    form.setValue("description", response.description);
+    form.setValue("icon", response.icon);
+    // TODO: AI agent
+    // form.setValue("tags", response.tags);
+    console.log(form.getValues("tags"), form.getValues("url"));
   };
-
-  useEffect(() => {
-    if (formURL) {
-      checkWebpageExist();
-    }
-  }, [formURL]);
-
-  useEffect(() => {
-    if (defaultForm) {
-      form.setValue("url", defaultForm.url);
-      form.setValue("title", defaultForm.title);
-      form.setValue("description", defaultForm.description);
-      form.setValue("icon", defaultForm.icon);
-    }
-  }, [defaultForm]);
 
   const onSubmit = async (data: z.infer<typeof collectWebSchema>) => {
     const response = await f("/api/webpage", {
@@ -100,18 +125,7 @@ export const CollectWebpageForm = ({
     submitSuccess();
   };
 
-  const handleFetchWebpageInfo = async () => {
-    const url = form.getValues("url");
-    if (!url) return;
-    const response = await f<ScrapedWebpage>("/api/spider/webpage", {
-      method: "POST",
-      body: { url },
-    });
-    if (!response) return;
-    form.setValue("title", response.title);
-    form.setValue("description", response.description);
-    form.setValue("icon", response.icon);
-  };
+
 
   const handleCreateTag = async (name: string) => {
     const response = await f("/api/tag", {
@@ -134,12 +148,13 @@ export const CollectWebpageForm = ({
           name="url"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{field.name}</FormLabel>
+              <FormLabel>URL</FormLabel>
               <FormControl>
                 <div className="flex items-center space-x-2">
                   <Input {...field} />
                   <Button
                     type="button"
+                    variant="secondary"
                     onClick={handleFetchWebpageInfo}
                     size="icon"
                     className="h-9 w-9 flex-shrink-0"
@@ -157,7 +172,7 @@ export const CollectWebpageForm = ({
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{field.name}</FormLabel>
+              <FormLabel>Title</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -170,7 +185,7 @@ export const CollectWebpageForm = ({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{field.name}</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea {...field} />
               </FormControl>
@@ -183,7 +198,7 @@ export const CollectWebpageForm = ({
           name="tags"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{field.name}</FormLabel>
+              <FormLabel>Tags</FormLabel>
               <FormControl>
                 <Combobox
                   {...field}
