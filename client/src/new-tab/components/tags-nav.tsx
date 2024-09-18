@@ -11,9 +11,6 @@ interface TagsNavProps {
 }
 
 export const TagsNav = ({ tags, activeTag, setActiveTag }: TagsNavProps) => {
-  const { session } = useAuth();
- 
-  console.log("session", session);
 
   return (
     <div className="flex flex-col h-full">
