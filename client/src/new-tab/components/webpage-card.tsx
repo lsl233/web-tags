@@ -106,6 +106,7 @@ export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
           </Button>
         </ContextMenuItem>
         <ContextMenuItem className="p-0">
+          {/* TODO: delete webpage */}
           <Button variant="ghost" size="menu" className="text-red-500">
             Delete
           </Button>

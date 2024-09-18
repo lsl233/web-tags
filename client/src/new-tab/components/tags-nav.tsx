@@ -21,6 +21,8 @@ export const TagsNav = ({ tags, activeTag, setActiveTag }: TagsNavProps) => {
         <Hash />
       </div>
       <div className="flex-1 overflow-y-auto p-1">
+        {/* TODO: edit tag */}
+        {/* TODO: delete tag */}
         {tags.map((tag) => (
           <Button
             key={tag.id}
