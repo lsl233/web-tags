@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { collectWebSchema } from "shared/webpage";
 import { useForm } from "react-hook-form";
-import { Download } from "lucide-react";
+import { Download, Eraser } from "lucide-react";
 import { Tag } from "shared/tag";
 import { useEffect, useState } from "react";
 import { f } from "../f";
@@ -38,7 +38,9 @@ export const CollectWebpageForm = ({
   const setTags = useStore((state) => state.setTags);
   const webpages = useStore((state) => state.webpages);
   const setWebpages = useStore((state) => state.setWebpages);
-  const setDefaultCollectForm = useStore((state) => state.setDefaultCollectForm);
+  const setDefaultCollectForm = useStore(
+    (state) => state.setDefaultCollectForm
+  );
   const [webpageId, setWebpageId] = useState<string>(defaultForm.id ?? "");
 
   const form = useForm({
@@ -137,7 +139,11 @@ export const CollectWebpageForm = ({
     });
     if (!response) return;
     if (webpageId) {
-      setWebpages(webpages.map((webpage) => (webpage.id === response.id ? response : webpage)));
+      setWebpages(
+        webpages.map((webpage) =>
+          webpage.id === response.id ? response : webpage
+        )
+      );
     } else {
       setWebpages([response, ...webpages]);
     }
@@ -155,6 +161,19 @@ export const CollectWebpageForm = ({
     return response;
   };
 
+  const handleClearURL = () => {
+    const url = form.getValues("url");
+    if (url) {
+      try {
+        const parsedUrl = new URL(url);
+        const clearedUrl = `${parsedUrl.protocol}//${parsedUrl.host}`;
+        form.setValue("url", clearedUrl);
+      } catch (error) {
+        console.error("Invalid URL:", error);
+      }
+    }
+  };
+
   return (
     <Form {...form}>
       <form
@@ -170,6 +189,15 @@ export const CollectWebpageForm = ({
               <FormControl>
                 <div className="flex items-center space-x-2">
                   <Input {...field} />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleClearURL}
+                    size="icon"
+                    className="h-9 w-9 flex-shrink-0"
+                  >
+                    <Eraser className="w-6 h-6" />
+                  </Button>
                   <Button
                     type="button"
                     variant="secondary"
