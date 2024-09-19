@@ -39,6 +39,7 @@ model WebPage {
 model Tag {
   id        String    @id @default(uuid())
   name      String
+  icon      String    @default("")
   webPages  WebPage[] @relation("WebPageTags")
   user      User      @relation(fields: [userId], references: [id])
   userId    String

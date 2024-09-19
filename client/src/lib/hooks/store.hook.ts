@@ -20,6 +20,11 @@ type Store = {
     setCollectDialogOpen: (open: boolean) => void
     defaultCollectForm: Partial<ScrapedWebpage>
     setDefaultCollectForm: (form: Partial<ScrapedWebpage>) => void
+
+    editTagDialogOpen: boolean,
+    setEditTagDialogOpen: (open: boolean) => void
+    defaultTagForm: Partial<Tag>
+    setDefaultTagForm: (form: Partial<Tag>) => void
 }
 
 export const useStore = create<Store>(set => ({
@@ -40,4 +45,9 @@ export const useStore = create<Store>(set => ({
     setCollectDialogOpen: (open) => set({collectDialogOpen: open}),
     defaultCollectForm: {},
     setDefaultCollectForm: (form) => set({defaultCollectForm: form}),
+
+    editTagDialogOpen: false,
+    setEditTagDialogOpen: (open) => set({editTagDialogOpen: open}),
+    defaultTagForm: {},
+    setDefaultTagForm: (form) => set({defaultTagForm: form}),
 }))

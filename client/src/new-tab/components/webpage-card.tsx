@@ -17,9 +17,11 @@ import {
 import { useStore } from "@/lib/hooks/store.hook";
 import { toast } from "sonner";
 import { f } from "@/lib/f";
+import { Edit, Trash2 } from "lucide-react";
 
 export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
-  const { setDefaultCollectForm, setCollectDialogOpen, setWebpages, webpages } = useStore();
+  const { setDefaultCollectForm, setCollectDialogOpen, setWebpages, webpages } =
+    useStore();
   const getIconURL = (webpage: WebpageWithTags) => {
     if (webpage.icon.startsWith("http")) return webpage.icon;
     if (webpage.url.startsWith("http")) {
@@ -57,10 +59,19 @@ export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
       <div className="flex items-center justify-between gap-2 w-full">
         <p>Confirm deletion？</p>
         <div>
-          <Button onClick={() => handleDeleteWebpage(toastId)} variant="destructive" size="sm" className="mr-2">
+          <Button
+            onClick={() => handleDeleteWebpage(toastId)}
+            variant="destructive"
+            size="sm"
+            className="mr-2"
+          >
             Yes, Delete
           </Button>
-          <Button onClick={() => toast.dismiss(toastId)} variant="text" size="text">
+          <Button
+            onClick={() => toast.dismiss(toastId)}
+            variant="text"
+            size="text"
+          >
             Cancel
           </Button>
         </div>
@@ -132,18 +143,24 @@ export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem className="p-0">
-          <Button onClick={handleOpenCreateDialog} variant="ghost" size="menu">
+          <Button
+            onClick={handleOpenCreateDialog}
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start"
+          >
+            <Edit className="w-4 h-4 mr-2" />
             Edit
           </Button>
         </ContextMenuItem>
         <ContextMenuItem className="p-0">
-          {/* TODO: delete webpage */}
           <Button
             onClick={handleOpenConfirmationPopup}
             variant="ghost"
-            size="menu"
-            className="text-red-500"
+            size="sm"
+            className="w-full justify-start text-red-500"
           >
+            <Trash2 className="w-4 h-4 mr-2" />
             Delete
           </Button>
         </ContextMenuItem>

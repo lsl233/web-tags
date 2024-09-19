@@ -33,13 +33,13 @@ export const CreateTagDialog = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [open, setOpen] = useState(false);
+  const { editTagDialogOpen, setEditTagDialogOpen, defaultTagForm  } = useStore();
   const { tags, setTags } = useStore();
   const form = useForm({
     resolver: zodResolver(tagSchema),
     defaultValues: {
-      name: "",
-      icon: "",
+      name: defaultTagForm.name || "",
+      icon: defaultTagForm.icon || "",
     },
   });
 
@@ -49,12 +49,12 @@ export const CreateTagDialog = ({
       body: data,
     });
     if (!createdTag) return;
-    setOpen(false);
+    setEditTagDialogOpen(false);
     setTags([createdTag, ...tags]);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={editTagDialogOpen} onOpenChange={setEditTagDialogOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="">
         <DialogHeader>

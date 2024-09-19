@@ -1,10 +1,9 @@
 import { Button } from "@/lib/ui/button";
 import { Hash, Tag as TagIcon } from "lucide-react";
-import { Tags } from "lucide-react";
 import { Tag } from "shared/tag";
-import { useAuth } from "./auth-provider";
 import { CreateTagDialog } from "./create-tag-dialog";
 import { ScrollArea } from "@/lib/ui/scroll-area";
+import { TagNavItem } from "./tag-nav-item";
 interface TagsNavProps {
   tags: Tag[];
   activeTag: Tag | null;
@@ -19,38 +18,18 @@ export const TagsNav = ({ tags, activeTag, setActiveTag }: TagsNavProps) => {
       </div>
       <ScrollArea className="flex-1 w-full">
         <div className="p-2">
-          {/* TODO: edit tag */}
-          {/* TODO: delete tag */}
+          
           {tags.map((tag) => (
-            <Button
+            <TagNavItem
               key={tag.id}
-              className="w-full justify-start"
+              tag={tag}
+              isActive={activeTag?.id === tag.id}
               onClick={() => setActiveTag(tag)}
-              variant={activeTag?.id === tag.id ? "default" : "ghost"}
-            >
-              <Tags className="w-5 h-5 mr-2" />
-              {tag.name}
-            </Button>
+            />
           ))}
         </div>
       </ScrollArea>
       <div className="shrink-0 flex items-center justify-center h-[52px] border-t border-gray-300">
-        {/* {session ? (
-          <Popover>
-            <PopoverTrigger>
-              <Avatar>
-                <AvatarFallback>
-                  {session.email.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-            </PopoverTrigger>
-            <PopoverContent className="p-2 w-auto"><Button onClick={signOut} variant="ghost"><LogOut className="w-4 h-4 mr-1" />Sign out</Button></PopoverContent>
-          </Popover>
-        ) : (
-          <SignDialog type="in">
-            <Button size="sm">Sign in</Button>
-          </SignDialog>
-        )} */}
 
         <CreateTagDialog>
           <Button variant="ghost" className="w-full h-full">
