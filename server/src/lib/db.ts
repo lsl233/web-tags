@@ -2,10 +2,10 @@ import { PrismaClient, Prisma } from "@prisma/client";
 
 // 定义全局变量类型
 declare global {
-  var prisma: PrismaClient | undefined;
+  var prisma: PrismaClient;
 }
 
-let prisma: PrismaClient | undefined;
+let prisma: PrismaClient;
 
 if (!globalThis.prisma) {
   // 创建 PrismaClient 实例
@@ -24,12 +24,9 @@ if (!globalThis.prisma) {
     });
 
   // 导出扩展后的 Prisma 客户端
-  
 
   // 在开发环境中，避免重复创建实例，防止内存泄露
-  if (process.env.NODE_ENV !== "production") {
-    globalThis.prisma = prisma;
-  }
+  globalThis.prisma = prisma;
 }
 
-export const db = globalThis.prisma || prisma;
+export const db = globalThis.prisma;
