@@ -1,10 +1,35 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 
+// 定义全局变量类型
 declare global {
-    var prisma: PrismaClient | undefined;
+  var prisma: PrismaClient | undefined;
 }
 
-export const db = globalThis.prisma || new PrismaClient();
+let prisma: PrismaClient | undefined;
 
-// 在开发环境中，会热重载，避免重复创建实例，倒置内存泄露
-if (process.env.NODE_ENV !== "production") globalThis.prisma = db
+if (!globalThis.prisma) {
+  // 创建 PrismaClient 实例
+  prisma = new PrismaClient({
+    log: ["query", "info", "warn", "error"],
+  });
+
+  // 连接事件监听
+  prisma
+    .$connect()
+    .then(() => {
+      console.log("PrismaClient has connected");
+    })
+    .catch((error: Error) => {
+      console.error("Failed to connect:", error);
+    });
+
+  // 导出扩展后的 Prisma 客户端
+  
+
+  // 在开发环境中，避免重复创建实例，防止内存泄露
+  if (process.env.NODE_ENV !== "production") {
+    globalThis.prisma = prisma;
+  }
+}
+
+export const db = globalThis.prisma || prisma;

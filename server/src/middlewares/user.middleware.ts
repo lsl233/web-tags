@@ -42,7 +42,6 @@ export const userMiddleware = (
     
     // 将用户信息附加到请求对象上，供后续路由使用
     req.user = decoded;
-    console.log(req.user), 'user from token';
     next(); // 继续到下一个中间件或路由
   } catch (err) {
     if (err instanceof jwt.TokenExpiredError) {
