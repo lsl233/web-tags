@@ -26,7 +26,7 @@ model User {
 model WebPage {
   id          String   @id @default(uuid())
   title       String
-  description String
+  description String   @db.Text
   url         String   @db.Text
   icon        String
   tags        Tag[]    @relation("WebPageTags")
