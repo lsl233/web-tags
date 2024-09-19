@@ -2,12 +2,12 @@ import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "@/global.css";
 import { f } from "@/lib/f";
-import { TagWithWebpagesAndTags } from "shared/tag";
 import { AuthProvider, useAuth } from "./components/auth-provider";
 import { TagsNav } from "./components/tags-nav";
 import { WebpagesView } from "./components/webpages-view";
 import { useStore } from "@/lib/hooks/store.hook";
 import { SignDialog } from "./components/sign-dialog";
+import { Toaster } from "@/lib/ui/sonner";
 
 const NewTab = () => {
   const { session } = useAuth();
@@ -83,6 +83,7 @@ const root = createRoot(document.getElementById("root")!);
 root.render(
   <React.StrictMode>
     <AuthProvider>
+      <Toaster closeButton toastOptions={{ cancelButtonStyle: { right: 0, left: "auto" } }} position="top-center" />
       <NewTab />
     </AuthProvider>
   </React.StrictMode>

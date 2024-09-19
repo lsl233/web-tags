@@ -71,6 +71,17 @@ router.post("/", async (req, res, next) => {
   res.json(createdWebpage);
 });
 
+router.delete("/:id", async (req, res, next) => {
+  if (!req.user) {
+    return next(ServerError.Unauthorized("Unauthorized"));
+  }
+  const { id } = req.params;
+  const deletedWebpage = await db.webPage.delete({
+    where: { id, userId: req.user.id },
+  });
+  res.json(deletedWebpage);
+});
+
 router.get("/exist", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));

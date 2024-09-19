@@ -15,9 +15,11 @@ import {
   ContextMenuTrigger,
 } from "@/lib/ui/context-menu";
 import { useStore } from "@/lib/hooks/store.hook";
+import { toast } from "sonner";
+import { f } from "@/lib/f";
 
 export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
-  const { setDefaultCollectForm, setCollectDialogOpen } = useStore();
+  const { setDefaultCollectForm, setCollectDialogOpen, setWebpages, webpages } = useStore();
   const getIconURL = (webpage: WebpageWithTags) => {
     if (webpage.icon.startsWith("http")) return webpage.icon;
     if (webpage.url.startsWith("http")) {
@@ -39,6 +41,35 @@ export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
       tags: webpage.tags.map((tag) => tag.id),
     });
     setCollectDialogOpen(true);
+  };
+
+  const handleDeleteWebpage = async (toastId: string | number) => {
+    await f(`/api/webpage/${webpage.id}`, {
+      method: "DELETE",
+    });
+    toast.success("Webpage deleted successfully");
+    toast.dismiss(toastId);
+    setWebpages(webpages.filter((w) => w.id !== webpage.id));
+  };
+
+  const handleOpenConfirmationPopup = () => {
+    const toastId = toast(
+      <div className="flex items-center justify-between gap-2 w-full">
+        <p>Confirm deletion？</p>
+        <div>
+          <Button onClick={() => handleDeleteWebpage(toastId)} variant="destructive" size="sm" className="mr-2">
+            Yes, Delete
+          </Button>
+          <Button onClick={() => toast.dismiss(toastId)} variant="text" size="text">
+            Cancel
+          </Button>
+        </div>
+      </div>,
+      {
+        duration: 100000,
+        closeButton: false,
+      }
+    );
   };
 
   return (
@@ -107,7 +138,12 @@ export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
         </ContextMenuItem>
         <ContextMenuItem className="p-0">
           {/* TODO: delete webpage */}
-          <Button variant="ghost" size="menu" className="text-red-500">
+          <Button
+            onClick={handleOpenConfirmationPopup}
+            variant="ghost"
+            size="menu"
+            className="text-red-500"
+          >
             Delete
           </Button>
         </ContextMenuItem>
