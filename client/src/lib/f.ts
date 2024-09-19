@@ -1,4 +1,5 @@
 import { useStore } from "@/lib/hooks/store.hook";
+import { toast } from "sonner";
 import { ZodError } from "zod";
 
 interface FetchJSONOptions extends Omit<RequestInit, "body"> {
@@ -17,7 +18,9 @@ class FetchResponseError extends Error {
     super(
       `Request to ${response.headers.get("method")} ${
         response.url
-      } failed with status ${response.status}: ${response.statusText} ${message}`
+      } failed with status ${response.status}: ${
+        response.statusText
+      } ${message}`
     );
     this.name = "FetchError";
     this.status = response.status;
@@ -26,6 +29,8 @@ class FetchResponseError extends Error {
     this.message = message;
   }
 }
+
+const cacheFetch = new Map<string, string>();
 
 export const f = async <T = any>(
   url: string,
@@ -61,9 +66,20 @@ export const f = async <T = any>(
 
   options.credentials = "include";
 
+  if (cacheFetch.has(JSON.stringify(options))) {
+    // toast.loading("Submitting, please wait…");
+    return false;
+  }
+
+  if (options.method && ["POST", "PUT", "DELETE"].includes(options.method)) {
+    cacheFetch.set(JSON.stringify(options), 'submitting');
+  }
+
   const res = await fetch(url, options as RequestInit);
 
   const json = await res.json();
+
+  cacheFetch.delete(JSON.stringify(options));
 
   if (!res.ok) {
     switch (res.status) {

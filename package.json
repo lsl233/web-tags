@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm -F client dev"
+    "dev": "pnpm -F client dev",
+    "build": "pnpm run build"
   },
   "workspaces": [
     "client",

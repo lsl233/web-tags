@@ -60,7 +60,7 @@ export const CollectWebpageForm = ({
 
   const checkWebpageExist = useCallback(async () => {
     // if title is not empty, it means the user has already input the title
-    if (!formURL || formTitle) return;
+    if (!formURL) return;
 
     const response = await f(`/api/webpage/exist?url=${formURL}`);
     if (response) {
@@ -90,7 +90,6 @@ export const CollectWebpageForm = ({
 
   useEffect(() => {
     return () => {
-      console.log("reset");
       setDefaultCollectForm({
         url: "",
         title: "",
@@ -100,18 +99,6 @@ export const CollectWebpageForm = ({
       });
     };
   }, []);
-
-  // useEffect(() => {
-  //   if (defaultForm) {
-  //     form.reset({
-  //       url: defaultForm.url ?? "",
-  //       title: defaultForm.title ?? "",
-  //       description: defaultForm.description ?? "",
-  //       icon: defaultForm.icon ?? "",
-  //       tags: defaultForm.tags ?? [],
-  //     }, { keepDefaultValues: true });
-  //   }
-  // }, [defaultForm]);
 
   const handleFetchWebpageInfo = async () => {
     const url = form.getValues("url");
@@ -124,7 +111,7 @@ export const CollectWebpageForm = ({
     form.setValue("title", response.title);
     form.setValue("description", response.description);
     form.setValue("icon", response.icon);
-    // TODO: AI agent
+    // TODO: AI agent～
     // form.setValue("tags", response.tags);
     console.log(form.getValues("tags"), form.getValues("url"));
   };
