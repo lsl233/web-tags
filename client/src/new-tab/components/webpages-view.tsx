@@ -13,6 +13,7 @@ import { Image } from "@/lib/ui/image";
 import { useStore } from "@/lib/hooks/store.hook";
 import { WebpageCard } from "./webpage-card";
 import { useEffect } from "react";
+import { ScrollArea } from "@/lib/ui/scroll-area";
 interface WebpagesViewProps {
   webpages: WebpageWithTags[];
 }
@@ -49,11 +50,13 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
           </Button>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-4 p-4 content-start">
-        {webpages.map((webpage) => (
-          <WebpageCard key={webpage.id} webpage={webpage} />
-        ))}
-      </div>
+      <ScrollArea className="flex-1 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-4 p-4 content-start">
+          {webpages.map((webpage) => (
+            <WebpageCard key={webpage.id} webpage={webpage} />
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 };
