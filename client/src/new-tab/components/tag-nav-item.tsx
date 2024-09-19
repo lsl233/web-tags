@@ -18,12 +18,15 @@ interface TagNavItemProps {
 }
 
 export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
-  const { setTags, tags } = useStore();
-
-  const handleEditTag = () => {
-    // TODO: Implement edit tag functionality
-    console.log("Edit tag:", tag.id);
-  };
+  const {
+    setTags,
+    tags,
+    activeTag,
+    setActiveTag,
+    setWebpages,
+    setCreateTagDialogOpen,
+    setDefaultTagForm,
+  } = useStore();
 
   const handleDeleteTag = async () => {
     const toastId = toast(
@@ -60,7 +63,16 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
         method: "DELETE",
       });
       toast.success("Tag deleted successfully");
-      setTags(tags.filter((t) => t.id !== tag.id));
+      const afterTags = tags.filter((t) => t.id !== tag.id);
+      if (afterTags.length) {
+        if (activeTag?.id === tag.id) {
+          setActiveTag(afterTags[0]);
+        }
+      } else {
+        setActiveTag(null);
+        setWebpages([]);
+      }
+      setTags(afterTags);
     } catch (error) {
       toast.error("Failed to delete tag");
     } finally {
@@ -69,8 +81,8 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
   };
 
   const handleOpenCreateTagDialog = () => {
-    // TODO: Implement edit tag functionality
-    console.log("Edit tag:", tag.id);
+    setDefaultTagForm(tag);
+    setCreateTagDialogOpen(true);
   };
 
   return (
@@ -87,13 +99,23 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem className="p-0">
-          <Button onClick={handleOpenCreateTagDialog} variant="ghost" size="sm" className="w-full justify-start">
+          <Button
+            onClick={handleOpenCreateTagDialog}
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start"
+          >
             <Edit className="w-4 h-4 mr-2" />
             Edit
           </Button>
         </ContextMenuItem>
         <ContextMenuItem className="p-0">
-          <Button onClick={handleDeleteTag} variant="ghost" size="sm" className="w-full justify-start text-red-500">
+          <Button
+            onClick={handleDeleteTag}
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start text-red-500"
+          >
             <Trash2 className="w-4 h-4 mr-2" />
             Delete
           </Button>

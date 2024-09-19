@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from "@/lib/ui/dialog";
 import { Button } from "@/lib/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Separator } from "@/lib/ui/separator";
 import {
@@ -33,15 +33,23 @@ export const CreateTagDialog = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { editTagDialogOpen, setEditTagDialogOpen, defaultTagForm  } = useStore();
+  const { createTagDialogOpen, setCreateTagDialogOpen, defaultTagForm } =
+    useStore();
   const { tags, setTags } = useStore();
   const form = useForm({
     resolver: zodResolver(tagSchema),
     defaultValues: {
-      name: defaultTagForm.name || "",
-      icon: defaultTagForm.icon || "",
+      name: "",
+      icon: "",
     },
   });
+
+  useEffect(() => {
+    form.reset({
+      name: defaultTagForm.name || "",
+      icon: defaultTagForm.icon || "",
+    });
+  }, [defaultTagForm, form]);
 
   const onSubmit = async (data: z.infer<typeof tagSchema>) => {
     const createdTag = await f("/api/tag", {
@@ -49,12 +57,12 @@ export const CreateTagDialog = ({
       body: data,
     });
     if (!createdTag) return;
-    setEditTagDialogOpen(false);
+    setCreateTagDialogOpen(false);
     setTags([createdTag, ...tags]);
   };
 
   return (
-    <Dialog open={editTagDialogOpen} onOpenChange={setEditTagDialogOpen}>
+    <Dialog open={createTagDialogOpen} onOpenChange={setCreateTagDialogOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="">
         <DialogHeader>

@@ -4,50 +4,54 @@ import { Tag } from "shared/tag";
 import { ScrapedWebpage } from "shared/spider";
 
 type Store = {
-    webpages: WebpageWithTags[],
-    setWebpages: (webpages: WebpageWithTags[]) => void
+  webpages: WebpageWithTags[];
+  setWebpages: (webpages: WebpageWithTags[]) => void;
 
-    activeTag: Tag | null,
-    setActiveTag: (tag: Tag | null) => void
+  activeTag: Tag | null;
+  setActiveTag: (tag: Tag | null) => void;
 
-    tags: Tag[],
-    setTags: (tags: Tag[]) => void
+  tags: Tag[];
+  setTags: (tags: Tag[]) => void;
 
-    signDialogOpen: boolean,
-    setSignDialogOpen: (open: boolean) => void
+  signDialogOpen: boolean;
+  setSignDialogOpen: (open: boolean) => void;
 
-    collectDialogOpen: boolean,
-    setCollectDialogOpen: (open: boolean) => void
-    defaultCollectForm: Partial<ScrapedWebpage>
-    setDefaultCollectForm: (form: Partial<ScrapedWebpage>) => void
+  collectDialogOpen: boolean;
+  setCollectDialogOpen: (open: boolean) => void;
+  defaultCollectForm: Partial<ScrapedWebpage>;
+  setDefaultCollectForm: (form: Partial<ScrapedWebpage>) => void;
 
-    editTagDialogOpen: boolean,
-    setEditTagDialogOpen: (open: boolean) => void
-    defaultTagForm: Partial<Tag>
-    setDefaultTagForm: (form: Partial<Tag>) => void
-}
+  createTagDialogOpen: boolean;
+  setCreateTagDialogOpen: (open: boolean) => void;
+  defaultTagForm: Partial<Tag>;
+  setDefaultTagForm: (form: Partial<Tag>) => void;
+};
 
-export const useStore = create<Store>(set => ({
+export const useStore = create<Store>((set) => ({
+  webpages: [],
+  setWebpages: (webpages) => set({ webpages }),
 
-    webpages: [],
-    setWebpages: (webpages) => set({webpages}),
+  activeTag: null,
+  setActiveTag: (tag) => set({ activeTag: tag }),
 
-    activeTag: null,
-    setActiveTag: (tag) => set({activeTag: tag}),
+  tags: [],
+  setTags: (tags) => set({ tags }),
 
-    tags: [],
-    setTags: (tags) => set({tags}),
+  signDialogOpen: false,
+  setSignDialogOpen: (open) => set({ signDialogOpen: open }),
 
-    signDialogOpen: false,
-    setSignDialogOpen: (open) => set({signDialogOpen: open}),
+  collectDialogOpen: false,
+  setCollectDialogOpen: (open) => set({ collectDialogOpen: open }),
+  defaultCollectForm: {},
+  setDefaultCollectForm: (form) => set({ defaultCollectForm: form }),
 
-    collectDialogOpen: false,
-    setCollectDialogOpen: (open) => set({collectDialogOpen: open}),
-    defaultCollectForm: {},
-    setDefaultCollectForm: (form) => set({defaultCollectForm: form}),
-
-    editTagDialogOpen: false,
-    setEditTagDialogOpen: (open) => set({editTagDialogOpen: open}),
-    defaultTagForm: {},
-    setDefaultTagForm: (form) => set({defaultTagForm: form}),
-}))
+  createTagDialogOpen: false,
+  setCreateTagDialogOpen: (open) => {
+    if (!open) {
+      set({ defaultTagForm: {} });
+    }
+    set({ createTagDialogOpen: open });
+  },
+  defaultTagForm: {},
+  setDefaultTagForm: (form) => set({ defaultTagForm: form }),
+}));
