@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from "@/lib/ui/dialog";
 import { Button } from "@/lib/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Separator } from "@/lib/ui/separator";
 import {
@@ -26,6 +26,7 @@ import { z } from "zod";
 import { Plus } from "lucide-react";
 import { f } from "@/lib/f";
 import { useStore } from "@/lib/hooks/store.hook";
+import { AsyncIcon, IconName, IconPicker } from "@/lib/ui/icon-picker";
 // TODO setting dialog
 
 export const CreateTagDialog = ({
@@ -54,11 +55,19 @@ export const CreateTagDialog = ({
   const onSubmit = async (data: z.infer<typeof tagSchema>) => {
     const createdTag = await f("/api/tag", {
       method: "POST",
-      body: data,
+      body: {
+        ...data,
+        id: defaultTagForm.id,
+      },
     });
     if (!createdTag) return;
+    if (defaultTagForm.id) {
+      setTags(tags.map((t) => (t.id === defaultTagForm.id ? createdTag : t)));
+    } else {
+      setTags([createdTag, ...tags]);
+    }
     setCreateTagDialogOpen(false);
-    setTags([createdTag, ...tags]);
+    // setTags([createdTag, ...tags]);
   };
 
   return (
@@ -81,14 +90,16 @@ export const CreateTagDialog = ({
                     <FormLabel>Icon</FormLabel>
                     <FormControl>
                       {/* TODO: add icon picker */}
-                      <Button
-                        type="button"
-                        className="mt-0 border border-dashed border-gray-300"
-                        variant="ghost"
-                        size="icon"
-                      >
-                        <Plus />
-                      </Button>
+                      <IconPicker value={field.value as IconName} onChange={field.onChange}>
+                        <Button
+                          type="button"
+                          className="mt-0 border border-dashed border-gray-300"
+                          variant="ghost"
+                          size="icon"
+                        >
+                          <AsyncIcon name={(field.value as IconName) || 'plus'} />
+                        </Button>
+                      </IconPicker>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -108,8 +119,11 @@ export const CreateTagDialog = ({
                 )}
               />
             </div>
+
             <DialogFooter className="mt-4">
-              <Button type="submit">Create</Button>
+              <Button type="submit">
+                {defaultTagForm.id ? "Update" : "Create"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

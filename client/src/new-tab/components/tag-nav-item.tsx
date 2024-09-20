@@ -10,6 +10,7 @@ import {
 import { useStore } from "@/lib/hooks/store.hook";
 import { toast } from "sonner";
 import { f } from "@/lib/f";
+import { AsyncIcon, IconName } from "@/lib/ui/icon-picker";
 
 interface TagNavItemProps {
   tag: Tag;
@@ -93,7 +94,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
           onClick={onClick}
           variant={isActive ? "default" : "ghost"}
         >
-          <Tags className="w-5 h-5 mr-2" />
+          <AsyncIcon name={(tag.icon as IconName) || 'tag'} className="w-4 h-4 mr-2" />
           {tag.name}
         </Button>
       </ContextMenuTrigger>

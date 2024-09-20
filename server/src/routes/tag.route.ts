@@ -25,27 +25,38 @@ router.post("/", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
-  const { name } = req.body;
-  const existingTag = await db.tag.findFirst({
-    where: {
-      name,
-      userId: req.user.id,
-    },
-  });
-  if (existingTag) {
-    return next(ServerError.BadRequest("Tag already exists"));
-  }
-  const createdTag = await db.tag.create({
-    data: {
-      name,
-      user: {
-        connect: {
-          id: req.user.id,
+  const { name, id, icon } = req.body;
+
+  if (id) {
+    // 更新现有标签
+    const updatedTag = await db.tag.update({
+      where: { id, userId: req.user.id },
+      data: { name, icon },
+    });
+    res.json(updatedTag);
+  } else {
+    // 创建新标签
+    const existingTag = await db.tag.findFirst({
+      where: {
+        name,
+        userId: req.user.id,
+      },
+    });
+    if (existingTag) {
+      return next(ServerError.BadRequest("Tag already exists"));
+    }
+    const createdTag = await db.tag.create({
+      data: {
+        name,
+        user: {
+          connect: {
+            id: req.user.id,
+          },
         },
       },
-    },
-  });
-  res.json(createdTag);
+    });
+    res.json(createdTag);
+  }
 });
 
 router.delete("/:id", async (req, res, next) => {
