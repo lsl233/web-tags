@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { collectWebSchema } from "shared/webpage";
 import { useForm } from "react-hook-form";
-import { Download, Eraser } from "lucide-react";
+import { Bot, Download, Eraser } from "lucide-react";
 import { Tag } from "shared/tag";
 import { useEffect, useState } from "react";
 import { f } from "../f";
@@ -161,6 +161,17 @@ export const CollectWebpageForm = ({
     }
   };
 
+  const handleAIChoseTags = async () => {
+    const response = await f("/api/tag/ai", {
+      method: "POST",
+      body: {
+        name: form.getValues("title"),
+        description: form.getValues("description"),
+      },
+    });
+    console.log(response, 'ai tags');
+  };
+
   return (
     <Form {...form}>
       <form
@@ -233,11 +244,22 @@ export const CollectWebpageForm = ({
             <FormItem>
               <FormLabel>Tags</FormLabel>
               <FormControl>
-                <Combobox
-                  {...field}
-                  options={tags}
-                  onCreate={handleCreateTag}
-                />
+                <div className="flex items-center gap-2">
+                  <Combobox
+                    {...field}
+                    options={tags}
+                    onCreate={handleCreateTag}
+                  />
+                  {/* <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleAIChoseTags}
+                    size="icon"
+                    className="h-9 w-9 flex-shrink-0"
+                  >
+                    <Bot className="w-6 h-6" />
+                  </Button> */}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>

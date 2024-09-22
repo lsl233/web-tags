@@ -11,6 +11,7 @@ import { useStore } from "@/lib/hooks/store.hook";
 import { toast } from "sonner";
 import { f } from "@/lib/f";
 import { AsyncIcon, IconName } from "@/lib/ui/icon-picker";
+import { useMemo } from "react";
 
 interface TagNavItemProps {
   tag: Tag;
@@ -86,6 +87,10 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
     setCreateTagDialogOpen(true);
   };
 
+  const MemoAsyncIcon = useMemo(() => {
+    return <AsyncIcon name={(tag.icon as IconName) || 'tag'} className="w-4 h-4 mr-2" />
+  }, [tag.icon]);
+
   return (
     <ContextMenu>
       <ContextMenuTrigger>
@@ -94,7 +99,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
           onClick={onClick}
           variant={isActive ? "default" : "ghost"}
         >
-          <AsyncIcon name={(tag.icon as IconName) || 'tag'} className="w-4 h-4 mr-2" />
+          {MemoAsyncIcon}
           {tag.name}
         </Button>
       </ContextMenuTrigger>
