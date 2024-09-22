@@ -30,6 +30,13 @@ export const IconPicker: React.FC<{ children: React.ReactNode, value: IconName, 
     "badge-info",
     "banana",
     "book-check",
+    "shield-alert",
+    "shield-check",
+    "shield-off",
+    "shield-x",
+    "shield-plus",
+    "shield-minus",
+    "shield-x",
   ];
   return (
     <Popover>

@@ -88,7 +88,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
   };
 
   const MemoAsyncIcon = useMemo(() => {
-    return <AsyncIcon name={(tag.icon as IconName) || 'tag'} className="w-4 h-4 mr-2" />
+    return <AsyncIcon name={(tag.icon as IconName) || 'tag'} className="w-5 h-5 mr-2" />
   }, [tag.icon]);
 
   return (
