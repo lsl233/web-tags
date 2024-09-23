@@ -39,6 +39,7 @@ router.post("/", async (req, res, next) => {
     const existingTag = await db.tag.findFirst({
       where: {
         name,
+        icon,
         userId: req.user.id,
       },
     });

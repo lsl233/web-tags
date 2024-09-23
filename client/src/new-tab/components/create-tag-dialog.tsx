@@ -53,6 +53,7 @@ export const CreateTagDialog = ({
   }, [defaultTagForm, form]);
 
   const onSubmit = async (data: z.infer<typeof tagSchema>) => {
+    console.log(data, "on submit");
     const createdTag = await f("/api/tag", {
       method: "POST",
       body: {
@@ -90,14 +91,19 @@ export const CreateTagDialog = ({
                     <FormLabel>Icon</FormLabel>
                     <FormControl>
                       {/* TODO: add icon picker */}
-                      <IconPicker value={field.value as IconName} onChange={field.onChange}>
+                      <IconPicker
+                        value={field.value as IconName}
+                        onChange={field.onChange}
+                      >
                         <Button
                           type="button"
                           className="mt-0 border border-dashed border-gray-300"
                           variant="ghost"
                           size="icon"
                         >
-                          <AsyncIcon name={(field.value as IconName) || 'plus'} />
+                          <AsyncIcon
+                            name={(field.value as IconName) || "plus"}
+                          />
                         </Button>
                       </IconPicker>
                     </FormControl>

@@ -37,14 +37,20 @@ export const IconPicker: React.FC<{ children: React.ReactNode, value: IconName, 
     "shield-plus",
     "shield-minus",
     "shield-x",
+    "monitor-play",
+    "book-a",
+    "file-code-2",
+    "scroll-text",
+    "briefcase-business"
   ];
+
   return (
     <Popover>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="p-4">
         <div className="w-auto grid grid-cols-[repeat(auto-fill,minmax(40px,1fr))] gap-2">
           {IconComponentNames.map((name) => (
-            <Button key={name} variant="ghost" size="icon" onClick={() => onChange(name)}>
+            <Button key={name} type="button" variant="ghost" size="icon" onClick={() => onChange(name)}>
               <AsyncIcon name={name} />
             </Button>
           ))}
