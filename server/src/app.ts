@@ -13,6 +13,8 @@ dotenv.config({
   path: '.env'
 });
 
+console.log(process.env);
+
 const init = async () => {
   const app = express();
   app.set('trust proxy', true);
