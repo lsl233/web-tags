@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon",
-    "build": "prisma generate && tsc && tsc-alias"
+    "build": "prisma generate && tsc && tsc-alias && cp .env dist/server/src/.env"
   },
   "keywords": [],
   "author": "",
