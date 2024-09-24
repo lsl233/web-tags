@@ -9,7 +9,10 @@ import tagRoutes from './routes/tag.route.js';
 import spiderRoutes from './routes/spider.route.js';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({
+  path: '.env'
+});
+
 const init = async () => {
   const app = express();
   app.set('trust proxy', true);
