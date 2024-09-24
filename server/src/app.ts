@@ -9,9 +9,7 @@ import tagRoutes from './routes/tag.route.js';
 import spiderRoutes from './routes/spider.route.js';
 import dotenv from 'dotenv';
 
-dotenv.config({
-  path: '.env'
-});
+dotenv.config();
 
 console.log(process.env);
 
