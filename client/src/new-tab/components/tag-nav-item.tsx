@@ -87,9 +87,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
     setCreateTagDialogOpen(true);
   };
 
-  const MemoAsyncIcon = useMemo(() => {
-    return <AsyncIcon name={(tag.icon as IconName) || 'tag'} className="w-5 h-5 mr-2" />
-  }, [tag.icon]);
+  const memoIcon = useMemo(() => (tag.icon as IconName) || 'tag', [tag.icon]);
 
   return (
     <ContextMenu>
@@ -99,7 +97,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
           onClick={onClick}
           variant={isActive ? "default" : "ghost"}
         >
-          {MemoAsyncIcon}
+          <AsyncIcon name={memoIcon} className="w-5 h-5 mr-2" />
           {tag.name}
         </Button>
       </ContextMenuTrigger>
