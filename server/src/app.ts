@@ -36,8 +36,8 @@ const init = async () => {
 
   
   // TODO get port from env
-  app.listen(3005, () => {
-    console.log('Server is running on port 3005');
+  app.listen(process.env.SERVER_PORT, () => {
+    console.log(`Server is running on port ${process.env.SERVER_PORT}`);
   });
 };
 
