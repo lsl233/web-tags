@@ -70,7 +70,7 @@ const Popup = () => {
   }, []);
 
   return (
-    <div className="w-96 p-4 relative">
+    <div className="w-96 p-4 relative bg-white">
       <div
         className={cn(
           "absolute top-0 left-0 transition-all duration-300 py-1 px-2 w-full bg-green-500 text-white text-sm text-center",

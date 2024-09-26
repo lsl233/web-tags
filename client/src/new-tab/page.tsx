@@ -62,7 +62,7 @@ const NewTab = () => {
   }, [activeTag]);
 
   return (
-    <main className="flex h-screen max-w-[1440px] mx-auto bg-white">
+    <main className="flex flex-col sm:flex-row h-screen max-w-[1920px] mx-auto bg-white">
       <div className="h-full w-1/6 border-r border-b border-gray-300 space-y-1">
         <TagsNav
           tags={tags}
