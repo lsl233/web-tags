@@ -12,6 +12,18 @@ router.get("/", async (req, res, next) => {
   const foundTags = await db.tag.findMany({
     where: {
       userId: req.user.id,
+      parentId: null,
+    },
+    include: {
+      children: {
+        include: {
+          children: {
+            include: {
+              children: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -25,7 +37,7 @@ router.post("/", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
-  const { name, id, icon } = req.body;
+  const { name, id, icon, parentId } = req.body;
 
   if (id) {
     // 更新现有标签
@@ -49,11 +61,14 @@ router.post("/", async (req, res, next) => {
     const createdTag = await db.tag.create({
       data: {
         name,
+        icon,
+        
         user: {
           connect: {
             id: req.user.id,
           },
         },
+        ...(parentId ? { parent: { connect: { id: parentId } } } : {}),
       },
     });
     res.json(createdTag);
