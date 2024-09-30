@@ -33,7 +33,7 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="shrink-0 h-[52px] flex justify-between items-center px-4 border-b border-gray-300">
+      <div className="shrink-0 h-[52px] flex justify-between items-center px-2 border-b border-gray-300">
         <CollectWebpageDialog>
           <Button size="sm">
             <PanelsTopLeft size={16} className="mr-1" />
