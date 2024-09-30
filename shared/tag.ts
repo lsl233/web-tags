@@ -13,6 +13,16 @@ export type TagWithWebpagesAndTags = Prisma.TagGetPayload<{
 
 export type Tag = PrismaTag;
 
+export type TagWithChildrenAndParent = Tag & {
+  children: TagWithChildrenAndParentAndLevel[];
+  parent: TagWithChildrenAndParentAndLevel;
+}
+
+export type TagWithChildrenAndParentAndLevel = TagWithChildrenAndParent & {
+  level: number;
+  
+};
+
 export const tagSchema = z.object({
   name: z.string().min(1, { message: "Please fill in the tag name" }).max(8, { message: "Tag name cannot exceed 8 characters" }),
   icon: z.string(),

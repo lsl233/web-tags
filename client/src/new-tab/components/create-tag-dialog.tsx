@@ -21,13 +21,12 @@ import {
 } from "@/lib/ui/form";
 import { Input } from "@/lib/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { tagSchema } from "shared/tag";
+import { tagSchema, TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { z } from "zod";
 import { Plus } from "lucide-react";
 import { f } from "@/lib/f";
 import { useStore } from "@/lib/hooks/store.hook";
 import { AsyncIcon, IconName, IconPicker } from "@/lib/ui/icon-picker";
-// TODO setting dialog
 
 export const CreateTagDialog = ({
   children,
@@ -52,20 +51,48 @@ export const CreateTagDialog = ({
     });
   }, [defaultTagForm, form]);
 
+  const deepMap = (
+    tags: TagWithChildrenAndParentAndLevel[],
+    callback: (tag: TagWithChildrenAndParentAndLevel) => TagWithChildrenAndParentAndLevel
+  ): TagWithChildrenAndParentAndLevel[] => {
+    return tags.map((tag: TagWithChildrenAndParentAndLevel) => {
+
+      const result = callback(tag); 
+      result.children = deepMap(result.children, callback);
+      return result;
+    });
+  };
+
   const onSubmit = async (data: z.infer<typeof tagSchema>) => {
     console.log(data, "on submit");
     const createdTag = await f("/api/tag", {
       method: "POST",
       body: {
         ...data,
+        parentId: defaultTagForm.parentId,
         id: defaultTagForm.id,
       },
     });
     if (!createdTag) return;
     if (defaultTagForm.id) {
-      setTags(tags.map((t) => (t.id === defaultTagForm.id ? createdTag : t)));
+      setTags(deepMap(tags, (t) => {
+        if (t.id === defaultTagForm.id) {
+          return Object.assign({}, t, createdTag);
+        }
+        return t;
+      }));
+      // setTags(tags.map((t) => (t.id === defaultTagForm.id ? createdTag : t)));
     } else {
-      setTags([createdTag, ...tags]);
+      setTags(deepMap(tags, (t) => {
+        if (t.id === defaultTagForm.parentId) {
+          createdTag.children = []
+          return Object.assign({}, t, {
+            children: [createdTag, ...t.children],
+          });
+        }
+        return t;
+      }));
+      // setTags([createdTag, ...tags]);
     }
     setCreateTagDialogOpen(false);
     // setTags([createdTag, ...tags]);

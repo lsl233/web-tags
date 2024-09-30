@@ -1,6 +1,6 @@
 import { Button } from "@/lib/ui/button";
-import { Tags, Edit, Trash2 } from "lucide-react";
-import { Tag } from "shared/tag";
+import { Tags, Edit, Trash2, Plus } from "lucide-react";
+import { Tag, TagWithChildrenAndParentAndLevel } from "shared/tag";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -11,10 +11,11 @@ import { useStore } from "@/lib/hooks/store.hook";
 import { toast } from "sonner";
 import { f } from "@/lib/f";
 import { AsyncIcon, IconName } from "@/lib/ui/icon-picker";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface TagNavItemProps {
-  tag: Tag;
+  tag: TagWithChildrenAndParentAndLevel;
   isActive: boolean;
   onClick: () => void;
 }
@@ -29,6 +30,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
     setCreateTagDialogOpen,
     setDefaultTagForm,
   } = useStore();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleDeleteTag = async () => {
     const toastId = toast(
@@ -88,22 +90,88 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
   };
 
   const MemoAsyncIcon = useMemo(() => {
-    return <AsyncIcon name={(tag.icon as IconName) || 'tag'} className="w-5 h-5 mr-2" />
+    return (
+      <AsyncIcon
+        name={(tag.icon as IconName) || "tag"}
+        className="w-5 h-5 mr-2"
+      />
+    );
   }, [tag.icon]);
+
+  const handleSwitchExpanded = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsExpanded(!isExpanded);
+  };
+
+  const handleOpenCreateSubTagDialog = () => {
+    setDefaultTagForm({
+      parentId: tag.id,
+    });
+    setCreateTagDialogOpen(true);
+  };
 
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <Button
-          className="w-full justify-start"
-          onClick={onClick}
-          variant={isActive ? "default" : "ghost"}
+        <div
+          className={cn("overflow-hidden", isExpanded ? "h-auto" : "h-[36px]")}
         >
-          {MemoAsyncIcon}
-          {tag.name}
-        </Button>
+          <Button
+            className="group w-full justify-start pl-0"
+            onClick={() => setActiveTag(tag)}
+            variant={isActive ? "default" : "ghost"}
+          >
+            <div
+              onClick={handleSwitchExpanded}
+              className={cn(
+                "opacity-0 transition-opacity duration-300",
+                isActive && tag.children.length ? "opacity-100" : "",
+                tag.children.length > 0 ? "group-hover:opacity-100" : ""
+              )}
+            >
+              <svg
+                className={cn(
+                  "w-5 h-5 mr-1 transition-transform duration-50",
+                  isExpanded ? "rotate-90" : ""
+                )}
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M16 12L10 18V6L16 12Z"></path>
+              </svg>
+            </div>
+            {MemoAsyncIcon}
+            {tag.name}
+          </Button>
+          <div className="ml-8 border-l border-gray-200">
+            {tag.children.length > 0 &&
+              tag.children.map((child) => (
+                <TagNavItem
+                  key={child.id}
+                  tag={child}
+                  isActive={activeTag?.id === child.id}
+                  onClick={() => setActiveTag(child)}
+                />
+              ))}
+          </div>
+        </div>
       </ContextMenuTrigger>
       <ContextMenuContent>
+        <ContextMenuItem className="p-0">
+          {tag.level < 3 && (
+            <Button
+              onClick={handleOpenCreateSubTagDialog}
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Sub Tag
+            </Button>
+          )}
+        </ContextMenuItem>
         <ContextMenuItem className="p-0">
           <Button
             onClick={handleOpenCreateTagDialog}

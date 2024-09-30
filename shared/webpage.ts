@@ -1,5 +1,6 @@
 import { object, string, array } from "zod";
-import { Tag as PrismaTag, Prisma } from "server/node_modules/@prisma/client";
+import { WebPage as PrismaWebpage, Prisma } from "server/node_modules/@prisma/client";
+import { TagWithChildrenAndParentAndLevel } from "./tag";
 
 export const collectWebSchema = object({
   url: string().url({ message: "网址格式错误" }),
@@ -9,9 +10,14 @@ export const collectWebSchema = object({
   tags: array(string()).min(1, { message: "至少选择一个标签" }),
 });
 
+export type WebpageWithTags = PrismaWebpage & {
+  tags: TagWithChildrenAndParentAndLevel[]
+}
 
-export type WebpageWithTags = Prisma.WebPageGetPayload<{
-  include: {
-    tags: true
-  }
-}>
+// export type WebpageWithTags = Prisma.WebPageGetPayload<{
+//   include: {
+//     tags: {
+
+//     }
+//   }
+// }>

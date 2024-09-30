@@ -1,13 +1,13 @@
 import { Button } from "@/lib/ui/button";
 import { Hash, Tag as TagIcon } from "lucide-react";
-import { Tag } from "shared/tag";
+import { Tag, TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { CreateTagDialog } from "./create-tag-dialog";
 import { ScrollArea } from "@/lib/ui/scroll-area";
 import { TagNavItem } from "./tag-nav-item";
 interface TagsNavProps {
-  tags: Tag[];
-  activeTag: Tag | null;
-  setActiveTag: (tag: Tag | null) => void;
+  tags: TagWithChildrenAndParentAndLevel[];
+  activeTag: TagWithChildrenAndParentAndLevel | null;
+  setActiveTag: (tag: TagWithChildrenAndParentAndLevel | null) => void;
 }
 
 export const TagsNav = ({ tags, activeTag, setActiveTag }: TagsNavProps) => {

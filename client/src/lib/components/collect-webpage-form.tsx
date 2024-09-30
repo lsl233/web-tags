@@ -16,8 +16,8 @@ import { z } from "zod";
 import { collectWebSchema } from "shared/webpage";
 import { useForm } from "react-hook-form";
 import { Bot, Download, Eraser } from "lucide-react";
-import { Tag } from "shared/tag";
-import { useEffect, useState } from "react";
+import { Tag, TagWithChildrenAndParentAndLevel } from "shared/tag";
+import { useEffect, useMemo, useState } from "react";
 import { f } from "../f";
 import { ScrapedWebpage } from "shared/spider";
 import { useStore } from "../hooks/store.hook";
@@ -27,6 +27,14 @@ interface CollectWebpageFormProps {
   submitSuccess: () => void;
   visibleButton: boolean;
   defaultForm?: Partial<ScrapedWebpage>;
+}
+
+function flatten(arr: TagWithChildrenAndParentAndLevel[], parentName = ''): Tag[] {
+  return arr.flatMap(item => {
+    const fullName = parentName ? `${parentName}/${item.name}` : item.name;
+    const { children, name, ...rest } = item;
+    return [{ ...rest, name: fullName }, ...flatten(children || [], fullName)];
+  });
 }
 
 export const CollectWebpageForm = ({
@@ -42,6 +50,7 @@ export const CollectWebpageForm = ({
     (state) => state.setDefaultCollectForm
   );
   const [webpageId, setWebpageId] = useState<string>(defaultForm.id ?? "");
+  const tagOptions = useMemo(() => flatten(tags), [tags]);
 
   const form = useForm({
     resolver: zodResolver(collectWebSchema),
@@ -247,7 +256,7 @@ export const CollectWebpageForm = ({
                 <div className="flex items-center gap-2">
                   <Combobox
                     {...field}
-                    options={tags}
+                    options={tagOptions}
                     onCreate={handleCreateTag}
                   />
                   {/* <Button

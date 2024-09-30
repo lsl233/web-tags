@@ -18,6 +18,10 @@ import { useStore } from "@/lib/hooks/store.hook";
 import { toast } from "sonner";
 import { f } from "@/lib/f";
 import { Edit, Trash2 } from "lucide-react";
+import { useMemo } from "react";
+import { TagWithChildrenAndParentAndLevel } from "shared/tag";
+import { TagBadge } from "@/lib/components/tag";
+// import { TagWithChildrenAndParentAndLevelAndParent } from "shared/tag";
 
 export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
   const { setDefaultCollectForm, setCollectDialogOpen, setWebpages, webpages } =
@@ -128,13 +132,7 @@ export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
               </TooltipTrigger>
               <TooltipContent className="flex flex-wrap gap-1 p-2">
                 {webpage?.tags.map((tag) => (
-                  <Badge
-                    key={tag.id}
-                    variant="outline"
-                    className="text-xs px-1.5 flex-shrink-0"
-                  >
-                    {tag.name}
-                  </Badge>
+                  <TagBadge tag={tag}></TagBadge>
                 ))}
               </TooltipContent>
             </Tooltip>

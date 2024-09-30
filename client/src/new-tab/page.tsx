@@ -8,6 +8,18 @@ import { WebpagesView } from "./components/webpages-view";
 import { useStore } from "@/lib/hooks/store.hook";
 import { SignDialog } from "./components/sign-dialog";
 import { Toaster } from "@/lib/ui/sonner";
+import { TagWithChildrenAndParentAndLevel } from "shared/tag";
+
+function mapTagsWithLevels(
+  tags: TagWithChildrenAndParentAndLevel[],
+  level: number = 1
+): TagWithChildrenAndParentAndLevel[] {
+  return tags.map((tag) => ({
+    ...tag,
+    level: level,
+    children: mapTagsWithLevels(tag.children, level + 1),
+  }));
+}
 
 const NewTab = () => {
   const { session } = useAuth();
@@ -16,7 +28,7 @@ const NewTab = () => {
 
   const fetchTags = async () => {
     const res = await f("/api/tag?includeWebPagesAndTags=true");
-    setTags(res);
+    setTags(mapTagsWithLevels(res));
     return res;
   };
 
@@ -83,7 +95,11 @@ const root = createRoot(document.getElementById("root")!);
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <Toaster closeButton toastOptions={{ cancelButtonStyle: { right: 0, left: "auto" } }} position="top-center" />
+      <Toaster
+        closeButton
+        toastOptions={{ cancelButtonStyle: { right: 0, left: "auto" } }}
+        position="top-center"
+      />
       <NewTab />
     </AuthProvider>
   </React.StrictMode>

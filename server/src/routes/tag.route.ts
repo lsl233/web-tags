@@ -1,5 +1,6 @@
 import { db } from "@/lib/db.js";
 import ServerError from "@/lib/error.js";
+import { includeTagLevel } from "@/lib/helper.js";
 import { Prisma } from "@prisma/client";
 import express from "express";
 
@@ -14,17 +15,7 @@ router.get("/", async (req, res, next) => {
       userId: req.user.id,
       parentId: null,
     },
-    include: {
-      children: {
-        include: {
-          children: {
-            include: {
-              children: true,
-            },
-          },
-        },
-      },
-    },
+    include: includeTagLevel,
     orderBy: {
       createdAt: "desc",
     },

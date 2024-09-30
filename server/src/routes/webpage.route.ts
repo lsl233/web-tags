@@ -1,5 +1,6 @@
 import { db } from "@/lib/db.js";
 import ServerError from "@/lib/error.js";
+import { includeTagLevel } from "@/lib/helper.js";
 import express from "express";
 import jwt from "jsonwebtoken";
 
@@ -28,7 +29,9 @@ router.get("/", async (req, res, next) => {
       },
     },
     include: {
-      tags: true,
+      tags: {
+        include: includeTagLevel
+      },
     },
   });
   res.json(foundWebpages);

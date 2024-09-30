@@ -1,17 +1,17 @@
 import { create } from "zustand";
 import { WebpageWithTags } from "shared/webpage";
-import { Tag } from "shared/tag";
+import { Tag, TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { ScrapedWebpage } from "shared/spider";
 
 type Store = {
   webpages: WebpageWithTags[];
   setWebpages: (webpages: WebpageWithTags[]) => void;
 
-  activeTag: Tag | null;
-  setActiveTag: (tag: Tag | null) => void;
+  activeTag: TagWithChildrenAndParentAndLevel | null;
+  setActiveTag: (tag: TagWithChildrenAndParentAndLevel | null) => void;
 
-  tags: Tag[];
-  setTags: (tags: Tag[]) => void;
+  tags: TagWithChildrenAndParentAndLevel[];
+  setTags: (tags: TagWithChildrenAndParentAndLevel[]) => void;
 
   signDialogOpen: boolean;
   setSignDialogOpen: (open: boolean) => void;
