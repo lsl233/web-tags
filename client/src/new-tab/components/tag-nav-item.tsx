@@ -109,6 +109,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
       parentId: tag.id,
     });
     setCreateTagDialogOpen(true);
+    setIsExpanded(true)
   };
 
   return (
