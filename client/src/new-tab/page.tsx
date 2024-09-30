@@ -9,6 +9,7 @@ import { useStore } from "@/lib/hooks/store.hook";
 import { SignDialog } from "./components/sign-dialog";
 import { Toaster } from "@/lib/ui/sonner";
 import { TagWithChildrenAndParentAndLevel } from "shared/tag";
+import { flattenChildrenKey, flattenParentKey } from "@/lib/utils";
 
 function mapTagsWithLevels(
   tags: TagWithChildrenAndParentAndLevel[],
@@ -33,13 +34,10 @@ const NewTab = () => {
   };
 
   const fetchWebpages = async () => {
-    try {
-      const res = await f(`/api/webpage?tagId=${activeTag?.id}`);
-      setWebpages(res);
-    } catch (e) {
-      console.error(e);
-      return [];
-    }
+    if (!activeTag) return;
+    const tagsId = flattenChildrenKey([activeTag], "id");
+    const res = await f(`/api/webpage?tagsId=${tagsId.join(",")}`);
+    setWebpages(res);
   };
 
   useEffect(() => {

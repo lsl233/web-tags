@@ -120,13 +120,7 @@ export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
               <TooltipTrigger className="max-w-full">
                 <div className="flex max-w-full gap-2 mt-2 flex-nowrap truncate">
                   {webpage?.tags.map((tag) => (
-                    <Badge
-                      key={tag.id}
-                      variant="outline"
-                      className="text-xs px-1.5 flex-shrink-0"
-                    >
-                      {tag.name}
-                    </Badge>
+                    <TagBadge tag={tag}></TagBadge>
                   ))}
                 </div>
               </TooltipTrigger>

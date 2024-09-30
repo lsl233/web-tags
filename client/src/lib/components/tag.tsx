@@ -1,25 +1,18 @@
 import { TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { Badge } from "../ui/badge";
 import { useMemo } from "react";
-  
+import { flattenParentKey } from "../utils";
+
 interface TagBadgeProps {
-  tag: TagWithChildrenAndParentAndLevel
+  tag: TagWithChildrenAndParentAndLevel;
 }
 
-export const TagBadge = ({tag}: TagBadgeProps) => {
+export const TagBadge = ({ tag }: TagBadgeProps) => {
+  const levelName = useMemo(
+    () => flattenParentKey(tag, "name").join("/"),
+    [tag]
+  );
 
-  const levelName = useMemo(() => {
-    let name = ''
-    const deep = (tag: TagWithChildrenAndParentAndLevel) => {
-        name = tag.name + '/' + name
-        if (tag.parent) {
-          deep(tag.parent)
-        }
-    }
-    deep(tag)
-    return name
-  }, [tag])
-  
   return (
     <Badge
       key={tag.id}

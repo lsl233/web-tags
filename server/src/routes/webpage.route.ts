@@ -2,7 +2,6 @@ import { db } from "@/lib/db.js";
 import ServerError from "@/lib/error.js";
 import { includeTagLevel } from "@/lib/helper.js";
 import express from "express";
-import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -10,21 +9,21 @@ router.get("/", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
-
-  if (
-    !req.query.tagId ||
-    req.query.tagId === "" ||
-    req.query.tagId === "undefined"
-  ) {
-    return next(ServerError.BadRequest("tagId is required"));
+  const tagsId = req.query.tagsId as string;
+  if (!tagsId || tagsId === "") {
+    return next(ServerError.BadRequest("tagsId is required"));
   }
+
+  const tagsIdArray = tagsId.split(",");
 
   const foundWebpages = await db.webPage.findMany({
     where: {
       userId: req.user.id,
       tags: {
         some: {
-          id: req.query.tagId as string,
+          id: {
+            in: tagsIdArray,
+          },
         },
       },
     },

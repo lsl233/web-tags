@@ -1,15 +1,7 @@
 import { Button } from "@/lib/ui/button";
-import { Badge } from "@/lib/ui/badge";
 import { WebpageWithTags } from "shared/webpage";
 import { PanelsTopLeft, SquareArrowOutUpRight } from "lucide-react";
 import { CollectWebpageDialog } from "@/lib/components/collect-webpage-dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/lib/ui/tooltip";
-import { Image } from "@/lib/ui/image";
 import { useStore } from "@/lib/hooks/store.hook";
 import { WebpageCard } from "./webpage-card";
 import { useEffect } from "react";
