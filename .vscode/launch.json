@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "Launch Chrome: ${workspaceFolder}",
+            "request": "launch",
+            "type": "chrome",
+            "url": "chrome-extension://biafgjlchnokbgdbnjgkhpfhofpcmfef/new-tab.html",
+            "webRoot": "${workspaceFolder}/client",
+            "sourceMaps": true,
+            "sourceMapPathOverrides": {                          // Example: "webpack:///project/app.ts" -> "/project/app.ts"
+                "webpack://chrome-extension-typescript-starter/*": "${workspaceFolder}/client/*"                   // Example: "meteor://💻app/main.ts" -> "/Users/me/project/main.ts"
+            }
+        }
+    ]
+}
