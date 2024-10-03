@@ -119,7 +119,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
           className={cn("overflow-hidden", isExpanded ? "h-auto" : "h-[36px]")}
         >
           <Button
-            className="group w-full justify-start pl-0"
+            className="group w-full justify-start pl-0 min-w-full"
             onClick={() => setActiveTag(tag)}
             variant={isActive ? "default" : "ghost"}
           >

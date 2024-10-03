@@ -10,6 +10,11 @@ import { SignDialog } from "./components/sign-dialog";
 import { Toaster } from "@/lib/ui/sonner";
 import { TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { flattenChildrenKey, flattenParentKey } from "@/lib/utils";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/lib/ui/resizable";
 
 function mapTagsWithLevels(
   tags: TagWithChildrenAndParentAndLevel[],
@@ -73,16 +78,21 @@ const NewTab = () => {
 
   return (
     <main className="flex flex-col sm:flex-row h-screen max-w-[1920px] mx-auto bg-white">
-      <div className="h-full w-1/6 border-r border-b border-gray-300 space-y-1">
-        <TagsNav
-          tags={tags}
-          activeTag={activeTag}
-          setActiveTag={setActiveTag}
-        />
-      </div>
-      <div className="h-full w-5/6 border-b border-gray-300 ">
-        <WebpagesView webpages={webpages} />
-      </div>
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel defaultSize={18}>
+          <TagsNav
+            tags={tags}
+            activeTag={activeTag}
+            setActiveTag={setActiveTag}
+          />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+
+        <ResizablePanel>
+          <WebpagesView webpages={webpages} />
+        </ResizablePanel>
+      </ResizablePanelGroup>
+
       <SignDialog children={undefined} type={"in"} />
     </main>
   );

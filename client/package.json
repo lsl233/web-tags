@@ -4,7 +4,7 @@
   "description": "chrome-extension-typescript-starter",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development webpack serve --config webpack/webpack.dev.js",
+    "dev": "NODE_ENV=development webpack --config webpack/webpack.dev.js --watch",
     "build": "NODE_ENV=production webpack --config webpack/webpack.prod.js",
     "clean": "rimraf dist",
     "test": "npx jest",
@@ -36,6 +36,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.53.0",
+    "react-resizable-panels": "^2.1.4",
     "shared": "workspace:*",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",

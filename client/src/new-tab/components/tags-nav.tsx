@@ -18,7 +18,6 @@ export const TagsNav = ({ tags, activeTag, setActiveTag }: TagsNavProps) => {
       </div>
       <ScrollArea className="flex-1 w-full">
         <div className="p-2">
-          
           {tags.map((tag) => (
             <TagNavItem
               key={tag.id}

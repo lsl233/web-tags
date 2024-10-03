@@ -6,7 +6,7 @@ console.log(path.join(__dirname, "../dist"));
 
 module.exports = merge(common, {
   mode: "development",
-  devtool: "inline-source-map",
+  devtool: "source-map",
   devServer: {
     static: {
       directory: path.join(__dirname, "../dist"),

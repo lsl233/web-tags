@@ -11,7 +11,7 @@ if (!globalThis.prisma) {
   // 创建 PrismaClient 实例
   prisma = new PrismaClient({
     datasourceUrl: process.env.DATABASE_URL,
-    log: ["query", "info", "warn", "error"],
+    log: [ "warn", "error"],
   });
 
   // 连接事件监听
