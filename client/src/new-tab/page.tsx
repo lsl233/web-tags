@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "@/global.css";
 import { f } from "@/lib/f";
@@ -9,7 +9,7 @@ import { useStore } from "@/lib/hooks/store.hook";
 import { SignDialog } from "./components/sign-dialog";
 import { Toaster } from "@/lib/ui/sonner";
 import { TagWithChildrenAndParentAndLevel } from "shared/tag";
-import { flattenChildrenKey, flattenParentKey } from "@/lib/utils";
+import { debounce, flattenChildrenKey, flattenParentKey } from "@/lib/utils";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -31,6 +31,14 @@ const NewTab = () => {
   const { session } = useAuth();
   const { tags, setTags, activeTag, setActiveTag, webpages, setWebpages } =
     useStore();
+
+  const [newTabPanelSize, setNewTabPanelSize] = useState(0);
+
+  useEffect(() => {
+    chrome.storage.local.get("newTabPanelSize", (data) => {
+      setNewTabPanelSize(data.newTabPanelSize);
+    });
+  }, []);
 
   const fetchTags = async () => {
     const res = await f("/api/tag?includeWebPagesAndTags=true");
@@ -76,10 +84,16 @@ const NewTab = () => {
     };
   }, [activeTag]);
 
+  const handleResize = debounce((size: number) => {
+    if (size !== newTabPanelSize) {
+      chrome.storage.local.set({ newTabPanelSize: size });
+    }
+  }, 500);
+
   return (
     <main className="flex flex-col sm:flex-row h-screen max-w-[1920px] mx-auto bg-white">
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={18}>
+        <ResizablePanel defaultSize={newTabPanelSize} onResize={handleResize}>
           <TagsNav
             tags={tags}
             activeTag={activeTag}
@@ -87,7 +101,6 @@ const NewTab = () => {
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
-
         <ResizablePanel>
           <WebpagesView webpages={webpages} />
         </ResizablePanel>

@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/lib/ui/dialog";
-import { Button } from "@/lib/ui/button";
+import { Button } from "@/lib/ui/button-loading";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInSchema, signUpSchema } from "shared/auth";
@@ -37,6 +37,7 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
   const { signIn, signUp } = useAuth();
   const { signDialogOpen, setSignDialogOpen } = useStore();
   const schema = signType === "in" ? signInSchema : signUpSchema;
+  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -48,14 +49,21 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
   });
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
-    if (signType === "in") {
-      await signIn(data);
-      setSignDialogOpen(false);
-    } else {
-      await signUp(data as z.infer<typeof signUpSchema>);
-      debugger;
-      setSignType("in");
-      // TODO toast
+    setLoading(true);
+    try {
+      if (signType === "in") {
+        await signIn(data);
+        setSignDialogOpen(false);
+      } else {
+        await signUp(data as z.infer<typeof signUpSchema>);
+        debugger;
+        setSignType("in");
+        // TODO toast
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -123,7 +131,9 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
               />
             )}
             <DialogFooter>
-              <Button type="submit">Submit</Button>
+              <Button type="submit" loading={loading}>
+                Submit
+              </Button>
             </DialogFooter>
           </form>
         </Form>
