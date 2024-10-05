@@ -15,6 +15,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/lib/ui/resizable";
+import { useRef } from "react";
+import { ImperativePanelHandle } from "react-resizable-panels";
 
 function mapTagsWithLevels(
   tags: TagWithChildrenAndParentAndLevel[],
@@ -29,14 +31,13 @@ function mapTagsWithLevels(
 
 const NewTab = () => {
   const { session } = useAuth();
+  const panelRef = useRef<ImperativePanelHandle>(null);
   const { tags, setTags, activeTag, setActiveTag, webpages, setWebpages } =
     useStore();
 
-  const [newTabPanelSize, setNewTabPanelSize] = useState(0);
-
   useEffect(() => {
     chrome.storage.local.get("newTabPanelSize", (data) => {
-      setNewTabPanelSize(data.newTabPanelSize);
+      panelRef.current?.resize(data.newTabPanelSize);
     });
   }, []);
 
@@ -85,15 +86,13 @@ const NewTab = () => {
   }, [activeTag]);
 
   const handleResize = debounce((size: number) => {
-    if (size !== newTabPanelSize) {
-      chrome.storage.local.set({ newTabPanelSize: size });
-    }
+    chrome.storage.local.set({ newTabPanelSize: size });
   }, 500);
 
   return (
     <main className="flex flex-col sm:flex-row h-screen max-w-[1920px] mx-auto bg-white">
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={newTabPanelSize} onResize={handleResize}>
+        <ResizablePanel ref={panelRef} defaultSize={18} onResize={handleResize}>
           <TagsNav
             tags={tags}
             activeTag={activeTag}
