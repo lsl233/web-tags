@@ -14,9 +14,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const activeTab = tabs[0];
       if (activeTab && activeTab.id) {
         const tabId = activeTab.id;
-        chrome.tabs.sendMessage(tabId, { type: messageType }, (response) => {
-          console.log(`[发送消息 background ${messageType}]`, response);
-          sendResponse(response);
+        chrome.scripting.executeScript({
+          target: { tabId },
+          files: ['js/content-script.js'],
+        }, () => {
+          chrome.tabs.sendMessage(tabId, { type: messageType }, (response) => {
+            console.log(`[发送消息 background ${messageType}]`, response);
+            sendResponse(response);
+          });
         });
       }
       // 向 content script 发送消息

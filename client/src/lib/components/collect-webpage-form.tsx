@@ -49,7 +49,7 @@ export const CollectWebpageForm = ({
   const setDefaultCollectForm = useStore(
     (state) => state.setDefaultCollectForm
   );
-  const [webpageId, setWebpageId] = useState<string>(defaultForm.id ?? "");
+  const [webpageId, setWebpageId] = useState<string>(defaultForm.id || "");
   const tagOptions = useMemo(() => flatten(tags), [tags]);
 
   const form = useForm({
