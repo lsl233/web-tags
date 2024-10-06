@@ -41,19 +41,6 @@ const NewTab = () => {
     });
   }, []);
 
-  const fetchTags = async () => {
-    const res = await f("/api/tag?includeWebPagesAndTags=true");
-    setTags(mapTagsWithLevels(res));
-    return res;
-  };
-
-  const fetchWebpages = async () => {
-    if (!activeTag) return;
-    const tagsId = flattenChildrenKey([activeTag], "id");
-    const res = await f(`/api/webpage?tagsId=${tagsId.join(",")}`);
-    setWebpages(res);
-  };
-
   useEffect(() => {
     if (session) {
       fetchTags().then((res) => {
@@ -84,6 +71,19 @@ const NewTab = () => {
       chrome.runtime.onMessage.removeListener(messageListener);
     };
   }, [activeTag]);
+
+  const fetchTags = async () => {
+    const res = await f("/api/tag?includeWebPagesAndTags=true");
+    setTags(mapTagsWithLevels(res));
+    return res;
+  };
+
+  const fetchWebpages = async () => {
+    if (!activeTag) return;
+    const tagsId = flattenChildrenKey([activeTag], "id");
+    const res = await f(`/api/webpage?tagsId=${tagsId.join(",")}`);
+    setWebpages(res);
+  };
 
   const handleResize = debounce((size: number) => {
     chrome.storage.local.set({ newTabPanelSize: size });

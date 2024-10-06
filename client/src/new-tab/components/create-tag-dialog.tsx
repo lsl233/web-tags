@@ -117,9 +117,7 @@ export const CreateTagDialog = ({
                   <FormItem className="w-auto flex flex-col">
                     <FormLabel>Icon</FormLabel>
                     <FormControl>
-                      {/* TODO: add icon picker */}
                       <IconPicker
-                        value={field.value as IconName}
                         onChange={field.onChange}
                       >
                         <Button
