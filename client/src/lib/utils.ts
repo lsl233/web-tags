@@ -24,7 +24,7 @@ export function flattenParentKey<T extends { parent: T }>(
 ) {
   const result = [obj[key]]
   if (obj.parent) {
-    result.push(...flattenParentKey(obj.parent, key))
+    result.unshift(...flattenParentKey(obj.parent, key))
   }
   return result
 }
