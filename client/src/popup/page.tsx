@@ -9,11 +9,14 @@ import { AuthProvider, useAuth } from "@/new-tab/components/auth-provider";
 import { Button } from "@/lib/ui/button";
 import { Skeleton, SkeletonList } from "@/lib/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/ui/tabs";
+import { CollectMultiWebpageForm } from "@/lib/components/collect-multi-webpage.form";
 
 const Popup = () => {
   const { setTags } = useStore();
   const { session, loading } = useAuth();
   const [showSlogan, setShowSlogan] = useState(false);
+  const [activeTab, setActiveTab] = useState("collect-webpage-form");
   const [defaultWebpageInfo, setDefaultWebpageInfo] = useState<
     ScrapedWebpage | undefined
   >();
@@ -70,36 +73,48 @@ const Popup = () => {
   }, []);
 
   return (
-    <div className="w-96 p-4 relative bg-white">
-      <div
-        className={cn(
-          "absolute top-0 left-0 transition-all duration-300 py-1 px-2 w-full bg-green-500 text-white text-sm text-center",
-          showSlogan ? "top-0" : "-top-full"
-        )}
-      >
-        Success
-      </div>
-      {loading ? (
-        <SkeletonList />
-      ) : session ? (
-        <CollectWebpageForm
-          defaultForm={defaultWebpageInfo}
-          submitSuccess={handleSubmitSuccess}
-          visibleButton
-        />
-      ) : (
-        <div className="text-center">
-          <Button
-            onClick={() => {
-              chrome.tabs.create({
-                url: chrome.runtime.getURL("new-tab.html"),
-              });
-            }}
+    <div className={cn(" p-4 relative bg-white min-h-[500px]", activeTab === "collect-webpage-form" ? "w-96" : "w-[620px]")}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="collect-webpage-form">Current Page</TabsTrigger>
+          <TabsTrigger value="collect-multi-webpage-form">All Tab Pages</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="collect-webpage-form">
+          <div
+            className={cn(
+              "absolute top-0 left-0 transition-all duration-300 py-1 px-2 w-full bg-green-500 text-white text-sm text-center",
+              showSlogan ? "top-0" : "-top-full"
+            )}
           >
-            Sign in
-          </Button>
-        </div>
-      )}
+            Success
+          </div>
+          {loading ? (
+            <SkeletonList />
+          ) : session ? (
+            <CollectWebpageForm
+              defaultForm={defaultWebpageInfo}
+              submitSuccess={handleSubmitSuccess}
+              visibleButton
+            />
+          ) : (
+            <div className="text-center">
+              <Button
+                onClick={() => {
+                  chrome.tabs.create({
+                    url: chrome.runtime.getURL("new-tab.html"),
+                  });
+                }}
+              >
+                Sign in
+              </Button>
+            </div>
+          )}
+        </TabsContent>
+        <TabsContent value="collect-multi-webpage-form">
+          <CollectMultiWebpageForm />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

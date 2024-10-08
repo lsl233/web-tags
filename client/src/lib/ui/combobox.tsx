@@ -108,7 +108,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0">
+      <PopoverContent className="p-0 max-h-full">
         <Command ref={ref}>
           <CommandInput
             onStateChange={handleStateChange}

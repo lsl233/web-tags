@@ -56,7 +56,6 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
         setSignDialogOpen(false);
       } else {
         await signUp(data as z.infer<typeof signUpSchema>);
-        debugger;
         setSignType("in");
         // TODO toast
       }

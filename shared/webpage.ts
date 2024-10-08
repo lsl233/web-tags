@@ -14,6 +14,10 @@ export type WebpageWithTags = PrismaWebpage & {
   tags: TagWithChildrenAndParentAndLevel[]
 }
 
+export type CreateWebpage = Prisma.WebPageCreateInput & {
+  tags: string[]
+}
+
 // export type WebpageWithTags = Prisma.WebPageGetPayload<{
 //   include: {
 //     tags: {

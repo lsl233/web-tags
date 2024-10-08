@@ -1,7 +1,9 @@
 import { db } from "@/lib/db.js";
 import ServerError from "@/lib/error.js";
 import { includeTagLevel } from "@/lib/helper.js";
+import { WebPage } from "@prisma/client";
 import express from "express";
+import { CreateWebpage } from "shared/webpage.js";
 
 const router = express.Router();
 
@@ -36,18 +38,14 @@ router.get("/", async (req, res, next) => {
   res.json(foundWebpages);
 });
 
-router.post("/", async (req, res, next) => {
-  if (!req.user) {
-    return next(ServerError.Unauthorized("Unauthorized"));
-  }
-
-  const { url, title, description, tags, icon } = req.body;
+const createWebpage = async (webpage: CreateWebpage, userId: string) => {
+  const { url, title, description, tags, icon, id } = webpage;
 
   const data = {
     url,
     title,
     description,
-    userId: req.user.id,
+    userId,
     icon,
     tags: {
       set: tags.map((tag: string) => ({ id: tag })),
@@ -56,7 +54,7 @@ router.post("/", async (req, res, next) => {
 
   const createdWebpage = await db.webPage.upsert({
     where: {
-      id: req.body.id as string,
+      id,
     },
     update: data,
     create: {
@@ -69,9 +67,32 @@ router.post("/", async (req, res, next) => {
       tags: true,
     },
   });
+  return createdWebpage;
+};
+
+router.post("/", async (req, res, next) => {
+  if (!req.user) {
+    return next(ServerError.Unauthorized("Unauthorized"));
+  }
+
+  const createdWebpage = await createWebpage(req.body, req.user.id)
 
   res.json(createdWebpage);
 });
+
+router.post('/multi', async (req, res, next) => {
+  if (!req.user) {
+    return next(ServerError.Unauthorized("Unauthorized"));
+  }
+
+  const createdWebpages = await db.webPage.createMany({
+    data: req.body.map((webpage: CreateWebpage) => ({
+      ...webpage,
+      userId: req.user.id,
+    })),
+  });
+  res.json(createdWebpages);
+})
 
 router.delete("/:id", async (req, res, next) => {
   if (!req.user) {
