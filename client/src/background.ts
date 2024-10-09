@@ -42,6 +42,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return {
           url: tab.url,
           title: tab.title,
+          icon: tab.favIconUrl,
           description: tab.title,
           tags: [],
         };

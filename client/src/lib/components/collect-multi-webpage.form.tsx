@@ -87,7 +87,7 @@ export const CollectMultiWebpageForm = () => {
         return item
       })
 
-      const result = await f("/api/webpage", {
+      const createdWebpages = await f("/api/webpage/multi", {
         method: "POST",
         body: data.items,
       });

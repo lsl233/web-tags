@@ -48,7 +48,7 @@ const createWebpage = async (webpage: CreateWebpage, userId: string) => {
     userId,
     icon,
     tags: {
-      set: tags.map((tag: string) => ({ id: tag })),
+      set: tags.map((id: string) => ({ id })),
     },
   };
 
@@ -85,12 +85,20 @@ router.post('/multi', async (req, res, next) => {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
 
-  const createdWebpages = await db.webPage.createMany({
-    data: req.body.map((webpage: CreateWebpage) => ({
-      ...webpage,
-      userId: req.user.id,
-    })),
-  });
+  const webpages: CreateWebpage[] = req.body
+
+  const createdWebpages = await db.$transaction(webpages.map((webpage) => {
+    return db.webPage.create({    
+      data: {
+        ...webpage,
+        tags: {
+          connect: webpage.tags.map((id: string) => ({ id })),
+        },
+        userId: req.user.id,
+      }
+    })
+  }))
+
   res.json(createdWebpages);
 })
 
