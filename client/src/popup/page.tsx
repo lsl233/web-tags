@@ -41,6 +41,7 @@ const Popup = () => {
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTab = tabs[0];
+      console.log(activeTab, 'activeTab')
       if (activeTab && activeTab.url) {
         const url = new URL(activeTab.url);
         if (isInternalPage(url.href)) {
@@ -73,22 +74,29 @@ const Popup = () => {
   }, []);
 
   return (
-    <div className={cn(" p-4 relative bg-white min-h-[500px]", activeTab === "collect-webpage-form" ? "w-96" : "w-[620px]")}>
+    <div
+      className={cn(
+        " p-4 relative bg-white min-h-[500px]",
+        activeTab === "collect-webpage-form" ? "w-96" : "w-[620px]"
+      )}
+    >
+      <div
+        className={cn(
+          "absolute top-0 left-0 transition-all duration-300 py-1 px-2 w-full bg-green-500 text-white text-sm text-center",
+          showSlogan ? "top-0" : "-top-full"
+        )}
+      >
+        Success
+      </div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="collect-webpage-form">Current Page</TabsTrigger>
-          <TabsTrigger value="collect-multi-webpage-form">All Tab Pages</TabsTrigger>
+          <TabsTrigger value="collect-multi-webpage-form">
+            All Tab Pages
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="collect-webpage-form">
-          <div
-            className={cn(
-              "absolute top-0 left-0 transition-all duration-300 py-1 px-2 w-full bg-green-500 text-white text-sm text-center",
-              showSlogan ? "top-0" : "-top-full"
-            )}
-          >
-            Success
-          </div>
           {loading ? (
             <SkeletonList />
           ) : session ? (
@@ -112,7 +120,7 @@ const Popup = () => {
           )}
         </TabsContent>
         <TabsContent value="collect-multi-webpage-form">
-          <CollectMultiWebpageForm />
+          <CollectMultiWebpageForm submitSuccess={handleSubmitSuccess} />
         </TabsContent>
       </Tabs>
     </div>

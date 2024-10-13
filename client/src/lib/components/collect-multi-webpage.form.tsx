@@ -27,7 +27,11 @@ const formSchema = z.object({
   items: z.array(collectWebSchema).min(1, "At least one item is required"),
 });
 
-export const CollectMultiWebpageForm = () => {
+interface CollectMultiWebpageFormProps {
+  submitSuccess: () => void;
+}
+
+export const CollectMultiWebpageForm = ({submitSuccess}: CollectMultiWebpageFormProps) => {
   const { session } = useAuth();
   if (!session) return null;
   const setTags = useStore((state) => state.setTags);
@@ -53,8 +57,7 @@ export const CollectMultiWebpageForm = () => {
   useEffect(() => {
     chrome.runtime.sendMessage(
       { type: "get-current-window-page-content" },
-      (data) => {
-        console.log(data, "data");
+      async (data) => {
         if (data) {
           const _defaultTag: TagWithId = {
             name: dayjs().format("YYYY-MM-DD HH:mm:ss"),
@@ -62,6 +65,11 @@ export const CollectMultiWebpageForm = () => {
             id: "-1",
           };
           setDefaultTag(_defaultTag);
+          const result = await f('/api/webpage/multi', {
+            method: 'POST',
+            body: data.map((item: ScrapedWebpage) => item.url)
+          })
+          // TODO: 多页面查询
           append(
             data.map((item: ScrapedWebpage) => {
               item.tags = [_defaultTag.id];
@@ -74,7 +82,6 @@ export const CollectMultiWebpageForm = () => {
   }, []);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log(data, "data");
     const foundTag = data.items.find(item => item.tags.includes("-1"))
     if (foundTag && defaultTag) {
       const result = await f("/api/tag", {
@@ -91,6 +98,9 @@ export const CollectMultiWebpageForm = () => {
         method: "POST",
         body: data.items,
       });
+
+
+      submitSuccess()
     }
 
   };

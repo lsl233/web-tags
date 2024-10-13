@@ -90,7 +90,10 @@ router.post('/multi', async (req, res, next) => {
   const createdWebpages = await db.$transaction(webpages.map((webpage) => {
     return db.webPage.create({    
       data: {
-        ...webpage,
+        url: webpage.url,
+        title: webpage.title,
+        description: webpage.description,
+        icon: webpage.icon,
         tags: {
           connect: webpage.tags.map((id: string) => ({ id })),
         },
