@@ -10,7 +10,11 @@ import {
 import { Input } from "@/lib/ui/input";
 import { ScrapedWebpage } from "shared/spider";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { collectWebSchema } from "shared/webpage";
+import {
+  CollectWebpageForm,
+  collectWebSchema,
+  WebpageWithTags,
+} from "shared/webpage";
 import { z } from "zod";
 import { Textarea } from "../ui/textarea";
 import { Combobox } from "../ui/combobox";
@@ -31,17 +35,19 @@ interface CollectMultiWebpageFormProps {
   submitSuccess: () => void;
 }
 
-export const CollectMultiWebpageForm = ({submitSuccess}: CollectMultiWebpageFormProps) => {
+export const CollectMultiWebpageForm = ({
+  submitSuccess,
+}: CollectMultiWebpageFormProps) => {
   const { session } = useAuth();
   if (!session) return null;
   const setTags = useStore((state) => state.setTags);
   const tags = useStore((state) => state.tags);
   const [defaultTag, setDefaultTag] = useState<TagWithId | null>(null);
   const tagOptions = useMemo(() => {
-    return [...flattenChildren(tags), defaultTag]
+    return [...flattenChildren(tags), defaultTag];
   }, [tags, defaultTag]);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -57,52 +63,82 @@ export const CollectMultiWebpageForm = ({submitSuccess}: CollectMultiWebpageForm
   useEffect(() => {
     chrome.runtime.sendMessage(
       { type: "get-current-window-page-content" },
-      async (data) => {
-        if (data) {
-          const _defaultTag: TagWithId = {
-            name: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-            icon: "calendar-days",
-            id: "-1",
-          };
+      async (currentWindowWebpages) => {
+        if (currentWindowWebpages) {
+          const _defaultTag = generateDefaultTag();
           setDefaultTag(_defaultTag);
-          const result = await f('/api/webpage/multi', {
-            method: 'POST',
-            body: data.map((item: ScrapedWebpage) => item.url)
-          })
+
           // TODO: 多页面查询
-          append(
-            data.map((item: ScrapedWebpage) => {
-              item.tags = [_defaultTag.id];
-              return item;
-            })
-          );
+          append(await generateDefaultForm(currentWindowWebpages, _defaultTag));
         }
       }
     );
   }, []);
 
+  const generateDefaultTag = () => {
+    const _defaultTag: TagWithId = {
+      name: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+      icon: "calendar-days",
+      id: "-1",
+    };
+    return _defaultTag;
+  };
+
+  const generateDefaultForm = async (
+    currentWindowWebpages: CollectWebpageForm[],
+    defaultTag: TagWithId
+  ) => {
+    const foundWebpages = await f<WebpageWithTags[]>("/api/webpage/multi", {
+      query: { urls: currentWindowWebpages.map((item) => item.url).join(",") },
+    });
+
+    if (foundWebpages) {
+      return currentWindowWebpages.map((item: CollectWebpageForm) => {
+        let result;
+        const foundWebpage = foundWebpages.find(
+          (webpage) => webpage.url === item.url
+        );
+        if (foundWebpage) {
+          return {
+            url: foundWebpage.url,
+            title: foundWebpage.title,
+            description: foundWebpage.description,
+            icon: foundWebpage.icon,
+            tags: [defaultTag.id, ...foundWebpage.tags.map((tag) => tag.id)],
+          } as CollectWebpageForm;
+        }
+        if (defaultTag) {
+          item.tags = [defaultTag.id];
+        }
+        return item;
+      });
+    }
+    return currentWindowWebpages.map((item: CollectWebpageForm) => {
+      item.tags = [defaultTag.id];
+      return item;
+    });
+  };
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    const foundTag = data.items.find(item => item.tags.includes("-1"))
+    const foundTag = data.items.find((item) => item.tags.includes("-1"));
     if (foundTag && defaultTag) {
       const result = await f("/api/tag", {
         method: "POST",
         body: { name: defaultTag.name, icon: defaultTag.icon },
       });
 
-      data.items.map(item => {
-        item.tags = item.tags.map(id => id === "-1" ? result.id : id)
-        return item
-      })
+      data.items.map((item) => {
+        item.tags = item.tags.map((id) => (id === "-1" ? result.id : id));
+        return item;
+      });
 
       const createdWebpages = await f("/api/webpage/multi", {
         method: "POST",
         body: data.items,
       });
 
-
-      submitSuccess()
+      submitSuccess();
     }
-
   };
 
   const handleCreateTag = async (name: string) => {

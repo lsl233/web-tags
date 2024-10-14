@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 
 interface FetchJSONOptions extends Omit<RequestInit, "body"> {
   body?: BodyInit | { [key: string]: any } | null;
+  query?: { [key: string]: any } | null;
 }
 
 // interface FetchResponseError extends Response, Error {}
@@ -44,6 +45,16 @@ export const f = async <T = any>(
     !(options.body instanceof URLSearchParams)
   ) {
     options.body = JSON.stringify(options.body);
+  }
+
+  if (options.query) {
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(options.query)) {
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, String(value));
+      }
+    }
+    url += `?${searchParams.toString()}`;
   }
 
   if (!url.startsWith("http")) {

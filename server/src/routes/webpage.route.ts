@@ -80,6 +80,28 @@ router.post("/", async (req, res, next) => {
   res.json(createdWebpage);
 });
 
+router.get('/multi', async (req, res, next) => {
+  if (!req.user) {
+    return next(ServerError.Unauthorized("Unauthorized"));
+  }
+  const urls = req.query.urls as string;
+  const urlsArray = urls.split(',');
+
+  const foundWebpages = await db.webPage.findMany({
+    where: {
+      url: {
+        in: urlsArray,
+      },
+      userId: req.user.id,
+    },
+    include: {
+      tags: true,
+    },
+  });
+
+  res.json(foundWebpages);
+})
+
 router.post('/multi', async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));

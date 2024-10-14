@@ -1,4 +1,4 @@
-import { object, string, array } from "zod";
+import { object, string, array, z } from "zod";
 import { WebPage as PrismaWebpage, Prisma } from "server/node_modules/@prisma/client";
 import { TagWithChildrenAndParentAndLevel } from "./tag";
 
@@ -9,6 +9,8 @@ export const collectWebSchema = object({
   icon: string().optional(),
   tags: array(string()).min(1, { message: "至少选择一个标签" }),
 });
+
+export type CollectWebpageForm = z.infer<typeof collectWebSchema>
 
 export type WebpageWithTags = PrismaWebpage & {
   tags: TagWithChildrenAndParentAndLevel[]
