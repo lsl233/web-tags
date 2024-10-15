@@ -37,6 +37,11 @@ model WebPage {
   updatedAt   DateTime @updatedAt
 }
 
+enum TagType {
+  SYSTEM
+  CUSTOM
+}
+
 model Tag {
   id        String    @id @default(uuid())
   name      String
@@ -44,7 +49,7 @@ model Tag {
   webPages  WebPage[] @relation("WebPageTags")
   user      User      @relation(fields: [userId], references: [id])
   userId    String
-
+  type      TagType   @default(SYSTEM)
   // 自关联：父标签和子标签
   parent    Tag?      @relation("TagHierarchy", fields: [parentId], references: [id])
   parentId  String?   // 可选的父标签 ID

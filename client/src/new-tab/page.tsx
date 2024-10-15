@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "@/global.css";
 import { f } from "@/lib/f";
@@ -9,7 +9,7 @@ import { useStore } from "@/lib/hooks/store.hook";
 import { SignDialog } from "./components/sign-dialog";
 import { Toaster } from "@/lib/ui/sonner";
 import { TagWithChildrenAndParentAndLevel } from "shared/tag";
-import { debounce, flattenChildrenKey, flattenParentKey } from "@/lib/utils";
+import { debounce, flattenChildrenKey } from "@/lib/utils";
 import {
   ResizableHandle,
   ResizablePanel,

@@ -11,6 +11,7 @@ import { Skeleton, SkeletonList } from "@/lib/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/ui/tabs";
 import { CollectMultiWebpageForm } from "@/lib/components/collect-multi-webpage.form";
+import { ScrollArea } from "@/lib/ui/scroll-area";
 
 const Popup = () => {
   const { setTags } = useStore();
@@ -41,7 +42,7 @@ const Popup = () => {
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTab = tabs[0];
-      console.log(activeTab, 'activeTab')
+      console.log(activeTab, "activeTab");
       if (activeTab && activeTab.url) {
         const url = new URL(activeTab.url);
         if (isInternalPage(url.href)) {
@@ -88,15 +89,15 @@ const Popup = () => {
       >
         Success
       </div>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col">
+        <TabsList className="grid w-full grid-cols-2 sticky top-4 bg-white">
           <TabsTrigger value="collect-webpage-form">Current Page</TabsTrigger>
           <TabsTrigger value="collect-multi-webpage-form">
             All Tab Pages
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="collect-webpage-form">
+        <TabsContent className="flex-1" value="collect-webpage-form">
           {loading ? (
             <SkeletonList />
           ) : session ? (
@@ -120,7 +121,11 @@ const Popup = () => {
           )}
         </TabsContent>
         <TabsContent value="collect-multi-webpage-form">
-          <CollectMultiWebpageForm submitSuccess={handleSubmitSuccess} />
+          {/* <ScrollArea className="w-full h-[200px]"> */}
+          <div className="w-full h-full">
+            <CollectMultiWebpageForm submitSuccess={handleSubmitSuccess} />
+          </div>
+          {/* </ScrollArea> */}
         </TabsContent>
       </Tabs>
     </div>

@@ -26,6 +26,7 @@ import { Button } from "../ui/button-loading";
 import { Tag, TagWithId } from "shared/tag";
 import dayjs from "dayjs";
 import { useAuth } from "@/new-tab/components/auth-provider";
+import { ScrollArea } from "@/lib/ui/scroll-area";
 
 const formSchema = z.object({
   items: z.array(collectWebSchema).min(1, "At least one item is required"),
@@ -88,13 +89,13 @@ export const CollectMultiWebpageForm = ({
     currentWindowWebpages: CollectWebpageForm[],
     defaultTag: TagWithId
   ) => {
+    let result: CollectWebpageForm[];
     const foundWebpages = await f<WebpageWithTags[]>("/api/webpage/multi", {
       query: { urls: currentWindowWebpages.map((item) => item.url).join(",") },
     });
 
     if (foundWebpages) {
-      return currentWindowWebpages.map((item: CollectWebpageForm) => {
-        let result;
+      result = currentWindowWebpages.map((item: CollectWebpageForm) => {
         const foundWebpage = foundWebpages.find(
           (webpage) => webpage.url === item.url
         );
@@ -113,10 +114,20 @@ export const CollectMultiWebpageForm = ({
         return item;
       });
     }
-    return currentWindowWebpages.map((item: CollectWebpageForm) => {
+    result = currentWindowWebpages.map((item: CollectWebpageForm) => {
       item.tags = [defaultTag.id];
       return item;
     });
+
+    result = result.filter(
+      (item) => !item.url.includes(chrome.runtime.getURL(""))
+    );
+
+    result = Array.from(
+      new Map(result.map((item) => [item.url, item])).values()
+    );
+
+    return result;
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -154,69 +165,49 @@ export const CollectMultiWebpageForm = ({
   return (
     <Form {...form}>
       <form
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-4 h-full"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        {fields.map((field, index) => (
-          <div key={index} className="flex gap-2">
-            {/* <FormField
-              control={form.control}
-              name={`items.${index}.url`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-            <FormField
-              control={form.control}
-              name={`items.${index}.title`}
-              render={({ field }) => (
-                <FormItem className="flex-2">
-                  {index === 0 && <FormLabel>Title</FormLabel>}
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* <FormField
-              control={form.control}
-              name={`items.${index}.description`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-            <FormField
-              control={form.control}
-              name={`items.${index}.tags`}
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  {index === 0 && <FormLabel>Tags</FormLabel>}
-                  <FormControl>
-                    <Combobox
-                      {...field}
-                      options={tagOptions}
-                      onCreate={handleCreateTag}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <div className="flex gap-2 mt-2 text-sm font-medium leading-none">
+          <div className="w-2/5">Title</div>
+          <div className="w-3/5">Tags</div>
+        </div>
+        <ScrollArea className="flex-1">
+          <div className="flex flex-col gap-4">
+            {fields.map((field, index) => (
+              <div key={index} className="flex gap-2">
+              <FormField
+                control={form.control}
+                name={`items.${index}.title`}
+                render={({ field }) => (
+                  <FormItem className="w-2/5">
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`items.${index}.tags`}
+                render={({ field }) => (
+                  <FormItem className="w-3/5">
+                    <FormControl>
+                      <Combobox
+                        {...field}
+                        options={tagOptions}
+                        onCreate={handleCreateTag}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              </div>
+            ))}
           </div>
-        ))}
+        </ScrollArea>
         <Button type="submit">Submit</Button>
       </form>
     </Form>
