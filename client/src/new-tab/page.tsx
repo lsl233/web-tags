@@ -116,7 +116,7 @@ root.render(
   <React.StrictMode>
     <AuthProvider>
       <Toaster
-        closeButton
+        theme="light"
         toastOptions={{ cancelButtonStyle: { right: 0, left: "auto" } }}
         position="top-center"
       />

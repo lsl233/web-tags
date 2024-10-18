@@ -38,7 +38,8 @@ model WebPage {
 }
 
 enum TagType {
-  SYSTEM
+  INBOX
+  DATE
   CUSTOM
 }
 
@@ -49,7 +50,8 @@ model Tag {
   webPages  WebPage[] @relation("WebPageTags")
   user      User      @relation(fields: [userId], references: [id])
   userId    String
-  type      TagType   @default(SYSTEM)
+  sortOrder Int?      @default(0)
+  type      TagType   @default(CUSTOM)
   // 自关联：父标签和子标签
   parent    Tag?      @relation("TagHierarchy", fields: [parentId], references: [id])
   parentId  String?   // 可选的父标签 ID

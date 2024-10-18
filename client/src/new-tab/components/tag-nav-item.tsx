@@ -1,6 +1,6 @@
 import { Button } from "@/lib/ui/button";
-import { Tags, Edit, Trash2, Plus } from "lucide-react";
-import { Tag, TagWithChildrenAndParentAndLevel } from "shared/tag";
+import { Edit, Trash2, Plus } from "lucide-react";
+import { TagWithChildrenAndParentAndLevel } from "shared/tag";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -35,28 +35,21 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
   const handleDeleteTag = async () => {
     const toastId = toast(
       <div className="flex items-center justify-between gap-2 w-full">
-        <p>Confirm deletion?</p>
+        <p>Confirm Deletion?</p>
         <div>
           <Button
             onClick={() => confirmDeleteTag(toastId)}
-            variant="destructive"
-            size="sm"
-            className="mr-2"
-          >
-            Yes, Delete
-          </Button>
-          <Button
-            onClick={() => toast.dismiss(toastId)}
             variant="text"
-            size="text"
+            className="h-5"
+            size="icon"
           >
-            Cancel
+            <Trash2 className="w-4 h-4 text-red-500 hover:text-red-600" />
           </Button>
         </div>
       </div>,
       {
         duration: 100000,
-        closeButton: false,
+        closeButton: true,
       }
     );
   };

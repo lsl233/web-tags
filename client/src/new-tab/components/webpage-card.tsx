@@ -61,28 +61,21 @@ export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
   const handleOpenConfirmationPopup = () => {
     const toastId = toast(
       <div className="flex items-center justify-between gap-2 w-full">
-        <p>Confirm deletion？</p>
+        <p>Confirm Deletion?</p>
         <div>
           <Button
             onClick={() => handleDeleteWebpage(toastId)}
-            variant="destructive"
-            size="sm"
-            className="mr-2"
-          >
-            Yes, Delete
-          </Button>
-          <Button
-            onClick={() => toast.dismiss(toastId)}
             variant="text"
-            size="text"
+            className="h-5"
+            size="icon"
           >
-            Cancel
+            <Trash2 className="w-4 h-4 text-red-500 hover:text-red-600" />
           </Button>
         </div>
       </div>,
       {
         duration: 100000,
-        closeButton: false,
+        closeButton: true,
       }
     );
   };

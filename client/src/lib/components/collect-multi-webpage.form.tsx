@@ -27,6 +27,7 @@ import { Tag, TagWithId } from "shared/tag";
 import dayjs from "dayjs";
 import { useAuth } from "@/new-tab/components/auth-provider";
 import { ScrollArea } from "@/lib/ui/scroll-area";
+import { Checkbox } from "../ui/checkbox";
 
 const formSchema = z.object({
   items: z.array(collectWebSchema).min(1, "At least one item is required"),
@@ -48,6 +49,7 @@ export const CollectMultiWebpageForm = ({
     return [...flattenChildren(tags), defaultTag];
   }, [tags, defaultTag]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCloseAllPages, setIsCloseAllPages] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -113,11 +115,12 @@ export const CollectMultiWebpageForm = ({
         }
         return item;
       });
+    } else {
+      result = currentWindowWebpages.map((item: CollectWebpageForm) => {
+        item.tags = [defaultTag.id];
+        return item;
+      });
     }
-    result = currentWindowWebpages.map((item: CollectWebpageForm) => {
-      item.tags = [defaultTag.id];
-      return item;
-    });
 
     result = result.filter(
       (item) => !item.url.includes(chrome.runtime.getURL(""))
@@ -165,50 +168,62 @@ export const CollectMultiWebpageForm = ({
   return (
     <Form {...form}>
       <form
-        className="flex flex-col gap-4 h-full"
+        className="flex flex-col h-full"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className="flex gap-2 mt-2 text-sm font-medium leading-none">
+        <div className="flex gap-2 mt-2 pb-2 text-sm font-medium leading-none">
           <div className="w-2/5">Title</div>
           <div className="w-3/5">Tags</div>
         </div>
-        <ScrollArea className="flex-1">
-          <div className="flex flex-col gap-4">
+        <ScrollArea className="h-[400px] -m-1">
+          <div className="flex flex-col gap-4 p-1">
             {fields.map((field, index) => (
               <div key={index} className="flex gap-2">
-              <FormField
-                control={form.control}
-                name={`items.${index}.title`}
-                render={({ field }) => (
-                  <FormItem className="w-2/5">
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`items.${index}.tags`}
-                render={({ field }) => (
-                  <FormItem className="w-3/5">
-                    <FormControl>
-                      <Combobox
-                        {...field}
-                        options={tagOptions}
-                        onCreate={handleCreateTag}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name={`items.${index}.title`}
+                  render={({ field }) => (
+                    <FormItem className="w-2/5">
+                      <FormControl>
+                        <Input {...field} autoFocus={index === 0} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`items.${index}.tags`}
+                  render={({ field }) => (
+                    <FormItem className="w-3/5">
+                      <FormControl>
+                        <Combobox
+                          {...field}
+                          options={tagOptions}
+                          onCreate={handleCreateTag}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             ))}
           </div>
         </ScrollArea>
-        <Button type="submit">Submit</Button>
+
+        <div className="mt-4">
+          <Checkbox id="terms1" onChange={() => setIsCloseAllPages(!isCloseAllPages)} checked={isCloseAllPages} />
+          <label
+            htmlFor="terms1"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Submitted, close all pages
+          </label>
+        </div>
+        <Button type="submit" className="mt-2">
+          Submit
+        </Button>
       </form>
     </Form>
   );

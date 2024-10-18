@@ -77,7 +77,7 @@ const Popup = () => {
   return (
     <div
       className={cn(
-        " p-4 relative bg-white min-h-[500px]",
+        " p-4 relative bg-white min-h-[400px]",
         activeTab === "collect-webpage-form" ? "w-96" : "w-[620px]"
       )}
     >
@@ -90,7 +90,7 @@ const Popup = () => {
         Success
       </div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col">
-        <TabsList className="grid w-full grid-cols-2 sticky top-4 bg-white">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="collect-webpage-form">Current Page</TabsTrigger>
           <TabsTrigger value="collect-multi-webpage-form">
             All Tab Pages
@@ -120,7 +120,7 @@ const Popup = () => {
             </div>
           )}
         </TabsContent>
-        <TabsContent value="collect-multi-webpage-form">
+        <TabsContent value="collect-multi-webpage-form" className="mt-0"> 
           {/* <ScrollArea className="w-full h-[200px]"> */}
           <div className="w-full h-full">
             <CollectMultiWebpageForm submitSuccess={handleSubmitSuccess} />
