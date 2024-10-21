@@ -152,6 +152,10 @@ export const CollectMultiWebpageForm = ({
       });
 
       submitSuccess();
+
+      if (isCloseAllPages) {
+        chrome.runtime.sendMessage({ type: "close-current-window-tabs" });
+      }
     }
   };
 
@@ -212,16 +216,16 @@ export const CollectMultiWebpageForm = ({
           </div>
         </ScrollArea>
 
-        <div className="mt-4">
-          <Checkbox id="terms1" onChange={() => setIsCloseAllPages(!isCloseAllPages)} checked={isCloseAllPages} />
+        <div className="mt-4 flex items-center gap-1">
+          <Checkbox id="terms1" onCheckedChange={() => setIsCloseAllPages(!isCloseAllPages)} checked={isCloseAllPages} />
           <label
             htmlFor="terms1"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm text-gray-500 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
-            Submitted, close all pages
+            Submitted and close all pages
           </label>
         </div>
-        <Button type="submit" className="mt-2">
+        <Button type="submit" className="mt-4">
           Submit
         </Button>
       </form>

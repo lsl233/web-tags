@@ -78,7 +78,7 @@ const Popup = () => {
     <div
       className={cn(
         " p-4 relative bg-white min-h-[400px]",
-        activeTab === "collect-webpage-form" ? "w-96" : "w-[620px]"
+        "w-[620px]"
       )}
     >
       <div

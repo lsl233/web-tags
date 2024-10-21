@@ -51,6 +51,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse(result);
     });
   }
+
+  if (messageType === "close-current-window-tabs") {
+    chrome.tabs.query({ }, (tabs) => {
+      chrome.tabs.remove(tabs.map((tab) => tab.id!));
+    });
+  }
   return true;
 });
 
