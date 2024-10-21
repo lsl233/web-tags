@@ -3,6 +3,9 @@ node_modules/
 dist/
 tmp/
 
+package-lock.json
+pnpm-lock.yaml
+
 .env
 .env.*
 *.zip
