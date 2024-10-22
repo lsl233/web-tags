@@ -3,6 +3,7 @@ import ServerError from "@/lib/error.js";
 import express from "express";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { TagType } from "@prisma/client";
 
 const router = express.Router();
 
@@ -81,6 +82,16 @@ router.post("/", async (req, res, next) => {
       password: hashedPassword,
     },
   });
+
+  await db.tag.create({
+    data: {
+      name: "Inbox",
+      type: TagType.DATE,
+      sortOrder: 1,
+      user: { connect: { id: createdUser.id } },
+    },
+  });
+
   res.json(createdUser);
 });
 
