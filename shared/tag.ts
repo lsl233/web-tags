@@ -23,9 +23,17 @@ export type TagWithChildrenAndParentAndLevel = TagWithChildrenAndParent & {
   
 };
 
+export enum TagType {
+  INBOX = "INBOX",
+  DATE = "DATE",
+  CUSTOM = "CUSTOM",
+}
+
 export const tagSchema = z.object({
   name: z.string().min(1, { message: "Please fill in the tag name" }).max(8, { message: "Tag name cannot exceed 8 characters" }),
   icon: z.string(),
 });
 
 export type TagWithId = z.infer<typeof tagSchema> & { id: string };
+
+

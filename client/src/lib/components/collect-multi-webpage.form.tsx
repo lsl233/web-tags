@@ -23,7 +23,7 @@ import { useStore } from "../hooks/store.hook";
 import { flattenChildren } from "../utils";
 import { f } from "../f";
 import { Button } from "../ui/button-loading";
-import { Tag, TagWithId } from "shared/tag";
+import { Tag, TagType, TagWithId } from "shared/tag";
 import dayjs from "dayjs";
 import { useAuth } from "@/new-tab/components/auth-provider";
 import { ScrollArea } from "@/lib/ui/scroll-area";
@@ -71,7 +71,6 @@ export const CollectMultiWebpageForm = ({
           const _defaultTag = generateDefaultTag();
           setDefaultTag(_defaultTag);
 
-          // TODO: 多页面查询
           append(await generateDefaultForm(currentWindowWebpages, _defaultTag));
         }
       }
@@ -136,9 +135,12 @@ export const CollectMultiWebpageForm = ({
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const foundTag = data.items.find((item) => item.tags.includes("-1"));
     if (foundTag && defaultTag) {
+
+      const inboxTag = tags.find((tag) => tag.type === TagType.INBOX);
+      if (!inboxTag) return;
       const result = await f("/api/tag", {
         method: "POST",
-        body: { name: defaultTag.name, icon: defaultTag.icon },
+        body: { name: defaultTag.name, icon: defaultTag.icon, type: TagType.DATE, parentId: inboxTag.id },
       });
 
       data.items.map((item) => {
