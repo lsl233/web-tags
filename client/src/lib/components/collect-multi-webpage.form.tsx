@@ -106,7 +106,7 @@ export const CollectMultiWebpageForm = ({
             title: foundWebpage.title,
             description: foundWebpage.description,
             icon: foundWebpage.icon,
-            tags: [defaultTag.id, ...foundWebpage.tags.map((tag) => tag.id)],
+            tags: [defaultTag.id],
           } as CollectWebpageForm;
         }
         if (defaultTag) {
@@ -136,11 +136,11 @@ export const CollectMultiWebpageForm = ({
     const foundTag = data.items.find((item) => item.tags.includes("-1"));
     if (foundTag && defaultTag) {
 
-      const inboxTag = tags.find((tag) => tag.type === TagType.INBOX);
-      if (!inboxTag) return;
+      // const inboxTag = tags.find((tag) => tag.type === TagType.INBOX);
+      // if (!inboxTag) return;
       const result = await f("/api/tag", {
         method: "POST",
-        body: { name: defaultTag.name, icon: defaultTag.icon, type: TagType.DATE, parentId: inboxTag.id },
+        body: { name: defaultTag.name, icon: defaultTag.icon, type: TagType.DATE },
       });
 
       data.items.map((item) => {
