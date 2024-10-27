@@ -6,6 +6,7 @@ import { useStore } from "@/lib/hooks/store.hook";
 import { WebpageCard } from "./webpage-card";
 import { useEffect } from "react";
 import { ScrollArea } from "@/lib/ui/scroll-area";
+import { TagType } from "shared/tag";
 interface WebpagesViewProps {
   webpages: WebpageWithTags[];
 }
@@ -45,7 +46,7 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
       <ScrollArea className="flex-1 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-2 p-2 content-start">
           {webpages.map((webpage) => (
-            <WebpageCard key={webpage.id} webpage={webpage} />
+            <WebpageCard key={webpage.id} webpage={webpage} showTags={activeTag?.type === TagType.CUSTOM} />
           ))}
         </div>
       </ScrollArea>

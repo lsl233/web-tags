@@ -23,7 +23,7 @@ import { TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { TagBadge } from "@/lib/components/tag";
 // import { TagWithChildrenAndParentAndLevelAndParent } from "shared/tag";
 
-export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
+export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWithTags, showTags?: boolean }) => {
   const { setDefaultCollectForm, setCollectDialogOpen, setWebpages, webpages } =
     useStore();
   const getIconURL = (webpage: WebpageWithTags) => {
@@ -108,9 +108,10 @@ export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
             {webpage.description}
           </div>
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger className="max-w-full">
+          {showTags && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="max-w-full">
                 <div className="flex max-w-full gap-2 mt-2 flex-nowrap truncate">
                   {webpage?.tags.map((tag) => (
                     <TagBadge key={tag.id} tag={tag}></TagBadge>
@@ -122,8 +123,9 @@ export const WebpageCard = ({ webpage }: { webpage: WebpageWithTags }) => {
                   <TagBadge key={tag.id} tag={tag}></TagBadge>
                 ))}
               </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent>

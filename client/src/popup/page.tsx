@@ -89,45 +89,45 @@ const Popup = () => {
       >
         Success
       </div>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="collect-webpage-form">Current Page</TabsTrigger>
-          <TabsTrigger value="collect-multi-webpage-form">
-            All Tab Pages
-          </TabsTrigger>
-        </TabsList>
+      {loading ? (
+        <SkeletonList />
+      ) : session ? (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="collect-webpage-form">Current Page</TabsTrigger>
+            <TabsTrigger value="collect-multi-webpage-form">
+              All Tab Pages
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent className="flex-1" value="collect-webpage-form">
-          {loading ? (
-            <SkeletonList />
-          ) : session ? (
+          <TabsContent className="flex-1" value="collect-webpage-form">
             <CollectWebpageForm
               defaultForm={defaultWebpageInfo}
               submitSuccess={handleSubmitSuccess}
               visibleButton
             />
-          ) : (
-            <div className="text-center">
-              <Button
-                onClick={() => {
-                  chrome.tabs.create({
-                    url: chrome.runtime.getURL("new-tab.html"),
-                  });
-                }}
-              >
-                Sign in
-              </Button>
+          </TabsContent>
+          <TabsContent value="collect-multi-webpage-form" className="mt-0">
+            {/* <ScrollArea className="w-full h-[200px]"> */}
+            <div className="w-full h-full">
+              <CollectMultiWebpageForm submitSuccess={handleSubmitSuccess} />
             </div>
-          )}
-        </TabsContent>
-        <TabsContent value="collect-multi-webpage-form" className="mt-0"> 
-          {/* <ScrollArea className="w-full h-[200px]"> */}
-          <div className="w-full h-full">
-            <CollectMultiWebpageForm submitSuccess={handleSubmitSuccess} />
-          </div>
-          {/* </ScrollArea> */}
-        </TabsContent>
-      </Tabs>
+            {/* </ScrollArea> */}
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <div className="flex justify-center items-center min-h-full">
+          <Button
+            onClick={() => {
+              chrome.tabs.create({
+                url: chrome.runtime.getURL("new-tab.html"),
+              });
+            }}
+          >
+            Sign in
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

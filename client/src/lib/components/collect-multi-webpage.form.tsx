@@ -136,11 +136,11 @@ export const CollectMultiWebpageForm = ({
     const foundTag = data.items.find((item) => item.tags.includes("-1"));
     if (foundTag && defaultTag) {
 
-      // const inboxTag = tags.find((tag) => tag.type === TagType.INBOX);
-      // if (!inboxTag) return;
+      const inboxTag = tags.find((tag) => tag.type === TagType.INBOX);
+      if (!inboxTag) return;
       const result = await f("/api/tag", {
         method: "POST",
-        body: { name: defaultTag.name, icon: defaultTag.icon, type: TagType.DATE },
+        body: { name: defaultTag.name, icon: defaultTag.icon, type: TagType.DATE, parentId: inboxTag.id },
       });
 
       data.items.map((item) => {
@@ -156,6 +156,7 @@ export const CollectMultiWebpageForm = ({
       submitSuccess();
 
       if (isCloseAllPages) {
+        chrome.tabs.create({ url: "" });
         chrome.runtime.sendMessage({ type: "close-current-window-tabs" });
       }
     }
