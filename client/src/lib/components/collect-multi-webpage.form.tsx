@@ -156,7 +156,6 @@ export const CollectMultiWebpageForm = ({
       submitSuccess();
 
       if (isCloseAllPages) {
-        chrome.tabs.create({ url: "" });
         chrome.runtime.sendMessage({ type: "close-current-window-tabs" });
       }
     }

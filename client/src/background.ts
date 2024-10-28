@@ -5,7 +5,7 @@ chrome.runtime.onInstalled.addListener(() => {
   // TODO 当插件安装，自动为已打开页面注入 content-script
 });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   const messageType = request.type;
   console.log(`[接收消息 background ${messageType}]`, request);
   if (messageType === "get-page-content") {
@@ -53,9 +53,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (messageType === "close-current-window-tabs") {
-    chrome.tabs.query({ }, (tabs) => {
-      chrome.tabs.remove(tabs.map((tab) => tab.id!));
-    });
+    chrome.tabs.create({ url: 'chrome://newtab/' }, () => {
+      chrome.tabs.query({ }, (tabs) => {
+        chrome.tabs.remove(tabs.map((tab) => tab.id!));
+      });
+    })
   }
   return true;
 });
