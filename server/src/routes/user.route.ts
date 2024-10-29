@@ -81,6 +81,7 @@ router.post("/", async (req, res, next) => {
   await db.tag.create({
     data: {
       name: "Inbox",
+      icon: '',
       type: TagType.INBOX,
       sortOrder: 1,
       user: { connect: { id: createdUser.id } },
