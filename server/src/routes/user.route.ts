@@ -34,12 +34,7 @@ router.post("/session", async (req, res, next) => {
     .update(password)
     .digest("hex");
 
-  const isPasswordCorrect = crypto.timingSafeEqual(
-    Buffer.from(foundUser.password),
-    Buffer.from(hashedPassword)
-  );
-
-  if (!isPasswordCorrect) {
+  if (hashedPassword !== foundUser.password) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
 
