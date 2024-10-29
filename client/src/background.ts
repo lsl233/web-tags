@@ -53,11 +53,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   }
 
   if (messageType === "close-current-window-tabs") {
-    chrome.tabs.create({ url: 'chrome://newtab/' }, () => {
-      chrome.tabs.query({ }, (tabs) => {
-        chrome.tabs.remove(tabs.map((tab) => tab.id!));
-      });
-    })
+    chrome.tabs.create({ url: chrome.runtime.getURL('new-tab.html') });
+    chrome.tabs.query({ }, (tabs) => {
+      chrome.tabs.remove(tabs.map((tab) => tab.id!));
+    });
   }
   return true;
 });
