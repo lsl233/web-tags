@@ -64,17 +64,25 @@ export const CollectMultiWebpageForm = ({
   });
 
   useEffect(() => {
-    chrome.runtime.sendMessage(
-      { type: "get-current-window-page-content" },
-      async (currentWindowWebpages) => {
-        if (currentWindowWebpages) {
-          const _defaultTag = generateDefaultTag();
-          setDefaultTag(_defaultTag);
+    chrome.tabs.query({}, async (tabs) => {
+      const currentWindowWebpages = tabs.map((tab) => {
+        return {
+          url: tab.url,
+          title: tab.title,
+          icon: tab.favIconUrl || "",
+          description: tab.title,
+          tags: [],
+        } as CollectWebpageForm;
+      });
+      const _defaultTag = generateDefaultTag();
+      setDefaultTag(_defaultTag);
 
-          append(await generateDefaultForm(currentWindowWebpages, _defaultTag));
-        }
-      }
-    );
+      const result = await generateDefaultForm(
+        currentWindowWebpages,
+        _defaultTag
+      );
+      append(result);
+    });
   }, []);
 
   const generateDefaultTag = () => {
@@ -135,12 +143,16 @@ export const CollectMultiWebpageForm = ({
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const foundTag = data.items.find((item) => item.tags.includes("-1"));
     if (foundTag && defaultTag) {
-
       const inboxTag = tags.find((tag) => tag.type === TagType.INBOX);
       if (!inboxTag) return;
       const result = await f("/api/tag", {
         method: "POST",
-        body: { name: defaultTag.name, icon: defaultTag.icon, type: TagType.DATE, parentId: inboxTag.id },
+        body: {
+          name: defaultTag.name,
+          icon: defaultTag.icon,
+          type: TagType.DATE,
+          parentId: inboxTag.id,
+        },
       });
 
       data.items.map((item) => {
@@ -156,7 +168,12 @@ export const CollectMultiWebpageForm = ({
       submitSuccess();
 
       if (isCloseAllPages) {
-        chrome.runtime.sendMessage({ type: "close-current-window-tabs" });
+        chrome.runtime.sendMessage(
+          { type: "close-current-window-tabs" },
+          (e) => {
+            console.log(e);
+          }
+        );
       }
     }
   };
@@ -219,7 +236,11 @@ export const CollectMultiWebpageForm = ({
         </ScrollArea>
 
         <div className="mt-4 flex items-center gap-1">
-          <Checkbox id="terms1" onCheckedChange={() => setIsCloseAllPages(!isCloseAllPages)} checked={isCloseAllPages} />
+          <Checkbox
+            id="terms1"
+            onCheckedChange={() => setIsCloseAllPages(!isCloseAllPages)}
+            checked={isCloseAllPages}
+          />
           <label
             htmlFor="terms1"
             className="text-sm text-gray-500 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
