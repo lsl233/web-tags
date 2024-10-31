@@ -7,7 +7,7 @@ import {
   FormMessage,
 } from "@/lib/ui/form";
 import { Input } from "@/lib/ui/input";
-import { Button } from "@/lib/ui/button";
+import { Button } from "@/lib/ui/button-loading";
 import { Textarea } from "@/lib/ui/textarea";
 import { Combobox } from "@/lib/ui/combobox";
 import { DialogFooter } from "@/lib/ui/dialog";
@@ -29,8 +29,11 @@ interface CollectWebpageFormProps {
   defaultForm?: Partial<ScrapedWebpage>;
 }
 
-function flatten(arr: TagWithChildrenAndParentAndLevel[], parentName = ''): Tag[] {
-  return arr.flatMap(item => {
+function flatten(
+  arr: TagWithChildrenAndParentAndLevel[],
+  parentName = ""
+): Tag[] {
+  return arr.flatMap((item) => {
     const fullName = parentName ? `${parentName}/${item.name}` : item.name;
     const { children, name, ...rest } = item;
     return [{ ...rest, name: fullName }, ...flatten(children || [], fullName)];
@@ -49,6 +52,7 @@ export const CollectWebpageForm = ({
   const setDefaultCollectForm = useStore(
     (state) => state.setDefaultCollectForm
   );
+  const [submitting, setSubmitting] = useState(false);
   const [webpageId, setWebpageId] = useState<string>(defaultForm.id || "");
   const tagOptions = useMemo(() => flatten(tags), [tags]);
 
@@ -126,6 +130,7 @@ export const CollectWebpageForm = ({
   };
 
   const onSubmit = async (data: z.infer<typeof collectWebSchema>) => {
+    setSubmitting(true);
     const response = await f("/api/webpage", {
       method: "POST",
       body: {
@@ -134,17 +139,20 @@ export const CollectWebpageForm = ({
       },
     });
     if (!response) return;
-    if (webpageId) {
-      setWebpages(
-        webpages.map((webpage) =>
-          webpage.id === response.id ? response : webpage
-        )
-      );
-    } else {
-      setWebpages([response, ...webpages]);
+    if (response) {
+      if (webpageId) {
+        setWebpages(
+          webpages.map((webpage) =>
+            webpage.id === response.id ? response : webpage
+          )
+        );
+      } else {
+        setWebpages([response, ...webpages]);
+      }
+      setWebpageId(response.id);
+      submitSuccess();
     }
-    setWebpageId(response.id);
-    submitSuccess();
+    setSubmitting(false);
   };
 
   const handleCreateTag = async (name: string) => {
@@ -178,7 +186,7 @@ export const CollectWebpageForm = ({
         description: form.getValues("description"),
       },
     });
-    console.log(response, 'ai tags');
+    console.log(response, "ai tags");
   };
 
   return (
@@ -276,7 +284,9 @@ export const CollectWebpageForm = ({
         />
         {visibleButton && (
           <DialogFooter>
-            <Button type="submit">{webpageId ? "Update" : "Submit"}</Button>
+            <Button loading={submitting} type="submit">
+              {webpageId ? "Update" : "Submit"}
+            </Button>
           </DialogFooter>
         )}
       </form>
