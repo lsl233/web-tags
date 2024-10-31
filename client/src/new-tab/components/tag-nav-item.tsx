@@ -86,7 +86,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
     return (
       <AsyncIcon
         name={(tag.icon as IconName) || "hash"}
-        className="w-5 h-5 mr-2"
+        className="w-5 h-5 mr-2 shrink-0"
       />
     );
   }, [tag.icon]);
