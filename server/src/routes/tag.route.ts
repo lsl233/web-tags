@@ -15,7 +15,27 @@ router.get("/", async (req, res, next) => {
       userId: req.user.id,
       parentId: null,
     },
-    include: includeTagLevel,
+    include: {
+      children: {
+        orderBy: { 
+          createdAt: 'desc', // 第一层子标签按创建时间升序排序
+        },
+        include: {
+          children: {
+            orderBy: { 
+              createdAt: 'desc', // 第二层子标签按创建时间升序排序
+            },
+            include: {
+              children: {
+                orderBy: {
+                  createdAt: 'desc', // 第三层子标签按创建时间升序排序
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     orderBy: {
       createdAt: "desc",
     },
