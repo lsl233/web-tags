@@ -28,7 +28,7 @@ router.post("/", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
-  const { name, id, icon, parentId } = req.body;
+  const { name, id, icon, type, parentId } = req.body;
 
   if (id) {
     // 更新现有标签
@@ -53,7 +53,7 @@ router.post("/", async (req, res, next) => {
       data: {
         name,
         icon,
-        
+        type,
         user: {
           connect: {
             id: req.user.id,
