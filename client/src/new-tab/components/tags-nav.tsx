@@ -1,9 +1,11 @@
 import { Button } from "@/lib/ui/button";
-import { Hash, Tag as TagIcon } from "lucide-react";
-import { Tag, TagWithChildrenAndParentAndLevel } from "shared/tag";
+import { Hash, Settings } from "lucide-react";
+import { TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { CreateTagDialog } from "./create-tag-dialog";
 import { ScrollArea } from "@/lib/ui/scroll-area";
 import { TagNavItem } from "./tag-nav-item";
+import { SettingDialog } from "./setting/dialog";
+
 interface TagsNavProps {
   tags: TagWithChildrenAndParentAndLevel[];
   activeTag: TagWithChildrenAndParentAndLevel | null;
@@ -29,13 +31,13 @@ export const TagsNav = ({ tags, activeTag, setActiveTag }: TagsNavProps) => {
         </div>
       </ScrollArea>
       <div className="shrink-0 flex items-center justify-center h-[52px] border-t border-gray-300">
-
-        <CreateTagDialog>
+        <CreateTagDialog />
+        <SettingDialog>
           <Button variant="ghost" className="w-full h-full">
-            <TagIcon className="w-4 h-4 mr-1" />
-            Create Tag
+            <Settings className="w-4 h-4 mr-1" />
+            Settings
           </Button>
-        </CreateTagDialog>
+        </SettingDialog>
       </div>
     </div>
   );

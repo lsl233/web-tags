@@ -23,7 +23,6 @@ import { Input } from "@/lib/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { tagSchema, TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { z } from "zod";
-import { Plus } from "lucide-react";
 import { f } from "@/lib/f";
 import { useStore } from "@/lib/hooks/store.hook";
 import { AsyncIcon, IconName, IconPicker } from "@/lib/ui/icon-picker";
@@ -31,7 +30,7 @@ import { AsyncIcon, IconName, IconPicker } from "@/lib/ui/icon-picker";
 export const CreateTagDialog = ({
   children,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) => {
   const { createTagDialogOpen, setCreateTagDialogOpen, defaultTagForm } =
     useStore();
