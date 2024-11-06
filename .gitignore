@@ -6,6 +6,7 @@ tmp/
 package-lock.json
 pnpm-lock.yaml
 
+.idea
 .env
 .env.*
 *.zip

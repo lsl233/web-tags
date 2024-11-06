@@ -5,27 +5,53 @@ import { CreateTagDialog } from "./create-tag-dialog";
 import { ScrollArea } from "@/lib/ui/scroll-area";
 import { TagNavItem } from "./tag-nav-item";
 import { SettingDialog } from "./setting/dialog";
+import { DndContext, DragEndEvent, PointerSensor, closestCorners, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable";
+import { arrayMove } from "@dnd-kit/sortable"
+import { useStore } from "@/lib/hooks/store.hook";
+import { useEffect, useState } from "react";
 
 interface TagsNavProps {
   tags: TagWithChildrenAndParentAndLevel[];
-  activeTag: TagWithChildrenAndParentAndLevel | null;
-  setActiveTag: (tag: TagWithChildrenAndParentAndLevel | null) => void;
 }
 
-export const TagsNav = ({ tags, activeTag, setActiveTag }: TagsNavProps) => {
+export const TagsNav = ({ tags }: TagsNavProps) => {
+  const [_tags, _setTags] = useState(tags)
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 5
+    }
+  });
+  const sensors = useSensors(pointerSensor)
+  const [activeTag, setActiveTag] = useStore((state) => [state.activeTag, state.setActiveTag]);
+
+  useEffect(() => _setTags(tags), [tags])
+
+  const getTagIndex = (id: string) => _tags.findIndex(tag => tag.id === id)
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    console.log('handleDragEnd', tags, event)
+    const startTag = tags.find(item => item.id === active.id)
+    const endTag = tags.find(item => item.id === over?.id)
+    console.log(startTag, endTag)
+    if (startTag && endTag) {
+      if (startTag.parentId === endTag.parentId) {
+        const oldIndex = getTagIndex(active.id as string)
+        const newIndex = getTagIndex(over?.id as string)
+        _setTags(arrayMove(_tags, oldIndex, newIndex))
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col h-full">
-      <div className="shrink-0 flex items-center justify-center h-[52px] border-b border-gray-300">
-        <CreateTagDialog>
-          <Button variant="ghost" className="w-full h-full">
-            <BookmarkPlus className="w-6 h-6 mr-1" />
-            Create
-          </Button>
-        </CreateTagDialog>
-      </div>
-      <ScrollArea className="flex-1 w-full">
-        <div className="p-2">
-          {tags.map((tag) => (
+      <DndContext onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCorners}>
+        <SortableContext items={_tags} strategy={verticalListSortingStrategy}>
+          {_tags.map((tag) => (
             <TagNavItem
               key={tag.id}
               tag={tag}
@@ -33,17 +59,8 @@ export const TagsNav = ({ tags, activeTag, setActiveTag }: TagsNavProps) => {
               onClick={() => setActiveTag(tag)}
             />
           ))}
-        </div>
-      </ScrollArea>
-      
-      <div className="shrink-0 flex items-center justify-center h-[52px] border-t border-gray-300">
-        <SettingDialog>
-          <Button variant="ghost" className="w-full h-full">
-            <Settings className="w-4 h-4 mr-1" />
-            Settings
-          </Button>
-        </SettingDialog>
-      </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };
