@@ -40,9 +40,10 @@ router.get("/", async (req, res, next) => {
         },
       },
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: [
+      {sortOrder: 'desc'},
+      {createdAt: 'desc'}
+    ],
   });
 
   res.json(foundTags);
