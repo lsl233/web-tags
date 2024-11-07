@@ -13,6 +13,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable"
 import { useStore } from "@/lib/hooks/store.hook";
 import { useEffect, useState } from "react";
+import { f } from "@/lib/f";
 
 interface TagsNavProps {
   tags: TagWithChildrenAndParentAndLevel[];
@@ -32,9 +33,8 @@ export const TagsNav = ({ tags }: TagsNavProps) => {
 
   const getTagIndex = (id: string) => _tags.findIndex(tag => tag.id === id)
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
-    console.log('handleDragEnd', tags, event)
     const startTag = tags.find(item => item.id === active.id)
     const endTag = tags.find(item => item.id === over?.id)
     console.log(startTag, endTag)
@@ -42,7 +42,14 @@ export const TagsNav = ({ tags }: TagsNavProps) => {
       if (startTag.parentId === endTag.parentId) {
         const oldIndex = getTagIndex(active.id as string)
         const newIndex = getTagIndex(over?.id as string)
-        _setTags(arrayMove(_tags, oldIndex, newIndex))
+        const result = arrayMove(_tags, oldIndex, newIndex)
+        const tagsSortOrder = result.map((item, index) => ({ id: item.id, sortOrder: index }))
+        console.log('tagsSortOrder', tagsSortOrder)
+        f('/api/tag/sort-order', {
+          method: "POST",
+          body: tagsSortOrder
+        })
+        _setTags(result)
       }
     }
   }

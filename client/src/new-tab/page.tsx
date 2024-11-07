@@ -23,11 +23,17 @@ function mapTagsWithLevels(
   tags: TagWithChildrenAndParentAndLevel[],
   level: number = 1
 ): TagWithChildrenAndParentAndLevel[] {
-  return tags.map((tag) => ({
-    ...tag,
-    level: level,
-    children: mapTagsWithLevels(tag.children, level + 1),
-  }));
+  return tags.map((tag, index) => {
+    const result = {
+      ...tag,
+      level: level,
+      children: mapTagsWithLevels(tag.children, level + 1),
+    }
+    if (!result.sortOrder) {
+      result.sortOrder = index
+    }
+    return result
+  });
 }
 
 const NewTab = () => {

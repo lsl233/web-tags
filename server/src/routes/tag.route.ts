@@ -6,6 +6,7 @@ import express from "express";
 
 const router = express.Router();
 
+// user tags
 router.get("/", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
@@ -17,19 +18,22 @@ router.get("/", async (req, res, next) => {
     },
     include: {
       children: {
-        orderBy: { 
-          createdAt: 'desc', // 第一层子标签按创建时间升序排序
-        },
+        orderBy: [
+          {sortOrder: 'desc'},
+          {createdAt: 'desc'}
+        ],
         include: {
           children: {
-            orderBy: { 
-              createdAt: 'desc', // 第二层子标签按创建时间升序排序
-            },
+            orderBy: [
+              {sortOrder: 'desc'},
+              {createdAt: 'desc'}
+            ],
             include: {
               children: {
-                orderBy: {
-                  createdAt: 'desc', // 第三层子标签按创建时间升序排序
-                },
+                orderBy: [
+                  {sortOrder: 'desc'},
+                  {createdAt: 'desc'}
+                ],
               },
             },
           },
@@ -44,6 +48,7 @@ router.get("/", async (req, res, next) => {
   res.json(foundTags);
 });
 
+// create or update tag
 router.post("/", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
@@ -86,6 +91,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+// delete tag
 router.delete("/:id", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
@@ -143,6 +149,7 @@ router.delete("/:id", async (req, res, next) => {
   }
 });
 
+// TODO ai generate tag
 router.post("/ai", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
@@ -186,5 +193,18 @@ router.post("/ai", async (req, res, next) => {
 
   res.send({ message: data.choices[0].message.content });
 });
+
+router.post("/sort-order", async (req, res, next) => {
+  const sortedTags = req.body
+  await db.$transaction(
+    sortedTags.map((tag: { id: string; sortOrder: number; }) =>
+      prisma.tag.update({
+        where: { id: tag.id },
+        data: { sortOrder: tag.sortOrder },
+      })
+    )
+  );
+  res.json({message: 'ok'})
+})
 
 export default router;
