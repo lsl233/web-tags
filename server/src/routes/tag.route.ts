@@ -19,19 +19,19 @@ router.get("/", async (req, res, next) => {
     include: {
       children: {
         orderBy: [
-          {sortOrder: 'desc'},
+          {sortOrder: 'asc'},
           {createdAt: 'desc'}
         ],
         include: {
           children: {
             orderBy: [
-              {sortOrder: 'desc'},
+              {sortOrder: 'asc'},
               {createdAt: 'desc'}
             ],
             include: {
               children: {
                 orderBy: [
-                  {sortOrder: 'desc'},
+                  {sortOrder: 'asc'},
                   {createdAt: 'desc'}
                 ],
               },
@@ -41,7 +41,7 @@ router.get("/", async (req, res, next) => {
       },
     },
     orderBy: [
-      {sortOrder: 'desc'},
+      {sortOrder: 'asc'},
       {createdAt: 'desc'}
     ],
   });
