@@ -12,10 +12,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/lib/ui/popover";
 import { Button } from "./button";
 import { areEqual, FixedSizeGrid } from "react-window";
 import { Input } from "./input-icon";
-import { debounce } from "../utils";
+import { cn, debounce } from "../utils";
 import { Separator } from "./separator";
 
-const fallback = <div style={{ background: "#ddd", width: 24, height: 24 }} />;
+const fallback = <div className="w-[24px] h-[24px]" />;
 
 export type IconName = keyof typeof dynamicIconImports;
 
@@ -27,7 +27,7 @@ export const AsyncIcon = ({ name, ...props }: IconProps) => {
   const LucideIcon = useMemo(() => lazy(dynamicIconImports[name]), [name]);
 
   return (
-    <Suspense fallback={fallback}>
+    <Suspense fallback={<div className={cn('bg-slate-300', props.className)} />}>
       <LucideIcon {...props} />
     </Suspense>
   );

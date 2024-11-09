@@ -55,19 +55,15 @@ export const TagsNav = ({ tags }: TagsNavProps) => {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <DndContext onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCorners}>
-        <SortableContext items={_tags} strategy={verticalListSortingStrategy}>
-          {_tags.map((tag) => (
-            <TagNavItem
-              key={tag.id}
-              tag={tag}
-              isActive={activeTag?.id === tag.id}
-              onClick={() => setActiveTag(tag)}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
-    </div>
+      <SortableContext items={tags} strategy={verticalListSortingStrategy}>
+        {tags.map((tag) => (
+          <TagNavItem
+            key={tag.id}
+            tag={tag}
+            isActive={activeTag?.id === tag.id}
+            onClick={() => setActiveTag(tag)}
+          />
+        ))}
+      </SortableContext>
   );
 };

@@ -63,7 +63,6 @@ export const CreateTagDialog = ({
   };
 
   const onSubmit = async (data: z.infer<typeof tagSchema>) => {
-    console.log(data, "on submit");
     const createdTag = await f("/api/tag", {
       method: "POST",
       body: {
@@ -73,6 +72,7 @@ export const CreateTagDialog = ({
       },
     });
     if (!createdTag) return;
+    // 更新
     if (defaultTagForm.id) {
       setTags(deepMap(tags, (t) => {
         if (t.id === defaultTagForm.id) {
@@ -80,8 +80,9 @@ export const CreateTagDialog = ({
         }
         return t;
       }));
-      // setTags(tags.map((t) => (t.id === defaultTagForm.id ? createdTag : t)));
-    } else {
+    }
+    // 创建子级别
+    else if (defaultTagForm.parentId) {
       setTags(deepMap(tags, (t) => {
         if (t.id === defaultTagForm.parentId) {
           createdTag.children = []
@@ -91,10 +92,13 @@ export const CreateTagDialog = ({
         }
         return t;
       }));
-      // setTags([createdTag, ...tags]);
+    }
+    // 创建第一级
+    else {
+      createdTag.children = []
+      setTags([...tags, createdTag])
     }
     setCreateTagDialogOpen(false);
-    // setTags([createdTag, ...tags]);
   };
 
   return (
