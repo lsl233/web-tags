@@ -7,12 +7,17 @@ import { WebpageCard } from "./webpage-card";
 import { useEffect } from "react";
 import { ScrollArea } from "@/lib/ui/scroll-area";
 import { TagType } from "shared/tag";
-interface WebpagesViewProps {
-  webpages: WebpageWithTags[];
-}
+import { closestCenter, DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext } from "@dnd-kit/sortable";
 
-export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
-  const { activeTag, setDefaultCollectForm } = useStore();
+export const WebpagesView = () => {
+  const { activeTag, setDefaultCollectForm, webpages, setWebpages } = useStore();
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 5
+    }
+  });
+  const sensors = useSensors(pointerSensor)
 
   useEffect(() => {
     setDefaultCollectForm({ tags: activeTag?.id ? [activeTag.id] : [] });
@@ -23,6 +28,10 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
       chrome.tabs.create({ url: webpage.url, active: false });
     });
   };
+
+  const handleDragEnd = () => {
+
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -45,9 +54,13 @@ export const WebpagesView = ({ webpages }: WebpagesViewProps) => {
       </div>
       <ScrollArea className="flex-1 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-2 p-2 content-start">
-          {webpages.map((webpage) => (
-            <WebpageCard key={webpage.id} webpage={webpage} showTags={activeTag?.type === TagType.CUSTOM} />
-          ))}
+          <DndContext onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCenter}>
+            <SortableContext items={webpages}>
+              {webpages.map((webpage) => (
+                <WebpageCard key={webpage.id} webpage={webpage} showTags={activeTag?.type === TagType.CUSTOM} />
+              ))}
+            </SortableContext>
+          </DndContext>
         </div>
       </ScrollArea>
     </div>

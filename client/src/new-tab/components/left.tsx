@@ -48,20 +48,50 @@ export const Left = () => {
     const activeItem = activeData.item;
     const newData = [...tags];
 
-    // 移除拖拽项
-    const activeParent = activeData.parentPath.reduce((acc, idx) => acc[idx].children, newData);
-    activeParent.splice(activeData.index, 1);
+    if (activeItem.parentId === overData.item.parentId) {
+      // 移除拖拽项
+      const activeParent = activeData.parentPath.reduce((acc, idx) => acc[idx].children, newData);
+      activeParent.splice(activeData.index, 1);
 
-    // 插入到目标位置
-    const overParent = overData.parentPath.reduce((acc, idx) => acc[idx].children, newData);
-    console.log(overParent)
-    overParent.splice(overData.index, 0, activeItem);
+      // 插入到目标位置
+      const overParent = overData.parentPath.reduce((acc, idx) => acc[idx].children, newData);
+      overParent.splice(overData.index, 0, activeItem);
 
-    setTags(newData);
+      setTags(newData);
+    }
+
   };
 
-  const handleDragStart = (e: DragEndEvent) => {
-    console.log('handle drag start', e)
+  const handleDragMove = (e: DragEndEvent) => {
+    console.log('handleDragMove', e)
+    const { active, over } = e;
+    if (!over) return;
+
+    const activeData = findItemAndParentPath(tags, active.id as string);
+    const overData = findItemAndParentPath(tags, over.id as string);
+
+    if (!activeData || !overData) return;
+
+    const activeItem = activeData.item;
+    const newData = [...tags];
+    console.log(activeData, overData)
+
+    if (activeItem.parentId !== overData.item.parentId) {
+      // 移除拖拽项
+      const activeParent = activeData.parentPath.reduce((acc, idx) => acc[idx].children, newData);
+      activeParent.splice(activeData.index, 1);
+
+      // 插入到目标位置
+      const overParent = overData.parentPath.reduce((acc, idx) => {
+        console.log(acc, idx)
+        return acc[idx].children
+      }, newData);
+      console.log(overParent, overData.parentPath, 'overParent')
+      activeItem.parentId = overData.item.parentId
+      overParent.splice(overData.index, 0, activeItem);
+
+      setTags(newData);
+    }
   }
 
   const handleDragOver = (e: DragEndEvent) => {
@@ -80,7 +110,7 @@ export const Left = () => {
       </div>
       <ScrollArea className="flex-1 w-full">
         <div className="p-2">
-          <DndContext onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCenter}>
+          <DndContext onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCenter}>
             <TagsNav tags={tags}></TagsNav>
           </DndContext>
         </div>

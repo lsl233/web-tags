@@ -21,18 +21,25 @@ import { Edit, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { TagBadge } from "@/lib/components/tag";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities"
+
 // import { TagWithChildrenAndParentAndLevelAndParent } from "shared/tag";
 
 export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWithTags, showTags?: boolean }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: webpage.id })
+  const style = {
+    transition,
+    transform: CSS.Transform.toString(transform)
+  }
   const { setDefaultCollectForm, setCollectDialogOpen, setWebpages, webpages } =
     useStore();
   const getIconURL = (webpage: WebpageWithTags) => {
     if (webpage.icon.startsWith("http")) return webpage.icon;
     if (webpage.url.startsWith("http")) {
       const urlObj = new URL(webpage.url);
-      return `${urlObj.protocol}//${urlObj.hostname}${
-        urlObj.port ? ":" + urlObj.port : ""
-      }/favicon.ico`;
+      return `${urlObj.protocol}//${urlObj.hostname}${urlObj.port ? ":" + urlObj.port : ""
+        }/favicon.ico`;
     }
     return "/default-webpage-icon.png";
   };
@@ -81,77 +88,79 @@ export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWith
   };
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger>
-        <div key={webpage.id} className="border border-gray-300 rounded-lg p-2">
-          <Button
-            variant="link"
-            className="p-0 h-auto justify-start w-full text-left"
-            title={webpage.title + " \n" + webpage.url}
-            onClick={() => handleOpenTab(webpage.url)}
-          >
-            <Image
-              className="w-4 h-4 mr-1 flex-shrink-0"
-              src={getIconURL(webpage)}
-              defaultSrc="/default-webpage-icon.png"
-              alt={webpage.icon}
-            />
-            <div className="w-full truncate text-sm font-bold">
-              {webpage.title}
+    <div ref={setNodeRef} {...attributes} {...listeners} style={style}>
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <div key={webpage.id} className="border border-gray-300 rounded-lg p-2">
+            <Button
+              variant="link"
+              className="p-0 h-auto justify-start w-full text-left"
+              title={webpage.title + " \n" + webpage.url}
+              onClick={() => handleOpenTab(webpage.url)}
+            >
+              <Image
+                className="w-4 h-4 mr-1 flex-shrink-0"
+                src={getIconURL(webpage)}
+                defaultSrc="/default-webpage-icon.png"
+                alt={webpage.icon}
+              />
+              <div className="w-full truncate text-sm font-bold">
+                {webpage.title}
+              </div>
+            </Button>
+
+            <div
+              className="text-sm text-gray-500 truncate w-full mt-2"
+              title={webpage.description}
+            >
+              {webpage.description}
             </div>
-          </Button>
 
-          <div
-            className="text-sm text-gray-500 truncate w-full mt-2"
-            title={webpage.description}
-          >
-            {webpage.description}
+            {showTags && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="max-w-full">
+                    <div className="flex max-w-full gap-2 mt-2 flex-nowrap truncate">
+                      {webpage?.tags.map((tag) => (
+                        <TagBadge key={tag.id} tag={tag}></TagBadge>
+                      ))}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="flex flex-wrap gap-1 p-2">
+                    {webpage?.tags.map((tag) => (
+                      <TagBadge key={tag.id} tag={tag}></TagBadge>
+                    ))}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
-
-          {showTags && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger className="max-w-full">
-                <div className="flex max-w-full gap-2 mt-2 flex-nowrap truncate">
-                  {webpage?.tags.map((tag) => (
-                    <TagBadge key={tag.id} tag={tag}></TagBadge>
-                  ))}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="flex flex-wrap gap-1 p-2">
-                {webpage?.tags.map((tag) => (
-                  <TagBadge key={tag.id} tag={tag}></TagBadge>
-                ))}
-              </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
-      </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem className="p-0">
-          <Button
-            onClick={handleOpenCreateDialog}
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start"
-          >
-            <Edit className="w-4 h-4 mr-2" />
-            Edit
-          </Button>
-        </ContextMenuItem>
-        <ContextMenuItem className="p-0">
-          <Button
-            onClick={handleOpenConfirmationPopup}
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start text-red-500"
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete
-          </Button>
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem className="p-0">
+            <Button
+              onClick={handleOpenCreateDialog}
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start"
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+          </ContextMenuItem>
+          <ContextMenuItem className="p-0">
+            <Button
+              onClick={handleOpenConfirmationPopup}
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start text-red-500"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete
+            </Button>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    </div>
   );
 };

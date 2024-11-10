@@ -104,7 +104,7 @@ const NewTab = () => {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel>
-          <WebpagesView webpages={webpages} />
+          <WebpagesView />
         </ResizablePanel>
       </ResizablePanelGroup>
 

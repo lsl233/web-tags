@@ -30,6 +30,7 @@ model WebPage {
   description String   @db.Text
   url         String   @db.Text
   icon        String   @db.Text
+  sortOrder   Int?     @default(0)
   tags        Tag[]    @relation("WebPageTags")
   user        User     @relation(fields: [userId], references: [id])
   userId      String
