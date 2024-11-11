@@ -199,7 +199,7 @@ router.post("/sort-order", async (req, res, next) => {
   const sortedTags = req.body
   await db.$transaction(
     sortedTags.map((tag: { id: string; sortOrder: number; }) =>
-      prisma.tag.update({
+      db.tag.update({
         where: { id: tag.id },
         data: { sortOrder: tag.sortOrder },
       })

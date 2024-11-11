@@ -155,4 +155,17 @@ router.get("/exist", async (req, res, next) => {
   res.json(foundWebpage);
 });
 
+router.post("/sort-order", async (req, res, next) => {
+  const sortedWebpages = req.body
+  await db.$transaction(
+    sortedWebpages.map((webpage: { id: string; sortOrder: number; }) =>
+      db.tag.update({
+        where: { id: webpage.id },
+        data: { sortOrder: webpage.sortOrder },
+      })
+    )
+  );
+  res.json({message: 'ok'})
+})
+
 export default router;

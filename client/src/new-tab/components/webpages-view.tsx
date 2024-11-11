@@ -7,8 +7,8 @@ import { WebpageCard } from "./webpage-card";
 import { useEffect } from "react";
 import { ScrollArea } from "@/lib/ui/scroll-area";
 import { TagType } from "shared/tag";
-import { closestCenter, DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { SortableContext } from "@dnd-kit/sortable";
+import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 
 export const WebpagesView = () => {
   const { activeTag, setDefaultCollectForm, webpages, setWebpages } = useStore();
@@ -29,8 +29,17 @@ export const WebpagesView = () => {
     });
   };
 
-  const handleDragEnd = () => {
-
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    let oldIndex
+    let newIndex
+    for (let i = 0, l = webpages.length; i < l; i++) {
+      if (active.id === webpages[i].id) oldIndex = i
+      if (over?.id === webpages[i].id) newIndex = i
+    }
+    if (oldIndex !== undefined && newIndex !== undefined) {
+      setWebpages(arrayMove(webpages, oldIndex, newIndex))
+    }
   }
 
   return (
