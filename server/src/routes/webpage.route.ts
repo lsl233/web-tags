@@ -97,6 +97,9 @@ router.get('/multi', async (req, res, next) => {
     include: {
       tags: true,
     },
+    orderBy: {
+      sortOrder: 'asc'
+    }
   });
 
   res.json(foundWebpages);
@@ -110,7 +113,7 @@ router.post('/multi', async (req, res, next) => {
   const webpages: CreateWebpage[] = req.body
 
   const createdWebpages = await db.$transaction(webpages.map((webpage) => {
-    return db.webPage.create({    
+    return db.webPage.create({
       data: {
         url: webpage.url,
         title: webpage.title,
@@ -165,7 +168,7 @@ router.post("/sort-order", async (req, res, next) => {
       })
     )
   );
-  res.json({message: 'ok'})
+  res.json({ message: 'ok' })
 })
 
 export default router;
