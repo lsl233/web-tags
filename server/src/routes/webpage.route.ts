@@ -159,7 +159,7 @@ router.post("/sort-order", async (req, res, next) => {
   const sortedWebpages = req.body
   await db.$transaction(
     sortedWebpages.map((webpage: { id: string; sortOrder: number; }) =>
-      db.tag.update({
+      db.webPage.update({
         where: { id: webpage.id },
         data: { sortOrder: webpage.sortOrder },
       })

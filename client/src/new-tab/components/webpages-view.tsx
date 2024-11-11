@@ -9,6 +9,7 @@ import { ScrollArea } from "@/lib/ui/scroll-area";
 import { TagType } from "shared/tag";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
+import { f } from "@/lib/f";
 
 export const WebpagesView = () => {
   const { activeTag, setDefaultCollectForm, webpages, setWebpages } = useStore();
@@ -38,7 +39,12 @@ export const WebpagesView = () => {
       if (over?.id === webpages[i].id) newIndex = i
     }
     if (oldIndex !== undefined && newIndex !== undefined) {
-      setWebpages(arrayMove(webpages, oldIndex, newIndex))
+      const result = arrayMove(webpages, oldIndex, newIndex)
+      f('/api/webpage/sort-order', {
+        method: "POST",
+        body: result.map((item, index) => ({id: item.id, sortOrder: index}))
+      })
+      setWebpages(result)
     }
   }
 
