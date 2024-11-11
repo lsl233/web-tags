@@ -34,6 +34,9 @@ router.get("/", async (req, res, next) => {
         include: includeTagLevel
       },
     },
+    orderBy: {
+      sortOrder: 'asc'
+    }
   });
   res.json(foundWebpages);
 });
@@ -97,9 +100,6 @@ router.get('/multi', async (req, res, next) => {
     include: {
       tags: true,
     },
-    orderBy: {
-      sortOrder: 'asc'
-    }
   });
 
   res.json(foundWebpages);
