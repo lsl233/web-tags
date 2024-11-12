@@ -158,7 +158,7 @@ export const CollectWebpageForm = ({
   const handleCreateTag = async (name: string) => {
     const response = await f("/api/tag", {
       method: "POST",
-      body: { name },
+      body: { name, icon: '' },
     });
     if (!response) return;
     setTags([...tags, response]);
