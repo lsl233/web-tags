@@ -17,7 +17,7 @@ import {
 } from "@/lib/ui/resizable";
 import { useRef } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
-import { Left } from "./components/left";
+import { Sidebar } from "./components/sidebar";
 
 function mapTagsWithLevels(
   tags: TagWithChildrenAndParentAndLevel[],
@@ -100,7 +100,7 @@ const NewTab = () => {
     <main className="flex flex-col sm:flex-row h-screen max-w-[1920px] mx-auto bg-white">
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel ref={panelRef} defaultSize={18} onResize={handleResize}>
-          <Left />
+          <Sidebar />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel>

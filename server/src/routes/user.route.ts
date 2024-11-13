@@ -46,7 +46,7 @@ router.post("/session", async (req, res, next) => {
     process.env.JWT_SECRET as string,
     {
       // TODO: 双 Token
-      expiresIn: "1h",
+      expiresIn: "7d",
     }
   );
 

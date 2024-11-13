@@ -1,4 +1,4 @@
-import { Settings } from "lucide-react"
+import { ChevronsUpDown, Settings } from "lucide-react"
 import { CreateTagDialog } from "./create-tag-dialog"
 import { ScrollArea } from "@/lib/ui/scroll-area"
 import { Button } from "@/lib/ui/button"
@@ -10,9 +10,15 @@ import { DndContext, DragEndEvent, useSensor, closestCenter } from "@dnd-kit/cor
 import { useSensors } from "@dnd-kit/core"
 import { PointerSensor } from "@dnd-kit/core"
 import { TagWithChildrenAndParentAndLevel } from "shared/tag"
+import { useAuth } from "./auth-provider"
+import { Popover, PopoverContent, PopoverTrigger } from "@/lib/ui/popover"
 
-export const Left = () => {
+export const Sidebar = () => {
+  const { session } = useAuth();
+
+  if (!session) return null;
   const { tags, setTags } = useStore();
+
 
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -62,42 +68,6 @@ export const Left = () => {
 
   };
 
-  const handleDragMove = (e: DragEndEvent) => {
-    console.log('handleDragMove', e)
-    const { active, over } = e;
-    if (!over) return;
-
-    const activeData = findItemAndParentPath(tags, active.id as string);
-    const overData = findItemAndParentPath(tags, over.id as string);
-
-    if (!activeData || !overData) return;
-
-    const activeItem = activeData.item;
-    const newData = [...tags];
-    console.log(activeData, overData)
-
-    if (activeItem.parentId !== overData.item.parentId) {
-      // 移除拖拽项
-      const activeParent = activeData.parentPath.reduce((acc, idx) => acc[idx].children, newData);
-      activeParent.splice(activeData.index, 1);
-
-      // 插入到目标位置
-      const overParent = overData.parentPath.reduce((acc, idx) => {
-        console.log(acc, idx)
-        return acc[idx].children
-      }, newData);
-      console.log(overParent, overData.parentPath, 'overParent')
-      activeItem.parentId = overData.item.parentId
-      overParent.splice(overData.index, 0, activeItem);
-
-      setTags(newData);
-    }
-  }
-
-  const handleDragOver = (e: DragEndEvent) => {
-    console.log('handle drag over', e)
-  }
-
   return (
     <div className="flex flex-col h-full">
       <div className="shrink-0 flex items-center justify-center h-[52px] border-b border-gray-300">
@@ -116,13 +86,28 @@ export const Left = () => {
         </div>
       </ScrollArea>
 
-      <div className="shrink-0 flex items-center justify-center h-[52px] border-t border-gray-300">
-        <SettingDialog>
-          <Button variant="ghost" className="w-full h-full">
-            <Settings className="w-4 h-4 mr-1" />
-            Settings
-          </Button>
-        </SettingDialog>
+      <div className="shrink-0  h-[52px] border-t border-gray-300 p-2">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" className="w-full h-full flex items-center justify-between px-2 py-4">
+              <div className="flex items-center">
+                <div className="bg-gray-500 w-6 h-6 text-center text-white leading-6 rounded">{session.email.charAt(0).toLocaleUpperCase()}</div>
+                <div className="ml-2">{session.email}</div>
+              </div>
+              <ChevronsUpDown size={16} />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent side="right">
+            <SettingDialog>
+              <Button variant="ghost" className="w-full h-full">
+                <Settings className="w-4 h-4 mr-1" />
+                Settings
+              </Button>
+            </SettingDialog>
+          </PopoverContent>
+        </Popover>
+
+
       </div>
     </div>
   )
