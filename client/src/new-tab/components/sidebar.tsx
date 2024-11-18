@@ -1,4 +1,4 @@
-import { ChevronsUpDown, Settings } from "lucide-react"
+import { ChevronsUpDown, LogOut, Settings } from "lucide-react"
 import { CreateTagDialog } from "./create-tag-dialog"
 import { ScrollArea } from "@/lib/ui/scroll-area"
 import { Button } from "@/lib/ui/button"
@@ -14,7 +14,7 @@ import { useAuth } from "./auth-provider"
 import { Popover, PopoverContent, PopoverTrigger } from "@/lib/ui/popover"
 
 export const Sidebar = () => {
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
 
   if (!session) return null;
   const { tags, setTags } = useStore();
@@ -68,6 +68,10 @@ export const Sidebar = () => {
 
   };
 
+  const handleLogout = () => {
+
+  }
+
   return (
     <div className="flex flex-col h-full">
       <div className="shrink-0 flex items-center justify-center h-[52px] border-b border-gray-300">
@@ -97,13 +101,17 @@ export const Sidebar = () => {
               <ChevronsUpDown size={16} />
             </Button>
           </PopoverTrigger>
-          <PopoverContent side="right">
+          <PopoverContent side="right" className="p-2">
             <SettingDialog>
-              <Button variant="ghost" className="w-full h-full">
+              <Button variant="ghost" size="sm" className="w-full h-full justify-start py-2">
                 <Settings className="w-4 h-4 mr-1" />
                 Settings
               </Button>
             </SettingDialog>
+            <Button onClick={signOut} variant="ghost" size="sm" className="w-full h-full justify-start py-2">
+              <LogOut className="w-4 h-4 mr-1" />
+              Log out
+            </Button>
           </PopoverContent>
         </Popover>
 
