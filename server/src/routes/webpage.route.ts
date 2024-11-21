@@ -7,11 +7,18 @@ import { CreateWebpage } from "shared/webpage.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res, next) => {
+interface GetWebpageQuery {
+  tagsId: string
+  page: number | undefined
+}
+router.get<null, any, null, GetWebpageQuery>("/", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
-  const tagsId = req.query.tagsId as string;
+  const { tagsId, page = 1 } = req.query;
+  
+  const pageSize = 20
+
   if (!tagsId || tagsId === "") {
     return next(ServerError.BadRequest("tagsId is required"));
   }
@@ -19,6 +26,8 @@ router.get("/", async (req, res, next) => {
   const tagsIdArray = tagsId.split(",");
 
   const foundWebpages = await db.webPage.findMany({
+    skip: (page - 1) * pageSize,
+    take: pageSize,
     where: {
       userId: req.user.id,
       tags: {
