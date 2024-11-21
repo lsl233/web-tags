@@ -17,7 +17,7 @@ import { z } from "zod";
 import { Combobox } from "../ui/combobox";
 import { useEffect, useMemo, useState } from "react";
 import { useStore } from "../hooks/store.hook";
-import { flattenChildren } from "../utils";
+import { flattenChildren, uniqueArrayByKey } from "../utils";
 import { f } from "../f";
 import { Button } from "../ui/button-loading";
 import { TagType, TagWithId } from "shared/tag";
@@ -78,7 +78,7 @@ export const CollectMultiWebpageForm = ({
         currentWindowWebpages,
         _defaultTag
       );
-      append(result);
+      append(uniqueArrayByKey(result, "url"));
     });
   }, []);
 
@@ -153,7 +153,7 @@ export const CollectMultiWebpageForm = ({
         },
       });
 
-      data.items.map((item) => {
+      data.items = data.items.map((item) => {
         item.tags = item.tags.map((id) => (id === "-1" ? result.id : id));
         return item;
       });
@@ -161,7 +161,7 @@ export const CollectMultiWebpageForm = ({
       
       const createdWebpages = await f("/api/webpage/multi", {
         method: "POST",
-        body: data.items,
+        body: uniqueArrayByKey(data.items, "url"),
       });
       setSubmitting(false);
       submitSuccess();

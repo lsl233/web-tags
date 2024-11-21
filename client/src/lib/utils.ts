@@ -31,10 +31,21 @@ export function flattenParentKey<T extends { parent: T }>(
 
 export function debounce<T extends (...args: any[]) => any>(fn: T, delay: number): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout;
-  return function(...args: Parameters<T>) {
+  return function (...args: Parameters<T>) {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       fn(...args);
     }, delay);
   };
+}
+
+export function uniqueArrayByKey<T>(arr: T[], key: keyof T) {
+  const seen = new Set();
+  return arr.filter(item => {
+    if (seen.has(item[key])) {
+      return false;
+    }
+    seen.add(item[key]);
+    return true;
+  });
 }
