@@ -42,7 +42,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signOut = async () => {
     await chrome.storage.local.remove("token");
     setSession(null);
-    setSignDialogOpen(true);
   };
 
   const fetchSession = async () => {

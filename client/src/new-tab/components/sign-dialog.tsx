@@ -28,7 +28,7 @@ import { useAuth } from "./auth-provider";
 import { useStore } from "@/lib/hooks/store.hook";
 
 interface SignDialogProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   type: "in" | "up";
 }
 

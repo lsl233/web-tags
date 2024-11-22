@@ -1,4 +1,4 @@
-import { ChevronsUpDown, LogOut, Settings } from "lucide-react"
+import { ChevronsUpDown, LogIn, LogOut, Settings } from "lucide-react"
 import { CreateTagDialog } from "./create-tag-dialog"
 import { ScrollArea } from "@/lib/ui/scroll-area"
 import { Button } from "@/lib/ui/button"
@@ -12,13 +12,20 @@ import { PointerSensor } from "@dnd-kit/core"
 import { TagWithChildrenAndParentAndLevel } from "shared/tag"
 import { useAuth } from "./auth-provider"
 import { Popover, PopoverContent, PopoverTrigger } from "@/lib/ui/popover"
+import { SignDialog } from "./sign-dialog"
+import { useEffect } from "react"
 
 export const Sidebar = () => {
   const { session, signOut } = useAuth();
 
-  if (!session) return null;
-  const { tags, setTags } = useStore();
+  const { tags, setTags, setSignDialogOpen } = useStore();
 
+  useEffect(() => {
+    console.log(session)
+    if (!session) {
+      setSignDialogOpen(true);
+    }
+  }, [])
 
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -95,8 +102,8 @@ export const Sidebar = () => {
           <PopoverTrigger asChild>
             <Button variant="ghost" className="w-full h-full flex items-center justify-between px-2 py-4">
               <div className="flex items-center">
-                <div className="bg-gray-500 w-6 h-6 text-center text-white leading-6 rounded">{session.email.charAt(0).toLocaleUpperCase()}</div>
-                <div className="ml-2">{session.email}</div>
+                <div className="bg-gray-500 w-6 h-6 text-center text-white leading-6 rounded">{session ? session.email.charAt(0).toLocaleUpperCase() : '-'}</div>
+                <div className="ml-2">{session ? session.email : '--'}</div>
               </div>
               <ChevronsUpDown size={16} />
             </Button>
@@ -108,14 +115,24 @@ export const Sidebar = () => {
                 Settings
               </Button>
             </SettingDialog>
-            <Button onClick={signOut} variant="ghost" size="sm" className="w-full h-full justify-start py-2">
-              <LogOut className="w-4 h-4 mr-1" />
-              Log out
-            </Button>
+            {
+              session
+                ?
+                <Button onClick={signOut} variant="ghost" size="sm" className="w-full h-full justify-start py-2">
+                  <LogOut className="w-4 h-4 mr-1" />
+                  Log out
+                </Button>
+                :
+                <Button onClick={() => setSignDialogOpen(true)} variant="ghost" size="sm" className="w-full h-full justify-start py-2">
+                  <LogIn className="w-4 h-4 mr-1" />
+                  Log in
+                </Button>
+            }
+
           </PopoverContent>
         </Popover>
 
-
+        <SignDialog type={"in"}></SignDialog>
       </div>
     </div>
   )

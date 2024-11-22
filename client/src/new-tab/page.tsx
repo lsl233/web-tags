@@ -3,10 +3,8 @@ import { createRoot } from "react-dom/client";
 import "@/global.css";
 import { f } from "@/lib/f";
 import { AuthProvider, useAuth } from "./components/auth-provider";
-import { TagsNav } from "./components/tags-nav";
 import { WebpagesView } from "./components/webpages-view";
 import { useStore } from "@/lib/hooks/store.hook";
-import { SignDialog } from "./components/sign-dialog";
 import { Toaster } from "@/lib/ui/sonner";
 import { TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { debounce, flattenChildrenKey } from "@/lib/utils";
@@ -107,8 +105,6 @@ const NewTab = () => {
           <WebpagesView />
         </ResizablePanel>
       </ResizablePanelGroup>
-
-      <SignDialog children={undefined} type={"in"} />
     </main>
   );
 };
