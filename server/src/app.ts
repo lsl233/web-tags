@@ -7,6 +7,7 @@ import userRoutes from './routes/user.route.js';
 import webpageRoutes from './routes/webpage.route.js';
 import tagRoutes from './routes/tag.route.js';
 import spiderRoutes from './routes/spider.route.js';
+import guestRoutes from './routes/guest.route.js'
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -25,6 +26,7 @@ const init = async () => {
   
   app.use(userMiddleware);
   app.use('/api/user', userRoutes);
+  app.use('/api/guest', guestRoutes)
   app.use('/api/webpage', webpageRoutes);
   app.use('/api/tag', tagRoutes);
   app.use('/api/spider', spiderRoutes);

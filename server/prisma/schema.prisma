@@ -14,10 +14,16 @@ generator client {
   previewFeatures = ["metrics"]
 }
 
+enum UserType {
+  NORMAL
+  GUEST
+}
+
 model User {
   id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
+  email     String?    @unique
+  type      UserType  @default(NORMAL)
+  password  String?
   webPages  WebPage[]
   tags      Tag[]
   createdAt DateTime  @default(now())

@@ -34,7 +34,7 @@ interface SignDialogProps {
 
 export const SignDialog = ({ children, type }: SignDialogProps) => {
   const [signType, setSignType] = useState<"in" | "up">(type);
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, signInInTourist } = useAuth();
   const { signDialogOpen, setSignDialogOpen } = useStore();
   const schema = signType === "in" ? signInSchema : signUpSchema;
   const [loading, setLoading] = useState(false);
@@ -66,6 +66,11 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
     }
   };
 
+  const handleGuestLogin = async () => {
+    await signInInTourist();
+    setSignDialogOpen(false);
+  }
+
   return (
     <Dialog open={signDialogOpen} onOpenChange={setSignDialogOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -74,14 +79,25 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
           <DialogTitle>Sign {signType}</DialogTitle>
           <DialogDescription>
             {signType === "in"
-              ? "Don't have an account？"
+              ? "Don't have an account?"
               : "Already have an account"}
             <Button
-              className="p-0"
+              className="p-0 ml-1"
               variant="link"
               onClick={() => setSignType(signType === "in" ? "up" : "in")}
             >
               Sign {signType}
+              <ArrowRight size={16} />
+            </Button>
+            <span className="ml-2">
+              Or you can use it as a tourist.
+            </span>
+            <Button
+              className="p-0 ml-1"
+              variant="link"
+              onClick={handleGuestLogin}
+            >
+              Go
               <ArrowRight size={16} />
             </Button>
           </DialogDescription>

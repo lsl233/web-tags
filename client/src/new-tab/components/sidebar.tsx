@@ -13,19 +13,19 @@ import { TagWithChildrenAndParentAndLevel } from "shared/tag"
 import { useAuth } from "./auth-provider"
 import { Popover, PopoverContent, PopoverTrigger } from "@/lib/ui/popover"
 import { SignDialog } from "./sign-dialog"
-import { useEffect } from "react"
+import { UserType } from "shared/user"
 
 export const Sidebar = () => {
   const { session, signOut } = useAuth();
 
   const { tags, setTags, setSignDialogOpen } = useStore();
 
-  useEffect(() => {
-    console.log(session)
-    if (!session) {
-      setSignDialogOpen(true);
-    }
-  }, [])
+  // useEffect(() => {
+  //   console.log(session)
+  //   if (!session) {
+  //     setSignDialogOpen(true);
+  //   }
+  // }, [])
 
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -75,10 +75,6 @@ export const Sidebar = () => {
 
   };
 
-  const handleLogout = () => {
-
-  }
-
   return (
     <div className="flex flex-col h-full">
       <div className="shrink-0 flex items-center justify-center h-[52px] border-b border-gray-300">
@@ -116,7 +112,7 @@ export const Sidebar = () => {
               </Button>
             </SettingDialog>
             {
-              session
+              session && session.type === UserType.NORMAL
                 ?
                 <Button onClick={signOut} variant="ghost" size="sm" className="w-full h-full justify-start py-2">
                   <LogOut className="w-4 h-4 mr-1" />

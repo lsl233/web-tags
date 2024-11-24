@@ -8,6 +8,7 @@ import { z } from "zod";
 // 创建 AuthContext
 interface AuthContextType {
   session: UserPayload | null;
+  signInInTourist: () => Promise<void>;
   signIn: (data: z.infer<typeof signInSchema>) => Promise<void>;
   signUp: (data: z.infer<typeof signUpSchema>) => Promise<void>;
   signOut: () => void;
@@ -31,6 +32,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     await fetchSession()
   };
   const { setSignDialogOpen } = useStore();
+
+  const signInInTourist = async () => {
+    let userId = await chrome.storage.local.get("userId")
+    if (!userId) {
+      const createdGuest = await f("/api/guest", {
+        method: "POST",
+      });
+      userId = createdGuest.id
+    }
+    
+    await chrome.storage.local.set({ userId });
+    const token = await f("/api/guest/session", { method: "POST", body: { id: userId } })
+    await chrome.storage.local.set({ token });
+    await fetchSession()
+  }
 
   const signUp = async (data: z.infer<typeof signUpSchema>) => {
     await f("/api/user", {
@@ -62,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   return (
-    <AuthContext.Provider value={{ session, signIn, signUp, signOut, loading }}>
+    <AuthContext.Provider value={{ session, signIn, signInInTourist, signUp, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   );

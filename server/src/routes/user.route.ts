@@ -3,7 +3,7 @@ import ServerError from "@/lib/error.js";
 import express from "express";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { TagType } from "@prisma/client";
+import { $Enums, TagType } from "@prisma/client";
 
 const router = express.Router();
 
@@ -17,7 +17,33 @@ router.get("/session", async (req, res, next) => {
 });
 
 router.post("/session", async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, id } = req.body;
+
+  if (id) {
+    const foundUser = await db.user.findUnique({
+      where: { id }
+    })
+    if (!foundUser) {
+      return next(ServerError.BadRequest("Invalid email or password"));
+    }
+
+    const token = jwt.sign(
+      {
+        id: foundUser.id,
+        type: foundUser.type,
+        email: 'Tourist@your.com',
+      },
+      process.env.JWT_SECRET as string,
+      {
+        // TODO: 双 Token
+        expiresIn: "7d",
+      }
+    );
+  
+    res.json(token);
+    return
+  }
+
   const foundUser = await db.user.findUnique({
     where: {
       email,
@@ -41,6 +67,7 @@ router.post("/session", async (req, res, next) => {
   const token = jwt.sign(
     {
       id: foundUser.id,
+      type: foundUser.type,
       email: foundUser.email,
     },
     process.env.JWT_SECRET as string,
@@ -53,9 +80,19 @@ router.post("/session", async (req, res, next) => {
   res.json(token);
 });
 
+router.post("/guest", async (req, res, next) => {
+  const createdTourist = await db.user.create({
+    data: {
+      type: $Enums.UserType.NORMAL
+    }
+  })
+  res.json(createdTourist)
+})
+
 
 router.post("/", async (req, res, next) => {
   const { email, password } = req.body;
+
   const hashedPassword = crypto
     .createHash("sha256")
     .update(password)
