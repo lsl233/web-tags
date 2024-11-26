@@ -1,6 +1,6 @@
 import { db } from "@/lib/db.js"
 import ServerError from "@/lib/error.js";
-import { $Enums } from "@prisma/client"
+import { $Enums, TagType } from "@prisma/client"
 import express from "express"
 import jwt from "jsonwebtoken";
 
@@ -13,6 +13,17 @@ router.post("/", async (req, res, next) => {
       type: $Enums.UserType.GUEST
     }
   })
+
+  await db.tag.create({
+    data: {
+      name: "Inbox",
+      icon: '',
+      type: TagType.INBOX,
+      sortOrder: 1,
+      user: { connect: { id: createdTourist.id } },
+    },
+  });
+
   res.json(createdTourist)
 })
 
@@ -33,7 +44,7 @@ router.post("/session", async (req, res, next) => {
     {
       id: foundGuest.id,
       type: foundGuest.type,
-      email: 'Tourist@your.com',
+      email: 'Guest@your.com',
     },
     process.env.JWT_SECRET as string,
     {

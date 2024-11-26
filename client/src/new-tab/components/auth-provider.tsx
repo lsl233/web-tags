@@ -31,19 +31,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     await chrome.storage.local.set({ token: res });
     await fetchSession()
   };
-  const { setSignDialogOpen } = useStore();
 
   const signInInTourist = async () => {
-    let userId = await chrome.storage.local.get("userId")
-    if (!userId) {
+    const storage = await chrome.storage.local.get("guestId")
+    let guestId = storage.guestId
+    if (!guestId) {
       const createdGuest = await f("/api/guest", {
         method: "POST",
       });
-      userId = createdGuest.id
+      guestId = createdGuest.id
     }
     
-    await chrome.storage.local.set({ userId });
-    const token = await f("/api/guest/session", { method: "POST", body: { id: userId } })
+    await chrome.storage.local.set({ guestId });
+    const token = await f("/api/guest/session", { method: "POST", body: { id: guestId } })
     await chrome.storage.local.set({ token });
     await fetchSession()
   }
