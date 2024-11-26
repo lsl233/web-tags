@@ -1,4 +1,4 @@
-import { ChevronsUpDown, LogIn, LogOut, Settings } from "lucide-react"
+import { ChevronsUpDown, Hash, LogIn, LogOut, Plus, Settings } from "lucide-react"
 import { CreateTagDialog } from "./create-tag-dialog"
 import { ScrollArea } from "@/lib/ui/scroll-area"
 import { Button } from "@/lib/ui/button"
@@ -78,10 +78,13 @@ export const Sidebar = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="shrink-0 flex items-center justify-center h-[52px] border-b border-gray-300">
+        <Hash />
+      </div>
+      <div className="group h-[24px] mt-2 px-2 flex justify-between items-center">
+        <span className="text-gray-500">Tags</span>
         <CreateTagDialog>
-          <Button variant="ghost" className="w-full h-full">
-            <BookmarkPlus className="w-6 h-6 mr-1" />
-            Create
+          <Button variant="ghost" size="icon" className="w-[24px] h-full hidden group-hover:flex">
+            <Plus className="w-5 h-5" />
           </Button>
         </CreateTagDialog>
       </div>
@@ -93,10 +96,10 @@ export const Sidebar = () => {
         </div>
       </ScrollArea>
 
-      <div className="shrink-0  h-[52px] border-t border-gray-300 p-2">
+      <div className="shrink-0 h-[52px] border-t border-gray-300 p-2">
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" className="w-full h-full flex items-center justify-between px-2 py-4">
+            <Button variant="ghost" className="w-full h-full flex items-center justify-between px-2">
               <div className="flex items-center">
                 <div className="bg-gray-500 w-6 h-6 text-center text-white leading-6 rounded">{session ? session.email.charAt(0).toLocaleUpperCase() : '-'}</div>
                 <div className="ml-2">{session ? session.email : '--'}</div>
@@ -104,9 +107,9 @@ export const Sidebar = () => {
               <ChevronsUpDown size={16} />
             </Button>
           </PopoverTrigger>
-          <PopoverContent side="right" className="p-2">
+          <PopoverContent side="right" className="p-2 mb-3">
             <SettingDialog>
-              <Button variant="ghost" size="sm" className="w-full h-full justify-start py-2">
+              <Button variant="ghost" size="sm" className="w-full h-full justify-start px-1 py-2">
                 <Settings className="w-4 h-4 mr-1" />
                 Settings
               </Button>
@@ -114,12 +117,12 @@ export const Sidebar = () => {
             {
               session && session.type === UserType.NORMAL
                 ?
-                <Button onClick={signOut} variant="ghost" size="sm" className="w-full h-full justify-start py-2">
+                <Button onClick={signOut} variant="ghost" size="sm" className="w-full h-full justify-start px-1 py-2">
                   <LogOut className="w-4 h-4 mr-1" />
                   Log out
                 </Button>
                 :
-                <Button onClick={() => setSignDialogOpen(true)} variant="ghost" size="sm" className="w-full h-full justify-start py-2">
+                <Button onClick={() => setSignDialogOpen(true)} variant="ghost" size="sm" className="w-full h-full justify-start px-1 py-2">
                   <LogIn className="w-4 h-4 mr-1" />
                   Log in
                 </Button>
