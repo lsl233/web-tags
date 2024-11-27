@@ -16,33 +16,28 @@ router.get("/session", async (req, res, next) => {
   res.json(session);
 });
 
-router.post("/session", async (req, res, next) => {
-  const { email, password, id } = req.body;
-
-  if (id) {
-    const foundUser = await db.user.findUnique({
-      where: { id }
-    })
-    if (!foundUser) {
-      return next(ServerError.BadRequest("Invalid email or password"));
+const mergeUser = async (userId: string, guestId: string) => {
+  await db.webPage.updateMany({
+    where: {
+      userId: guestId
+    },
+    data: {
+      userId
     }
+  })
 
-    const token = jwt.sign(
-      {
-        id: foundUser.id,
-        type: foundUser.type,
-        email: 'Tourist@your.com',
-      },
-      process.env.JWT_SECRET as string,
-      {
-        // TODO: 双 Token
-        expiresIn: "7d",
-      }
-    );
-  
-    res.json(token);
-    return
-  }
+  const updatedTags = await db.tag.updateMany({
+    where: {
+      userId: guestId
+    },
+    data: {
+      userId
+    }
+  })
+}
+
+router.post("/session", async (req, res, next) => {
+  const { email, password, guestId } = req.body;
 
   const foundUser = await db.user.findUnique({
     where: {
@@ -54,6 +49,9 @@ router.post("/session", async (req, res, next) => {
     return next(ServerError.BadRequest("Invalid email or password"));
   }
 
+  if (guestId) {
+    await mergeUser(foundUser.id, guestId)
+  }
   // TODO use bcrypt
   const hashedPassword = crypto
     .createHash("sha256")
@@ -91,7 +89,7 @@ router.post("/guest", async (req, res, next) => {
 
 
 router.post("/", async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, guestId } = req.body;
 
   const hashedPassword = crypto
     .createHash("sha256")
@@ -115,15 +113,19 @@ router.post("/", async (req, res, next) => {
     },
   });
 
-  await db.tag.create({
-    data: {
-      name: "Inbox",
-      icon: '',
-      type: TagType.INBOX,
-      sortOrder: 1,
-      user: { connect: { id: createdUser.id } },
-    },
-  });
+  if (guestId) {
+    await mergeUser(createdUser.id, guestId)
+  } else {
+    await db.tag.create({
+      data: {
+        name: "Inbox",
+        icon: '',
+        type: TagType.INBOX,
+        sortOrder: 1,
+        user: { connect: { id: createdUser.id } },
+      },
+    });
+  }
 
   res.json(createdUser);
 });

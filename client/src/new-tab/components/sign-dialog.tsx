@@ -51,14 +51,18 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
   const onSubmit = async (data: z.infer<typeof schema>) => {
     setLoading(true);
     try {
+      const storage = await chrome.storage.local.get("guestId")
+      if (storage.guestId) {
+        data.guestId = storage.guestId
+      }
       if (signType === "in") {
         await signIn(data);
         setSignDialogOpen(false);
       } else {
         await signUp(data as z.infer<typeof signUpSchema>);
         setSignType("in");
-        // TODO toast
       }
+      chrome.storage.local.remove("guestId")
     } catch (err) {
       console.error(err);
     } finally {
