@@ -7,8 +7,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/lib/ui/dialog";
-import { Button } from "@/lib/ui/button";
-import { useEffect } from "react";
+import { Button } from "@/lib/ui/button-loading";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Separator } from "@/lib/ui/separator";
 import {
@@ -35,6 +35,7 @@ export const CreateTagDialog = ({
   const { createTagDialogOpen, setCreateTagDialogOpen, defaultTagForm } =
     useStore();
   const { tags, setTags } = useStore();
+  const [ submitting, setSubmitting ] = useState(false);
   const form = useForm({
     resolver: zodResolver(tagSchema),
     defaultValues: {
@@ -63,6 +64,7 @@ export const CreateTagDialog = ({
   };
 
   const onSubmit = async (data: z.infer<typeof tagSchema>) => {
+    setSubmitting(true)
     const createdTag = await f("/api/tag", {
       method: "POST",
       body: {
@@ -71,6 +73,7 @@ export const CreateTagDialog = ({
         id: defaultTagForm.id,
       },
     });
+    setSubmitting(false)
     if (!createdTag) return;
     // 更新
     if (defaultTagForm.id) {
@@ -155,7 +158,7 @@ export const CreateTagDialog = ({
             </div>
 
             <DialogFooter className="mt-4">
-              <Button type="submit">
+              <Button type="submit" loading={submitting}>
                 {defaultTagForm.id ? "Update" : "Create"}
               </Button>
             </DialogFooter>

@@ -109,7 +109,7 @@ export const Sidebar = () => {
           </PopoverTrigger>
           <PopoverContent side="right" className="p-2 mb-3">
             <SettingDialog>
-              <Button variant="ghost" size="sm" className="w-full h-full justify-start px-1 py-2">
+              <Button variant="ghost" size="sm" className="w-full h-full justify-start px-2 py-2">
                 <Settings className="w-4 h-4 mr-1" />
                 Settings
               </Button>
@@ -117,12 +117,12 @@ export const Sidebar = () => {
             {
               session && session.type === UserType.NORMAL
                 ?
-                <Button onClick={signOut} variant="ghost" size="sm" className="w-full h-full justify-start px-1 py-2">
+                <Button onClick={signOut} variant="ghost" size="sm" className="w-full h-full justify-start px-2 py-2">
                   <LogOut className="w-4 h-4 mr-1" />
                   Log out
                 </Button>
                 :
-                <Button onClick={() => setSignDialogOpen(true)} variant="ghost" size="sm" className="w-full h-full justify-start px-1 py-2">
+                <Button onClick={() => setSignDialogOpen(true)} variant="ghost" size="sm" className="w-full h-full justify-start px-2 py-2">
                   <LogIn className="w-4 h-4 mr-1" />
                   Log in
                 </Button>
