@@ -57,37 +57,30 @@ const NewTab = () => {
   }, [session]);
 
   useEffect(() => {
-    if (activeTag) {
-      fetchWebpages();
-    }
+    // if (activeTag) {
+    //   fetchWebpages();
+    // }
   }, [activeTag]);
 
   useEffect(() => {
-    const messageListener = (request: any) => {
-      if (request.type === "active-new-tab") {
-        fetchTags();
-        fetchWebpages();
-      }
-    };
+    // const messageListener = (request: any) => {
+    //   if (request.type === "active-new-tab") {
+    //     fetchTags();
+    //     fetchWebpages();
+    //   }
+    // };
 
-    chrome.runtime.onMessage.addListener(messageListener);
+    // chrome.runtime.onMessage.addListener(messageListener);
 
-    return () => {
-      chrome.runtime.onMessage.removeListener(messageListener);
-    };
+    // return () => {
+    //   chrome.runtime.onMessage.removeListener(messageListener);
+    // };
   }, [activeTag]);
 
   const fetchTags = async () => {
     const res = await f("/api/tag?includeWebPagesAndTags=true");
     setTags(mapTagsWithLevels(res));
     return res;
-  };
-
-  const fetchWebpages = async () => {
-    if (!activeTag) return;
-    const tagsId = flattenChildrenKey([activeTag], "id");
-    const res = await f(`/api/webpage?tagsId=${tagsId.join(",")}`);
-    setWebpages(res);
   };
 
   const handleResize = debounce((size: number) => {

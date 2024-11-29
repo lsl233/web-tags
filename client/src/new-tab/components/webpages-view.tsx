@@ -4,25 +4,74 @@ import { PanelsTopLeft, SquareArrowOutUpRight } from "lucide-react";
 import { CollectWebpageDialog } from "@/lib/components/collect-webpage-dialog";
 import { useStore } from "@/lib/hooks/store.hook";
 import { WebpageCard } from "./webpage-card";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/lib/ui/scroll-area";
 import { TagType } from "shared/tag";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { f } from "@/lib/f";
+import { debounce, flattenChildrenKey } from "@/lib/utils";
 
 export const WebpagesView = () => {
   const { activeTag, setDefaultCollectForm, webpages, setWebpages } = useStore();
+  const [query, setQuery] = useState({ page: 1 });
+  const [hasMore, setHasMore] = useState(true);
+  const scrollFooterElement = useRef<HTMLDivElement>(null);
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 5
     }
   });
+
+  
+
   const sensors = useSensors(pointerSensor)
 
   useEffect(() => {
-    setDefaultCollectForm({ tags: activeTag?.id ? [activeTag.id] : [] });
+    if (!activeTag) return;
+    // 重置分页
+    if (query.page !== 1) {
+      setQuery({ page: 1 });
+    }
+
+    setWebpages([]);
+    // 设置默认表单值
+    setDefaultCollectForm({ tags: [activeTag.id] });
+
+    // 初始化 intersection observer
+    const intersectionObserver = new IntersectionObserver((entries) => {
+      if (entries[0].intersectionRatio > 0) {
+        console.log(hasMore, 'has more')
+        setQuery(prev => ({ page: prev.page + 1 }));
+      }
+    });
+
+    // 获取数据并设置 observer
+    fetchWebpages().then(() => {
+      if (scrollFooterElement.current) {
+        intersectionObserver.observe(scrollFooterElement.current);
+      }
+    });
+
+    return () => {
+      intersectionObserver.disconnect();
+    };
   }, [activeTag]);
+
+  // 处理分页加载
+  useEffect(() => {
+    // 跳过首次 activeTag 变化触发的 query 更新
+    fetchWebpages();
+  }, [query]);
+
+  const fetchWebpages = async () => {
+    if (!activeTag) return;
+
+    const tagsId = flattenChildrenKey([activeTag], "id");
+    const res = await f(`/api/webpage?tagsId=${tagsId.join(",")}&page=${query.page}`);
+    setWebpages([...webpages, ...res]);
+    setHasMore(res.length > 0);
+  };
 
   const handleOpenAllTabs = (webpages: WebpageWithTags[]) => {
     webpages.forEach((webpage) => {
@@ -42,7 +91,7 @@ export const WebpagesView = () => {
       const result = arrayMove(webpages, oldIndex, newIndex)
       f('/api/webpage/sort-order', {
         method: "POST",
-        body: result.map((item, index) => ({id: item.id, sortOrder: index}))
+        body: result.map((item, index) => ({ id: item.id, sortOrder: index }))
       })
       setWebpages(result)
     }
@@ -77,6 +126,7 @@ export const WebpagesView = () => {
             </SortableContext>
           </DndContext>
         </div>
+        <div ref={scrollFooterElement}></div>
       </ScrollArea>
     </div>
   );
