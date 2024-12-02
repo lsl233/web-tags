@@ -6,6 +6,7 @@ import { ScrapedWebpage } from "shared/spider";
 type Store = {
   webpages: WebpageWithTags[];
   setWebpages: (webpages: WebpageWithTags[]) => void;
+  insertWebpages: (webpages: WebpageWithTags[]) => void;
 
   activeTag: TagWithChildrenAndParentAndLevel | null;
   setActiveTag: (tag: TagWithChildrenAndParentAndLevel | null) => void;
@@ -30,7 +31,7 @@ type Store = {
 export const useStore = create<Store>((set) => ({
   webpages: [],
   setWebpages: (webpages) => set({ webpages }),
-
+  insertWebpages: (webpages) => set((state) => ({ webpages: [...state.webpages, ...webpages] })),
   activeTag: null,
   setActiveTag: (tag) => set({ activeTag: tag }),
 

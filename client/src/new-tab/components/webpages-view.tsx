@@ -13,9 +13,10 @@ import { f } from "@/lib/f";
 import { debounce, flattenChildrenKey } from "@/lib/utils";
 
 export const WebpagesView = () => {
-  const { activeTag, setDefaultCollectForm, webpages, setWebpages } = useStore();
+  const { activeTag, setDefaultCollectForm, webpages, setWebpages, insertWebpages } = useStore();
   const [query, setQuery] = useState({ page: 1 });
   const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false)
   const scrollFooterElement = useRef<HTMLDivElement>(null);
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -23,54 +24,37 @@ export const WebpagesView = () => {
     }
   });
 
-  
-
   const sensors = useSensors(pointerSensor)
 
   useEffect(() => {
+    console.log('activeTag', activeTag)
     if (!activeTag) return;
-    // 重置分页
+
+    // 设置默认表单值
+    setDefaultCollectForm({ tags: [activeTag.id] });
+    setWebpages([]);
     if (query.page !== 1) {
       setQuery({ page: 1 });
     }
+  }, [activeTag])
 
-    setWebpages([]);
-    // 设置默认表单值
-    setDefaultCollectForm({ tags: [activeTag.id] });
-
-    // 初始化 intersection observer
-    const intersectionObserver = new IntersectionObserver((entries) => {
-      if (entries[0].intersectionRatio > 0) {
-        console.log(hasMore, 'has more')
-        setQuery(prev => ({ page: prev.page + 1 }));
-      }
-    });
-
-    // 获取数据并设置 observer
-    fetchWebpages().then(() => {
-      if (scrollFooterElement.current) {
-        intersectionObserver.observe(scrollFooterElement.current);
-      }
-    });
-
-    return () => {
-      intersectionObserver.disconnect();
-    };
-  }, [activeTag]);
-
-  // 处理分页加载
   useEffect(() => {
-    // 跳过首次 activeTag 变化触发的 query 更新
-    fetchWebpages();
-  }, [query]);
+
+    fetchWebpages()
+  }, [activeTag, query])
 
   const fetchWebpages = async () => {
-    if (!activeTag) return;
-
+    if (!activeTag) return [];
+    setLoading(true)
     const tagsId = flattenChildrenKey([activeTag], "id");
-    const res = await f(`/api/webpage?tagsId=${tagsId.join(",")}&page=${query.page}`);
-    setWebpages([...webpages, ...res]);
-    setHasMore(res.length > 0);
+    const res = await f<WebpageWithTags[]>(`/api/webpage?tagsId=${tagsId.join(",")}&page=${query.page}`);
+    if (res) {
+      setHasMore(res.length > 0);
+      insertWebpages(res);
+    }
+    
+    setLoading(false);
+    return res || [];
   };
 
   const handleOpenAllTabs = (webpages: WebpageWithTags[]) => {
