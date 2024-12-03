@@ -6,15 +6,16 @@ import { useStore } from "@/lib/hooks/store.hook";
 import { WebpageCard } from "./webpage-card";
 import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/lib/ui/scroll-area";
-import { TagType } from "shared/tag";
+import { TagType, TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { f } from "@/lib/f";
 import { debounce, flattenChildrenKey } from "@/lib/utils";
 
-export const WebpagesView = () => {
-  const { activeTag, setDefaultCollectForm, webpages, setWebpages, insertWebpages } = useStore();
-  const [query, setQuery] = useState({ page: 1 });
+export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParentAndLevel }) => {
+  const { setDefaultCollectForm, webpages, setWebpages, insertWebpages } = useStore();
+  
+  const [query, setQuery] = useState({ page: 1, pageSize: 10 });
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false)
   const scrollFooterElement = useRef<HTMLDivElement>(null);
@@ -27,24 +28,48 @@ export const WebpagesView = () => {
   const sensors = useSensors(pointerSensor)
 
   useEffect(() => {
-    console.log('activeTag', activeTag)
-    if (!activeTag) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            console.log('滚动到底部，加载更多内容');
+            setQuery(prev => ({ ...prev, page: prev.page + 1 }));
+          }
+        });
+      },
+      {
+        rootMargin: '0px',
+        threshold: 1.0,
+      }
+    );
 
+    if (scrollFooterElement.current) {
+      observer.observe(scrollFooterElement.current);
+    }
+
+    return () => {
+      if (scrollFooterElement.current) {
+        observer.unobserve(scrollFooterElement.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     // 设置默认表单值
     setDefaultCollectForm({ tags: [activeTag.id] });
     setWebpages([]);
     if (query.page !== 1) {
-      setQuery({ page: 1 });
+      setQuery(prev => ({ ...prev, page: 1 }));
     }
   }, [activeTag])
 
   useEffect(() => {
-
+    console.log(query)
     fetchWebpages()
-  }, [activeTag, query])
+  }, [query])
 
   const fetchWebpages = async () => {
-    if (!activeTag) return [];
+    if (!hasMore) return;
     setLoading(true)
     const tagsId = flattenChildrenKey([activeTag], "id");
     const res = await f<WebpageWithTags[]>(`/api/webpage?tagsId=${tagsId.join(",")}&page=${query.page}`);

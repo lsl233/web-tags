@@ -95,7 +95,7 @@ const NewTab = () => {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel>
-          <WebpagesView />
+          { activeTag && <WebpagesView activeTag={activeTag} /> }
         </ResizablePanel>
       </ResizablePanelGroup>
     </main>

@@ -10,14 +10,13 @@ const router = express.Router();
 interface GetWebpageQuery {
   tagsId: string
   page: number | undefined
+  pageSize: number | undefined
 }
 router.get<null, any, null, GetWebpageQuery>("/", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
-  const { tagsId, page = 1 } = req.query;
-  
-  const pageSize = 20
+  const { tagsId, page = 1, pageSize = 20 } = req.query;
 
   if (!tagsId || tagsId === "") {
     return next(ServerError.BadRequest("tagsId is required"));
