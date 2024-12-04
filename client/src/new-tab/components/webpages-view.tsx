@@ -32,8 +32,7 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            console.log('滚动到底部，加载更多内容');
-            setQuery(prev => ({ ...prev, page: prev.page + 1 }));
+            fetchWebpages()
           }
         });
       },
@@ -52,21 +51,16 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
         observer.unobserve(scrollFooterElement.current);
       }
     };
-  }, []);
+  }, [query]);
 
   useEffect(() => {
-    // 设置默认表单值
-    setDefaultCollectForm({ tags: [activeTag.id] });
-    setWebpages([]);
+    console.log('activeTag', activeTag)
+    setWebpages([])
+    setHasMore(true)
     if (query.page !== 1) {
       setQuery(prev => ({ ...prev, page: 1 }));
     }
   }, [activeTag])
-
-  useEffect(() => {
-    console.log(query)
-    fetchWebpages()
-  }, [query])
 
   const fetchWebpages = async () => {
     if (!hasMore) return;
@@ -75,6 +69,7 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
     const res = await f<WebpageWithTags[]>(`/api/webpage?tagsId=${tagsId.join(",")}&page=${query.page}`);
     if (res) {
       setHasMore(res.length > 0);
+      setQuery(prev => ({ ...prev, page: prev.page + 1 }));
       insertWebpages(res);
     }
     
