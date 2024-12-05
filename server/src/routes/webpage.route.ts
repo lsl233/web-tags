@@ -25,8 +25,8 @@ router.get<null, any, null, GetWebpageQuery>("/", async (req, res, next) => {
   const tagsIdArray = tagsId.split(",");
 
   const foundWebpages = await db.webPage.findMany({
-    skip: (page - 1) * pageSize,
-    take: pageSize,
+    skip: (Number(page) - 1) * Number(pageSize),
+    take: Number(pageSize),
     where: {
       userId: req.user.id,
       tags: {

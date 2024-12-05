@@ -10,11 +10,12 @@ import { TagType, TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { f } from "@/lib/f";
-import { debounce, flattenChildrenKey } from "@/lib/utils";
+import { cn, debounce, flattenChildrenKey } from "@/lib/utils";
+import { Skeleton } from "@/lib/ui/skeleton";
 
 export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParentAndLevel }) => {
   const { setDefaultCollectForm, webpages, setWebpages, insertWebpages } = useStore();
-  
+
   const [query, setQuery] = useState({ page: 1, pageSize: 10 });
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false)
@@ -37,8 +38,8 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
         });
       },
       {
-        rootMargin: '0px',
-        threshold: 1.0,
+        rootMargin: '0px 0px 0px 0px',
+        threshold: 0,
       }
     );
 
@@ -66,13 +67,18 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
     if (!hasMore) return;
     setLoading(true)
     const tagsId = flattenChildrenKey([activeTag], "id");
-    const res = await f<WebpageWithTags[]>(`/api/webpage?tagsId=${tagsId.join(",")}&page=${query.page}`);
+    const res = await f<WebpageWithTags[]>('/api/webpage', {
+      query: {
+        tagsId: tagsId.join(","),
+        ...query
+      }
+    });
     if (res) {
-      setHasMore(res.length > 0);
+      setHasMore(res.length === query.pageSize);
       setQuery(prev => ({ ...prev, page: prev.page + 1 }));
       insertWebpages(res);
     }
-    
+
     setLoading(false);
     return res || [];
   };
@@ -127,10 +133,19 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
               {webpages.map((webpage) => (
                 <WebpageCard key={webpage.id} webpage={webpage} showTags={activeTag?.type === TagType.CUSTOM} />
               ))}
+              {
+                hasMore && (
+                  <>
+                    <Skeleton ref={scrollFooterElement} className={cn(activeTag?.type === TagType.CUSTOM ? 'h-[98.5px]' : 'h-[68.5px]', 'rounded-lg p-2')} />
+                    <Skeleton className={cn(activeTag?.type === TagType.CUSTOM ? 'h-[98.5px]' : 'h-[68.5px]', 'rounded-lg p-2')} />
+                    <Skeleton className={cn(activeTag?.type === TagType.CUSTOM ? 'h-[98.5px]' : 'h-[68.5px]', 'rounded-lg p-2')} />
+                    <Skeleton className={cn(activeTag?.type === TagType.CUSTOM ? 'h-[98.5px]' : 'h-[68.5px]', 'rounded-lg p-2')} />
+                  </>
+                )
+              }
             </SortableContext>
           </DndContext>
         </div>
-        <div ref={scrollFooterElement}></div>
       </ScrollArea>
     </div>
   );
