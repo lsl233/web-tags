@@ -110,11 +110,10 @@ export const IconPicker: React.FC<{
     [keyword]
   );
 
-  console.log(keyword);
 
   return (
     <Popover>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
+      <PopoverTrigger>{children}</PopoverTrigger>
       <PopoverContent className="py-2 pl-2 pr-0 w-auto">
         <Input
           onChange={debounce((e) => setKeyword(e.target.value), 300)}
