@@ -15,7 +15,7 @@ import {
 } from "shared/webpage";
 import { z } from "zod";
 import { Combobox } from "../ui/combobox";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "../hooks/store.hook";
 import { flattenChildren, uniqueArrayByKey } from "../utils";
 import { f } from "../f";
@@ -47,6 +47,7 @@ export const CollectMultiWebpageForm = ({
   }, [tags, defaultTag]);
   const [submitting, setSubmitting] = useState(false);
   const [isCloseAllPages, setIsCloseAllPages] = useState(false);
+  const isMounted = useRef(false)
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -61,6 +62,8 @@ export const CollectMultiWebpageForm = ({
   });
 
   useEffect(() => {
+    if (isMounted.current) return
+    isMounted.current = true
     chrome.tabs.query({}, async (tabs) => {
       const currentWindowWebpages = tabs.map((tab) => {
         return {
