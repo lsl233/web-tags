@@ -8,6 +8,7 @@ import webpageRoutes from './routes/webpage.route.js';
 import tagRoutes from './routes/tag.route.js';
 import spiderRoutes from './routes/spider.route.js';
 import guestRoutes from './routes/guest.route.js'
+import settingsRoutes from './routes/settings.route.js'
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -30,6 +31,7 @@ const init = async () => {
   app.use('/api/webpage', webpageRoutes);
   app.use('/api/tag', tagRoutes);
   app.use('/api/spider', spiderRoutes);
+  app.use('/api/settings', settingsRoutes);
   
   app.use(errorMiddleware);
   // /auth/signin/github
