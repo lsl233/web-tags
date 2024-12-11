@@ -16,7 +16,7 @@ import { Skeleton } from "@/lib/ui/skeleton";
 export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParentAndLevel }) => {
   const { setDefaultCollectForm, webpages, setWebpages, insertWebpages } = useStore();
 
-  const [query, setQuery] = useState({ page: 1, pageSize: 10 });
+  const [query, setQuery] = useState({ page: 1, pageSize: 50 });
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false)
   const scrollFooterElement = useRef<HTMLDivElement>(null);
