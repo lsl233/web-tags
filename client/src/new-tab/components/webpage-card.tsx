@@ -23,11 +23,13 @@ import { TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { TagBadge } from "@/lib/components/tag";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities"
+import { useSettingsStore } from "@/lib/hooks/settings.store.hook";
 
 // import { TagWithChildrenAndParentAndLevelAndParent } from "shared/tag";
 
 export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWithTags, showTags?: boolean }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: webpage.id })
+  const settings = useSettingsStore()
   const style = {
     transition,
     transform: CSS.Transform.toString(transform)
@@ -45,7 +47,7 @@ export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWith
   };
 
   const handleOpenTab = (url: string) => {
-    chrome.tabs.create({ url, active: false });
+    chrome.tabs.create({ url, active: settings.webpageActive });
   };
 
   const handleOpenCreateDialog = () => {

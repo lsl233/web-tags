@@ -16,6 +16,7 @@ import {
 import { useRef } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
 import { Sidebar } from "./components/sidebar";
+import { useSettingsStore } from "@/lib/hooks/settings.store.hook";
 
 function mapTagsWithLevels(
   tags: TagWithChildrenAndParentAndLevel[],
@@ -36,6 +37,7 @@ function mapTagsWithLevels(
 
 const NewTab = () => {
   const { session } = useAuth();
+  const { setSettings } = useSettingsStore();
   const panelRef = useRef<ImperativePanelHandle>(null);
   const { tags, setTags, activeTag, setActiveTag, webpages, setWebpages } =
     useStore();
@@ -44,6 +46,7 @@ const NewTab = () => {
     chrome.storage.local.get("newTabPanelSize", (data) => {
       panelRef.current?.resize(data.newTabPanelSize);
     });
+    fetchSettings()
   }, []);
 
   useEffect(() => {
@@ -56,26 +59,10 @@ const NewTab = () => {
     }
   }, [session]);
 
-  useEffect(() => {
-    // if (activeTag) {
-    //   fetchWebpages();
-    // }
-  }, [activeTag]);
-
-  useEffect(() => {
-    // const messageListener = (request: any) => {
-    //   if (request.type === "active-new-tab") {
-    //     fetchTags();
-    //     fetchWebpages();
-    //   }
-    // };
-
-    // chrome.runtime.onMessage.addListener(messageListener);
-
-    // return () => {
-    //   chrome.runtime.onMessage.removeListener(messageListener);
-    // };
-  }, [activeTag]);
+  const fetchSettings = async () => {
+    const res = await f("/api/settings");
+    res && setSettings(res.settingsJson);
+  };
 
   const fetchTags = async () => {
     const res = await f("/api/tag?includeWebPagesAndTags=true");

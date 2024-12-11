@@ -11,9 +11,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Separator } from "@/lib/ui/separator";
 import { BasicForm } from "./basic-form";
+import { useSettingsStore } from "@/lib/hooks/settings.store.hook";
 // TODO setting dialog
 
 export const SettingDialog = ({ children }: { children: React.ReactNode }) => {
+  const settings = useSettingsStore();
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -26,7 +28,7 @@ export const SettingDialog = ({ children }: { children: React.ReactNode }) => {
           <Separator />
         </DialogHeader>
         <div className="mt-4">
-          <BasicForm />
+          <BasicForm settings={settings} />
         </div>
       </DialogContent>
     </Dialog>

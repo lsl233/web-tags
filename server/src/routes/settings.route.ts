@@ -5,6 +5,12 @@ import express from "express";
 const router = express.Router();
 
 router.get("/", async (req, res, next) => {
+    const session = req.user;
+
+    if (!session) {
+        return next(ServerError.Unauthorized("Unauthorized"));
+    }
+    
     const settings = await db.settings.findFirst({
         where: {
             userId: req.user.id
@@ -25,13 +31,13 @@ router.post("/", async (req, res, next) => {
 
     const settings = await db.settings.upsert({
         where: {
-            id
+            userId: session.id
         },
         update: {
-            settings_json: data.settingsJSON
+            settingsJson: data.settingsJson
         },
         create: {
-            settings_json: data.settingsJSON,
+            settingsJson: data.settingsJson,
             user: {
                 connect: {
                     id: session.id

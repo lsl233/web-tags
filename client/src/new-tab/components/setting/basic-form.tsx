@@ -14,29 +14,33 @@ import { Switch } from "@/lib/ui/switch";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect } from "react";
+import { SettingsStore, useSettingsStore } from "@/lib/hooks/settings.store.hook";
 
 const schema = z.object({
   focus: z.boolean(),
 });
 
-export const BasicForm = () => {
+export const BasicForm = ({ settings }: { settings: Omit<SettingsStore, "setSettings"> }) => {
+  const { setSettings } = useSettingsStore();
 
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      focus: true,
+      webpageActive: settings.webpageActive,
     },
   });
 
   useEffect(() => {
-    const subscription = form.watch((value, { name, type }) =>
-      f("/api/settings", {
+    const subscription = form.watch(async (value, { name, type }) => {
+      await f("/api/settings", {
         method: "POST",
         body: {
-          settingsJSON: value,
+          settingsJson: value,
         }
       })
-    )
+      setSettings(value);
+    })
+
     return () => subscription.unsubscribe()
   }, [form.watch])
 
@@ -44,7 +48,7 @@ export const BasicForm = () => {
     <Form {...form}>
       <FormField
         control={form.control}
-        name="focus"
+        name="webpageActive"
         render={({ field }) => (
           <FormItem className="flex items-center justify-between w-full space-y-0">
             <div>
