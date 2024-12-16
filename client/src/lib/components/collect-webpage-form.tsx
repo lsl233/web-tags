@@ -13,7 +13,7 @@ import { Combobox } from "@/lib/ui/combobox";
 import { DialogFooter } from "@/lib/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { collectWebSchema } from "shared/webpage";
+import { collectWebSchema, WebpageWithTags } from "shared/webpage";
 import { useForm } from "react-hook-form";
 import { Bot, Download, Eraser } from "lucide-react";
 import { Tag, TagWithChildrenAndParentAndLevel } from "shared/tag";
@@ -49,6 +49,7 @@ export const CollectWebpageForm = ({
   const setTags = useStore((state) => state.setTags);
   const webpages = useStore((state) => state.webpages);
   const setWebpages = useStore((state) => state.setWebpages);
+  const activeTag = useStore((state) => state.activeTag);
   const [submitting, setSubmitting] = useState(false);
   const [webpageId, setWebpageId] = useState(defaultForm.id || "");
   const tagOptions = useMemo(() => flatten(tags), [tags]);
@@ -115,7 +116,7 @@ export const CollectWebpageForm = ({
 
   const onSubmit = async (data: z.infer<typeof collectWebSchema>) => {
     setSubmitting(true);
-    const response = await f("/api/webpage", {
+    const response = await f<WebpageWithTags>("/api/webpage", {
       method: "POST",
       body: {
         ...data,
@@ -124,13 +125,23 @@ export const CollectWebpageForm = ({
     });
     if (!response) return;
     if (response) {
+      // update
       if (webpageId) {
-        setWebpages(
-          webpages.map((webpage) =>
-            webpage.id === response.id ? response : webpage
-          )
-        );
-      } else {
+        const hasActiveTag = response.tags.find(tag => tag.id === activeTag?.id);
+        const foundWebpageIndex = webpages.findIndex((webpage) => webpage.id === webpageId);
+        let newWebpages = [...webpages];
+        newWebpages[foundWebpageIndex] = response;
+        if (hasActiveTag) {
+          setWebpages(newWebpages);
+        } else {
+          newWebpages = newWebpages.filter((webpage) => {
+            return webpage.tags.find(tag => tag.id === activeTag?.id);
+          });
+          setWebpages(newWebpages);
+        }
+      }
+      // append
+      else {
         setWebpages([response, ...webpages]);
       }
       setWebpageId(response.id);
