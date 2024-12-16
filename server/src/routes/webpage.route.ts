@@ -153,10 +153,10 @@ router.get("/exist", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
-  const { url } = req.query;
+  const url = decodeURIComponent(req.query.url as string);
   const foundWebpage = await db.webPage.findFirst({
     where: {
-      url: url as string,
+      url,
       userId: req.user.id,
     },
     include: {

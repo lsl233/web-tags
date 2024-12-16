@@ -49,11 +49,8 @@ export const CollectWebpageForm = ({
   const setTags = useStore((state) => state.setTags);
   const webpages = useStore((state) => state.webpages);
   const setWebpages = useStore((state) => state.setWebpages);
-  const setDefaultCollectForm = useStore(
-    (state) => state.setDefaultCollectForm
-  );
   const [submitting, setSubmitting] = useState(false);
-  const [webpageId, setWebpageId] = useState<string>(defaultForm.id || "");
+  const [webpageId, setWebpageId] = useState(defaultForm.id || "");
   const tagOptions = useMemo(() => flatten(tags), [tags]);
 
   const form = useForm({
@@ -74,8 +71,7 @@ export const CollectWebpageForm = ({
   const checkWebpageExist = useCallback(async () => {
     // if title is not empty, it means the user has already input the title
     if (!formURL) return;
-
-    const response = await f(`/api/webpage/exist?url=${formURL}`);
+    const response = await f(`/api/webpage/exist?url=${encodeURIComponent(formURL)}`);
     if (response) {
       setWebpageId(response.id);
       form.reset(
@@ -100,18 +96,6 @@ export const CollectWebpageForm = ({
     const debounceTimer = setTimeout(checkWebpageExist, 300);
     return () => clearTimeout(debounceTimer);
   }, [checkWebpageExist]);
-
-  useEffect(() => {
-    return () => {
-      setDefaultCollectForm({
-        url: "",
-        title: "",
-        description: "",
-        icon: "",
-        tags: [] as string[],
-      });
-    };
-  }, []);
 
   const handleFetchWebpageInfo = async () => {
     const url = form.getValues("url");
