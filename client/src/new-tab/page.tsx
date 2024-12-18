@@ -44,10 +44,10 @@ const NewTab = () => {
 
   useEffect(() => {
     chrome.storage.local.get("newTabPanelSize", (data) => {
-      panelRef.current?.resize(data.newTabPanelSize);
+      panelRef.current?.resize(data.newTabPanelSize || 18);
     });
     fetchSettings()
-  }, []);
+  }, []); 
 
   useEffect(() => {
     if (session) {
@@ -77,7 +77,7 @@ const NewTab = () => {
   return (
     <main className="flex flex-col sm:flex-row h-screen max-w-[1920px] mx-auto bg-white">
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel ref={panelRef} defaultSize={18} onResize={handleResize}>
+        <ResizablePanel ref={panelRef} onResize={handleResize}>
           <Sidebar />
         </ResizablePanel>
         <ResizableHandle withHandle />
