@@ -87,6 +87,9 @@ router.post("/", async (req, res, next) => {
         },
         ...(parentId ? { parent: { connect: { id: parentId } } } : {}),
       },
+      include: {
+        children: true,
+      }
     });
     res.json(createdTag);
   }
