@@ -22,6 +22,7 @@ import { f } from "../f";
 import { ScrapedWebpage } from "shared/spider";
 import { useStore } from "../hooks/store.hook";
 import { useCallback } from "react";
+import { TooltipContent, TooltipTrigger, Tooltip, TooltipProvider } from "@/lib/ui/tooltip";
 
 interface CollectWebpageFormProps {
   submitSuccess: () => void;
@@ -199,24 +200,45 @@ export const CollectWebpageForm = ({
               <FormControl>
                 <div className="flex items-center space-x-2">
                   <Input {...field} />
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleClearURL}
-                    size="icon"
-                    className="h-9 w-9 flex-shrink-0"
-                  >
-                    <Eraser className="w-6 h-6" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleFetchWebpageInfo}
-                    size="icon"
-                    className="h-9 w-9 flex-shrink-0"
-                  >
-                    <Download className="w-6 h-6" />
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={handleClearURL}
+                          size="icon"
+                          className="h-9 w-9 flex-shrink-0"
+                        >
+                          <Eraser className="w-6 h-6" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Auto-Clear Trailing Path</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={handleFetchWebpageInfo}
+                          size="icon"
+                          className="h-9 w-9 flex-shrink-0"
+                        >
+                          <Download className="w-6 h-6" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Web Information Auto-Capture</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+
                 </div>
               </FormControl>
               <FormMessage />
