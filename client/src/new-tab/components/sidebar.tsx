@@ -20,13 +20,6 @@ export const Sidebar = () => {
 
   const { tags, setTags, setSignDialogOpen } = useStore();
 
-  // useEffect(() => {
-  //   console.log(session)
-  //   if (!session) {
-  //     setSignDialogOpen(true);
-  //   }
-  // }, [])
-
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 5
