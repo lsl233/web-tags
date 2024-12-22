@@ -14,6 +14,8 @@ import { useAuth } from "./auth-provider"
 import { Popover, PopoverContent, PopoverTrigger } from "@/lib/ui/popover"
 import { SignDialog } from "./sign-dialog"
 import { UserType } from "shared/user"
+import { arrayMove } from "@dnd-kit/sortable"
+import { f } from "@/lib/f"
 
 export const Sidebar = () => {
   const { session, signOut } = useAuth();
@@ -43,27 +45,20 @@ export const Sidebar = () => {
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeData = findItemAndParentPath(tags, active.id as string);
-    const overData = findItemAndParentPath(tags, over.id as string);
-
-    if (!activeData || !overData) return;
-
-    const activeItem = activeData.item;
-    const newData = [...tags];
-
-    if (activeItem.parentId === overData.item.parentId) {
-      // 移除拖拽项
-      const activeParent = activeData.parentPath.reduce((acc, idx) => acc[idx].children, newData);
-      activeParent.splice(activeData.index, 1);
-
-      // 插入到目标位置
-      const overParent = overData.parentPath.reduce((acc, idx) => acc[idx].children, newData);
-      overParent.splice(overData.index, 0, activeItem);
-
-      setTags(newData);
+    const { active, over } = event
+    let oldIndex
+    let newIndex
+    for (let i = 0, l = tags.length; i < l; i++) {
+      if (active.id === tags[i].id) oldIndex = i
+      if (over?.id === tags[i].id) newIndex = i
+    }
+    if (oldIndex !== undefined && newIndex !== undefined) {
+      const result = arrayMove(tags, oldIndex, newIndex)
+      f('/api/tag/sort-order', {
+        method: "POST",
+        body: result.map((item, index) => ({ id: item.id, sortOrder: index }))
+      })
+      setTags(result)
     }
 
   };
