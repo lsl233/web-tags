@@ -55,7 +55,6 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
   }, [query]);
 
   useEffect(() => {
-    console.log('activeTag', activeTag)
     setWebpages([])
     setHasMore(true)
     if (query.page !== 1) {
@@ -135,12 +134,7 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
               ))}
               {
                 hasMore && (
-                  <>
-                    <Skeleton ref={scrollFooterElement} className={cn(activeTag?.type === TagType.CUSTOM ? 'h-[98.5px]' : 'h-[68.5px]', 'rounded-lg p-2')} />
-                    <Skeleton className={cn(activeTag?.type === TagType.CUSTOM ? 'h-[98.5px]' : 'h-[68.5px]', 'rounded-lg p-2')} />
-                    <Skeleton className={cn(activeTag?.type === TagType.CUSTOM ? 'h-[98.5px]' : 'h-[68.5px]', 'rounded-lg p-2')} />
-                    <Skeleton className={cn(activeTag?.type === TagType.CUSTOM ? 'h-[98.5px]' : 'h-[68.5px]', 'rounded-lg p-2')} />
-                  </>
+                  <Skeleton ref={scrollFooterElement} className={cn(activeTag?.type === TagType.CUSTOM ? 'h-[98.5px]' : 'h-[68.5px]', 'rounded-lg p-2')} />
                 )
               }
             </SortableContext>
