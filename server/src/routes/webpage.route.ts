@@ -50,7 +50,7 @@ router.get<null, any, null, GetWebpageQuery>("/", async (req, res, next) => {
 });
 
 const createWebpage = async (webpage: CreateWebpage, userId: string) => {
-  const { url, title, description, tags, icon, id } = webpage;
+  const { url, title, description, tags, icon, id = "" } = webpage;
 
   const data = {
     url,

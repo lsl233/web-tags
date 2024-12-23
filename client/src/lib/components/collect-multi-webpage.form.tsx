@@ -9,8 +9,8 @@ import {
 import { Input } from "@/lib/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  CollectWebpageForm,
-  collectWebSchema,
+  webpageFormData,
+  WebpageFormData,
   WebpageWithTags,
 } from "shared/webpage";
 import { z } from "zod";
@@ -27,7 +27,7 @@ import { ScrollArea } from "@/lib/ui/scroll-area";
 import { Checkbox } from "../ui/checkbox";
 
 const formSchema = z.object({
-  items: z.array(collectWebSchema).min(1, "At least one item is required"),
+  items: z.array(webpageFormData).min(1, "At least one item is required"),
 });
 
 interface CollectMultiWebpageFormProps {
@@ -72,7 +72,7 @@ export const CollectMultiWebpageForm = ({
           icon: tab.favIconUrl || "",
           description: tab.title,
           tags: [],
-        } as CollectWebpageForm;
+        } as WebpageFormData;
       });
       const _defaultTag = generateDefaultTag();
       setDefaultTag(_defaultTag);
@@ -95,16 +95,16 @@ export const CollectMultiWebpageForm = ({
   };
 
   const generateDefaultForm = async (
-    currentWindowWebpages: CollectWebpageForm[],
+    currentWindowWebpages: WebpageFormData[],
     defaultTag: TagWithId
   ) => {
-    let result: CollectWebpageForm[];
+    let result: WebpageFormData[];
     const foundWebpages = await f<WebpageWithTags[]>("/api/webpage/multi", {
       query: { urls: currentWindowWebpages.map((item) => item.url).join(",") },
     });
 
     if (foundWebpages) {
-      result = currentWindowWebpages.map((item: CollectWebpageForm) => {
+      result = currentWindowWebpages.map((item: WebpageFormData) => {
         const foundWebpage = foundWebpages.find(
           (webpage) => webpage.url === item.url
         );
@@ -115,7 +115,7 @@ export const CollectMultiWebpageForm = ({
             description: foundWebpage.description,
             icon: foundWebpage.icon,
             tags: [defaultTag.id],
-          } as CollectWebpageForm;
+          } as WebpageFormData;
         }
         if (defaultTag) {
           item.tags = [defaultTag.id];
@@ -123,7 +123,7 @@ export const CollectMultiWebpageForm = ({
         return item;
       });
     } else {
-      result = currentWindowWebpages.map((item: CollectWebpageForm) => {
+      result = currentWindowWebpages.map((item: WebpageFormData) => {
         item.tags = [defaultTag.id];
         return item;
       });

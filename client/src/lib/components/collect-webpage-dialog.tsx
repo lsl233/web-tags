@@ -6,8 +6,7 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@/lib/ui/dialog";
-import { CollectWebpageForm } from "./collect-webpage-form";
-import { useEffect, useState } from "react";
+import { CollectWebpageForm } from "./_collect-webpage-form";
 import { useStore } from "../hooks/store.hook";
 import { ScrapedWebpage } from "shared/spider";
 

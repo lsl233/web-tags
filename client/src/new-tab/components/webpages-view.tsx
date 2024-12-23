@@ -1,7 +1,8 @@
 import { Button } from "@/lib/ui/button";
 import { WebpageWithTags } from "shared/webpage";
 import { PanelsTopLeft, SquareArrowOutUpRight } from "lucide-react";
-import { CollectWebpageDialog } from "@/lib/components/collect-webpage-dialog";
+// import { CollectWebpageDialog } from "@/lib/components/collect-webpage-dialog";
+import { AddWebpageFormDialog } from "@/lib/components/add-webpage-form-dialog";
 import { useStore } from "@/lib/hooks/store.hook";
 import { WebpageCard } from "./webpage-card";
 import { useEffect, useRef, useState } from "react";
@@ -12,6 +13,7 @@ import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { f } from "@/lib/f";
 import { cn, debounce, flattenChildrenKey } from "@/lib/utils";
 import { Skeleton } from "@/lib/ui/skeleton";
+import { WebpageFormDialog } from "@/lib/components/webpage-form-dialog";
 
 export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParentAndLevel }) => {
   const { setDefaultCollectForm, webpages, setWebpages, insertWebpages } = useStore();
@@ -109,12 +111,12 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
   return (
     <div className="flex flex-col h-full">
       <div className="shrink-0 h-[52px] flex justify-between items-center px-2 border-b border-gray-300">
-        <CollectWebpageDialog>
+        <AddWebpageFormDialog>
           <Button size="sm">
             <PanelsTopLeft size={16} className="mr-1" />
             Collect Webpage
           </Button>
-        </CollectWebpageDialog>
+        </AddWebpageFormDialog>
         {webpages.length > 0 && (
           <Button
             variant="outline"

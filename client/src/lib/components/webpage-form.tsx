@@ -12,8 +12,7 @@ import { Textarea } from "@/lib/ui/textarea";
 import { Combobox } from "@/lib/ui/combobox";
 import { DialogFooter } from "@/lib/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { collectWebSchema, WebpageWithTags } from "shared/webpage";
+import { WebpageFormData, webpageFormData } from "shared/webpage";
 import { useForm } from "react-hook-form";
 import { Bot, Download, Eraser } from "lucide-react";
 import { Tag, TagWithChildrenAndParentAndLevel } from "shared/tag";
@@ -21,13 +20,13 @@ import { useEffect, useMemo, useState } from "react";
 import { f } from "../f";
 import { ScrapedWebpage } from "shared/spider";
 import { useStore } from "../hooks/store.hook";
-import { useCallback } from "react";
 import { TooltipContent, TooltipTrigger, Tooltip, TooltipProvider } from "@/lib/ui/tooltip";
 
-interface CollectWebpageFormProps {
-  submitSuccess: () => void;
-  visibleButton: boolean;
-  defaultForm?: Partial<ScrapedWebpage>;
+export interface WebpageFormProps {
+  onSubmit?: (data: WebpageFormData) => Promise<void>;
+  submitButtonText?: string;
+  visibleButton?: boolean;
+  formData?: Partial<WebpageFormData>;
 }
 
 function flatten(
@@ -41,115 +40,37 @@ function flatten(
   });
 }
 
-export const CollectWebpageForm = ({
-  defaultForm = {},
-  submitSuccess,
-  visibleButton = false,
-}: CollectWebpageFormProps) => {
+const defaultFormData = {
+  url: "",
+  title: "",
+  description: "",
+  icon: "",
+  tags: [] as string[],
+}
+
+export const WebpageForm = ({
+  formData = defaultFormData,
+  onSubmit = async (data: WebpageFormData) => { },
+  submitButtonText = "Submit",
+}: WebpageFormProps) => {
   const tags = useStore((state) => state.tags);
   const setTags = useStore((state) => state.setTags);
-  const webpages = useStore((state) => state.webpages);
-  const setWebpages = useStore((state) => state.setWebpages);
-  const activeTag = useStore((state) => state.activeTag);
-  const [submitting, setSubmitting] = useState(false);
-  const [webpageId, setWebpageId] = useState(defaultForm.id || "");
   const tagOptions = useMemo(() => flatten(tags), [tags]);
+  const [submitting, setSubmitting] = useState(false);
 
   const form = useForm({
-    resolver: zodResolver(collectWebSchema),
+    resolver: zodResolver(webpageFormData),
     defaultValues: {
-      url: "",
-      title: "",
-      description: "",
-      icon: "",
-      tags: [] as string[],
-      ...defaultForm,
+      ...defaultFormData,
+      ...formData
     },
   });
 
-  const formURL = form.watch("url");
-  const formTitle = form.watch("title");
-
-  const checkWebpageExist = useCallback(async () => {
-    // if title is not empty, it means the user has already input the title
-    if (!formURL) return;
-    const response = await f(`/api/webpage/exist?url=${encodeURIComponent(formURL)}`);
-    if (response) {
-      setWebpageId(response.id);
-      form.reset(
-        {
-          ...form.getValues(),
-          tags:
-            response.tags.length > 0
-              ? response.tags.map((tag: Tag) => tag.id)
-              : form.getValues("tags"),
-          title: response.title || form.getValues("title"),
-          description: response.description || form.getValues("description"),
-          icon: response.icon || form.getValues("icon"),
-        },
-        { keepDefaultValues: true }
-      );
-    } else {
-      setWebpageId("");
-    }
-  }, [formURL, form]);
+  
 
   useEffect(() => {
-    const debounceTimer = setTimeout(checkWebpageExist, 300);
-    return () => clearTimeout(debounceTimer);
-  }, [checkWebpageExist]);
-
-  const handleFetchWebpageInfo = async () => {
-    const url = form.getValues("url");
-    if (!url) return;
-    const response = await f<ScrapedWebpage>("/api/spider/webpage", {
-      method: "POST",
-      body: { url },
-    });
-    if (!response) return;
-    form.setValue("title", response.title);
-    form.setValue("description", response.description);
-    form.setValue("icon", response.icon);
-    // TODO: AI agent～
-    // form.setValue("tags", response.tags);
-    console.log(form.getValues("tags"), form.getValues("url"));
-  };
-
-  const onSubmit = async (data: z.infer<typeof collectWebSchema>) => {
-    setSubmitting(true);
-    const response = await f<WebpageWithTags>("/api/webpage", {
-      method: "POST",
-      body: {
-        ...data,
-        id: webpageId,
-      },
-    });
-    if (!response) return;
-    if (response) {
-      // update
-      if (webpageId) {
-        const hasActiveTag = response.tags.find(tag => tag.id === activeTag?.id);
-        const foundWebpageIndex = webpages.findIndex((webpage) => webpage.id === webpageId);
-        let newWebpages = [...webpages];
-        newWebpages[foundWebpageIndex] = response;
-        if (hasActiveTag) {
-          setWebpages(newWebpages);
-        } else {
-          newWebpages = newWebpages.filter((webpage) => {
-            return webpage.tags.find(tag => tag.id === activeTag?.id);
-          });
-          setWebpages(newWebpages);
-        }
-      }
-      // append
-      else {
-        setWebpages([response, ...webpages]);
-      }
-      setWebpageId(response.id);
-      submitSuccess();
-    }
-    setSubmitting(false);
-  };
+    form.reset(formData)
+  }, [formData])
 
   const handleCreateTag = async (name: string) => {
     const response = await f("/api/tag", {
@@ -174,22 +95,36 @@ export const CollectWebpageForm = ({
     }
   };
 
-  const handleAIChoseTags = async () => {
-    const response = await f("/api/tag/ai", {
+  const handleFetchWebpageInfo = async () => {
+    const url = form.getValues("url");
+    if (!url) return;
+    const response = await f<ScrapedWebpage>("/api/spider/webpage", {
       method: "POST",
-      body: {
-        name: form.getValues("title"),
-        description: form.getValues("description"),
-      },
+      body: { url },
     });
-    console.log(response, "ai tags");
+    if (!response) return;
+    form.setValue("title", response.title);
+    form.setValue("description", response.description);
+    form.setValue("icon", response.icon);
+    console.log(form.getValues("tags"), form.getValues("url"));
   };
+
+  const handleSubmit = async (data: WebpageFormData) => {
+    try {
+      setSubmitting(true)
+      await onSubmit(data)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <Form {...form}>
       <form
         className="flex flex-col gap-4"
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(handleSubmit)}
       >
         <FormField
           control={form.control}
@@ -284,28 +219,17 @@ export const CollectWebpageForm = ({
                     options={tagOptions}
                     onCreate={handleCreateTag}
                   />
-                  {/* <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleAIChoseTags}
-                    size="icon"
-                    className="h-9 w-9 flex-shrink-0"
-                  >
-                    <Bot className="w-6 h-6" />
-                  </Button> */}
                 </div>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        {visibleButton && (
-          <DialogFooter>
-            <Button loading={submitting} type="submit">
-              {webpageId ? "Update" : "Submit"}
-            </Button>
-          </DialogFooter>
-        )}
+        <DialogFooter>
+          <Button loading={submitting} type="submit">
+            {submitButtonText}
+          </Button>
+        </DialogFooter>
       </form>
     </Form>
   );

@@ -18,18 +18,20 @@ import { useStore } from "@/lib/hooks/store.hook";
 import { toast } from "sonner";
 import { f } from "@/lib/f";
 import { Edit, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { TagBadge } from "@/lib/components/tag";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities"
 import { useSettingsStore } from "@/lib/hooks/settings.store.hook";
+import { EditWebpageFormDialog } from "@/lib/components/edit-webpage-form-dialog";
 
 // import { TagWithChildrenAndParentAndLevelAndParent } from "shared/tag";
 
 export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWithTags, showTags?: boolean }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: webpage.id })
   const settings = useSettingsStore()
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const style = {
     transition,
     transform: CSS.Transform.toString(transform)
@@ -51,11 +53,7 @@ export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWith
   };
 
   const handleOpenCreateDialog = () => {
-    setDefaultCollectForm({
-      ...webpage,
-      tags: webpage.tags.map((tag) => tag.id),
-    });
-    setCollectDialogOpen(true);
+    setEditDialogOpen(true)
   };
 
   const handleDeleteWebpage = async (toastId: string | number) => {
@@ -91,6 +89,7 @@ export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWith
 
   return (
     <div ref={setNodeRef} {...attributes} {...listeners} style={style}>
+      <EditWebpageFormDialog webpage={webpage} open={editDialogOpen} setOpen={setEditDialogOpen} />
       <ContextMenu>
         <ContextMenuTrigger>
           <div key={webpage.id} className="border border-gray-300 rounded-lg p-2">
@@ -141,7 +140,7 @@ export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWith
         <ContextMenuContent>
           <ContextMenuItem className="p-0">
             <Button
-              onClick={handleOpenCreateDialog}
+              onClick={() => setEditDialogOpen(true)}
               variant="ghost"
               size="sm"
               className="w-full justify-start"

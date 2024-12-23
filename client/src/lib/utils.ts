@@ -49,3 +49,7 @@ export function uniqueArrayByKey<T>(arr: T[], key: keyof T) {
     return true;
   });
 }
+
+export const isInternalPage = (url: string) => {
+  return url.startsWith("chrome://") || url.startsWith("chrome-extension://");
+};

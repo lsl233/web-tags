@@ -62,7 +62,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
     return true;
   }
-  
+
+  if (messageType === "get-current-tab-info") {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const activeTab = tabs[0];
+      sendResponse(activeTab);
+    });
+    return true;
+  }
 });
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
