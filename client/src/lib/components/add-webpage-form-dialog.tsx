@@ -9,7 +9,7 @@ export interface AddWebpageFormDialogProps extends WebpageFormDialogProps {}
 
 export const AddWebpageFormDialog = ({ children }: AddWebpageFormDialogProps) => {
   const [ open, setOpen ] = useState(false);
-  const { setWebpages, webpages } = useStore();
+  const { setWebpages, webpages, activeTag } = useStore();
 
   const handleSubmit = async (data: WebpageFormData) => {
     const createdWebpage = await f<WebpageWithTags>("/api/webpage", {
@@ -25,5 +25,5 @@ export const AddWebpageFormDialog = ({ children }: AddWebpageFormDialogProps) =>
     setOpen(false);
   }
 
-  return <WebpageFormDialog open={open} setOpen={setOpen} title="Add Webpage" onSubmit={handleSubmit}>{children}</WebpageFormDialog>
+  return <WebpageFormDialog formData={{ tags: activeTag?.id ? [activeTag.id] : [] }} open={open} setOpen={setOpen} title="Add Webpage" onSubmit={handleSubmit}>{children}</WebpageFormDialog>
 };
