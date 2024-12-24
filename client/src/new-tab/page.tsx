@@ -7,7 +7,7 @@ import { WebpagesView } from "./components/webpages-view";
 import { useStore } from "@/lib/hooks/store.hook";
 import { Toaster } from "@/lib/ui/sonner";
 import { TagWithChildrenAndParentAndLevel } from "shared/tag";
-import { debounce, flattenChildrenKey } from "@/lib/utils";
+import { debounce } from "@/lib/utils";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -39,15 +39,7 @@ const NewTab = () => {
   const { session } = useAuth();
   const { setSettings } = useSettingsStore();
   const panelRef = useRef<ImperativePanelHandle>(null);
-  const { tags, setTags, activeTag, setActiveTag, webpages, setWebpages } =
-    useStore();
-
-  useEffect(() => {
-    chrome.storage.local.get("newTabPanelSize", (data) => {
-      panelRef.current?.resize(data.newTabPanelSize || 18);
-    });
-    fetchSettings()
-  }, []); 
+  const { setTags, activeTag, setActiveTag } = useStore();
 
   useEffect(() => {
     if (session) {
@@ -56,6 +48,11 @@ const NewTab = () => {
           setActiveTag({ ...res[0] });
         }
       });
+
+      chrome.storage.local.get("newTabPanelSize", (data) => {
+        panelRef.current?.resize(data.newTabPanelSize || 18);
+      });
+      fetchSettings()
     }
   }, [session]);
 
@@ -82,7 +79,7 @@ const NewTab = () => {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel>
-          { activeTag && <WebpagesView activeTag={activeTag} /> }
+          {activeTag && <WebpagesView activeTag={activeTag} />}
         </ResizablePanel>
       </ResizablePanelGroup>
     </main>

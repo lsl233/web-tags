@@ -1,4 +1,5 @@
 import { f } from "@/lib/f";
+import { useSettingsStore } from "@/lib/hooks/settings.store.hook";
 import { useStore } from "@/lib/hooks/store.hook";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { signInSchema, signUpSchema } from "shared/auth";
@@ -23,6 +24,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [session, setSession] = useState<UserPayload | null>(null);
   const [loading, setLoading] = useState(true)
+  const { setActiveTag, setTags, setWebpages } = useStore();
+  const { setSettings } = useSettingsStore();
   const signIn = async (data: z.infer<typeof signInSchema>) => {
     const res = await f("/api/user/session", {
       method: "POST",
@@ -58,6 +61,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signOut = async () => {
     await chrome.storage.local.remove("token");
     setSession(null);
+    setActiveTag(null);
+    setTags([]);
+    setWebpages([]);
+    setSettings({})
   };
 
   const fetchSession = async () => {
