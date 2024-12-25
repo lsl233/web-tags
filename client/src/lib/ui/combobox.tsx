@@ -56,14 +56,15 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
       setInternalValues([currentValue]);
       onChange([currentValue]);
       setOpen(false);
+      return
     }
     const newValues = internalValues.includes(currentValue)
       ? internalValues.filter((v) => v !== currentValue)
       : [...internalValues, currentValue];
     setInternalValues(newValues);
     onChange(newValues);
-    
-  }, [internalValues]);
+
+  }, [internalValues, onChange, multiple]);
 
   const handleStateChange = useCallback((count: number, search: string) => {
     setCommandState({ count, search });
