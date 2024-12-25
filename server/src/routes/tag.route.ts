@@ -60,7 +60,7 @@ router.post("/", async (req, res, next) => {
     // 更新现有标签
     const updatedTag = await db.tag.update({
       where: { id, userId: req.user.id },
-      data: { name, icon, parentId },
+      data: { name, icon, parentId: parentId || undefined },
     });
     res.json(updatedTag);
   } else {
