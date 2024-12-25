@@ -35,7 +35,7 @@ export enum TagType {
 
 export const tagSchema = z.object({
   parentId: z.array(z.string()).optional(),
-  name: z.string().min(1, { message: "Please fill in the tag name" }).max(8, { message: "Tag name cannot exceed 8 characters" }),
+  name: z.string().min(1, { message: "Please fill in the tag name" }).max(50, { message: "Tag name cannot exceed 50 characters" }),
   icon: z.string(),
 });
 
