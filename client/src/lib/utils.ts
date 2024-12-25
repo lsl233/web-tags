@@ -1,5 +1,24 @@
 import { clsx, type ClassValue } from "clsx";
+import { Tag, TagWithLevel } from "shared/tag";
+import { TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { twMerge } from "tailwind-merge";
+
+export function mapTagsWithLevels(
+  tags: TagWithChildrenAndParentAndLevel[],
+  level: number = 1
+): TagWithChildrenAndParentAndLevel[] {
+  return tags.map((tag, index) => {
+    const result = {
+      ...tag,
+      level: level,
+      children: mapTagsWithLevels(tag.children, level + 1),
+    }
+    if (!result.sortOrder) {
+      result.sortOrder = index
+    }
+    return result
+  });
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -27,6 +46,17 @@ export function flattenParentKey<T extends { parent: T }>(
     result.unshift(...flattenParentKey(obj.parent, key))
   }
   return result
+}
+
+export function flatten(
+  arr: TagWithChildrenAndParentAndLevel[],
+  parentName = ""
+): TagWithLevel[] {
+  return arr.flatMap((item) => {
+    const fullName = parentName ? `${parentName}/${item.name}` : item.name;
+    const { children, name, ...rest } = item;
+    return [{ ...rest, name: fullName }, ...flatten(children || [], fullName)];
+  });
 }
 
 export function debounce<T extends (...args: any[]) => any>(fn: T, delay: number): (...args: Parameters<T>) => void {

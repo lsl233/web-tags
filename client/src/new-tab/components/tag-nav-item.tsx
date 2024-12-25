@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { f } from "@/lib/f";
 import { AsyncIcon, IconName } from "@/lib/ui/icon-picker";
 import { useMemo, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, mapTagsWithLevels } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities"
 import { TagsNav } from "./tags-nav";
@@ -69,16 +69,12 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
         method: "DELETE",
       });
       toast.success("Tag deleted successfully");
-      const afterTags = tags.filter((t) => t.id !== tag.id);
-      if (afterTags.length) {
-        if (activeTag?.id === tag.id) {
-          setActiveTag(afterTags[0]);
-        }
-      } else {
+      if (activeTag?.id === tag.id) {
         setActiveTag(null);
         setWebpages([]);
       }
-      setTags(afterTags);
+      const res = await f("/api/tag?includeWebPagesAndTags=true");
+      setTags(mapTagsWithLevels(res));
     } catch (error) {
       toast.error("Failed to delete tag");
     } finally {
@@ -109,6 +105,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
   const handleOpenCreateSubTagDialog = () => {
     setDefaultTagForm({
       parentId: tag.id,
+      level: tag.level,
     });
     setCreateTagDialogOpen(true);
     setIsExpanded(true)

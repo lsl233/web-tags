@@ -28,6 +28,8 @@ interface CommandSelectProps<T> {
   placeholder?: string;
   value?: string[];
   options?: T[];
+  multiple?: boolean;
+  disabled?: boolean;
   onChange?: (value: string[]) => void;
   onCreate?: (name: string) => Promise<T>;
 }
@@ -35,9 +37,11 @@ interface CommandSelectProps<T> {
 export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>>(({
   placeholder = "place select",
   value = [],
-  onChange = () => {},
+  onChange = () => { },
   options = [],
-  onCreate
+  onCreate,
+  multiple = true,
+  disabled = false,
 }, ref) => {
   const [open, setOpen] = React.useState(false);
   const [internalValues, setInternalValues] = React.useState<string[]>(value);
@@ -45,29 +49,21 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
     search: "",
     count: 0,
   });
-  
-  // Update internal state when prop changes
-  React.useEffect(() => {
-    setInternalValues(value);
-  }, [value]);
-
-  // Notify parent component of changes
-  const notifyChange = React.useCallback((newValues: string[]) => {
-    if (JSON.stringify(newValues) !== JSON.stringify(value)) {
-      onChange(newValues);
-    }
-  }, [onChange, value]);
 
   // Handle selection
   const handleSelect = React.useCallback((currentValue: string) => {
-    setInternalValues((prev) => {
-      const newValues = prev.includes(currentValue)
-        ? prev.filter((v) => v !== currentValue)
-        : [...prev, currentValue];
-      notifyChange(newValues);
-      return newValues;
-    });
-  }, [notifyChange]);
+    if (!multiple) {
+      setInternalValues([currentValue]);
+      onChange([currentValue]);
+      setOpen(false);
+    }
+    const newValues = internalValues.includes(currentValue)
+      ? internalValues.filter((v) => v !== currentValue)
+      : [...internalValues, currentValue];
+    setInternalValues(newValues);
+    onChange(newValues);
+    
+  }, [internalValues]);
 
   const handleStateChange = useCallback((count: number, search: string) => {
     setCommandState({ count, search });
@@ -77,16 +73,17 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
     const createdOption = await onCreate?.(commandState.search);
     setInternalValues((prev) => {
       const newValues = [...prev, createdOption.id];
-      notifyChange(newValues);
+      onChange(newValues);
       return newValues;
     });
     setOpen(false);
-  }, [commandState.search, onCreate, notifyChange]);
+  }, [commandState.search, onCreate, onChange]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          disabled={disabled}
           variant="outline"
           role="combobox"
           aria-expanded={open}
@@ -116,16 +113,21 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
           />
 
           <CommandList>
-            <CommandEmpty className="p-2">
-              <Button
-                onClick={handleCreateOption}
-                variant="secondary"
-                className="w-full"
-              >
-                <TagIcon className="mr-2 h-4 w-4" />
-                创建“{commandState.search}”标签
-              </Button>
-            </CommandEmpty>
+            {
+              onCreate ? (
+                <CommandEmpty className="p-2">
+                  <Button
+                    onClick={handleCreateOption}
+                    variant="secondary"
+                    className="w-full"
+                  >
+                    <TagIcon className="mr-2 h-4 w-4" />
+                    创建“{commandState.search}”标签
+                  </Button>
+                </CommandEmpty>
+              ) : null
+            }
+
             {options.map((option) => (
               <CommandItem
                 key={option.id}

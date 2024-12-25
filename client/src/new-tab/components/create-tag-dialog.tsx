@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from "@/lib/ui/dialog";
 import { Button } from "@/lib/ui/button-loading";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Separator } from "@/lib/ui/separator";
 import {
@@ -26,6 +26,9 @@ import { z } from "zod";
 import { f } from "@/lib/f";
 import { useStore } from "@/lib/hooks/store.hook";
 import { AsyncIcon, IconName, IconPicker } from "@/lib/ui/icon-picker";
+import { Combobox } from "@/lib/ui/combobox";
+import { flatten, mapTagsWithLevels } from "@/lib/utils";
+import { TagType } from "shared/tag";
 
 export const CreateTagDialog = ({
   children,
@@ -35,10 +38,28 @@ export const CreateTagDialog = ({
   const { createTagDialogOpen, setCreateTagDialogOpen, defaultTagForm } =
     useStore();
   const { tags, setTags } = useStore();
-  const [ submitting, setSubmitting ] = useState(false);
+  const tagOptions = useMemo(() => {
+    const result = flatten(tags)
+    result.unshift({
+      name: "Root(Top-level node)",
+      icon: "",
+      parentId: null,
+      sortOrder: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      level: 0,
+      id: "",
+      userId: "",
+      type: TagType.CUSTOM,
+    })
+    console.log(result)
+    return result.filter(t => t.type === TagType.CUSTOM || t.level !== 3)
+  }, [tags]);
+  const [submitting, setSubmitting] = useState(false);
   const form = useForm({
     resolver: zodResolver(tagSchema),
     defaultValues: {
+      parentId: [""],
       name: "",
       icon: "",
     },
@@ -46,6 +67,7 @@ export const CreateTagDialog = ({
 
   useEffect(() => {
     form.reset({
+      parentId: defaultTagForm.parentId ? [defaultTagForm.parentId] : [""],
       name: defaultTagForm.name || "",
       icon: defaultTagForm.icon || "",
     });
@@ -57,7 +79,7 @@ export const CreateTagDialog = ({
   ): TagWithChildrenAndParentAndLevel[] => {
     return tags.map((tag: TagWithChildrenAndParentAndLevel) => {
 
-      const result = callback(tag); 
+      const result = callback(tag);
       result.children = deepMap(result.children, callback);
       return result;
     });
@@ -65,44 +87,28 @@ export const CreateTagDialog = ({
 
   const onSubmit = async (data: z.infer<typeof tagSchema>) => {
     setSubmitting(true)
+    console.log({
+      ...data,
+      parentId: data.parentId?.[0],
+      id: defaultTagForm.id,
+    })
     const createdTag = await f("/api/tag", {
       method: "POST",
       body: {
         ...data,
-        parentId: defaultTagForm.parentId,
+        parentId: data.parentId?.[0],
         id: defaultTagForm.id,
       },
     });
+    const res = await f("/api/tag?includeWebPagesAndTags=true");
+    setTags(mapTagsWithLevels(res));
     setSubmitting(false)
-    if (!createdTag) return;
-    // 更新
-    if (defaultTagForm.id) {
-      setTags(deepMap(tags, (t) => {
-        if (t.id === defaultTagForm.id) {
-          return Object.assign({}, t, createdTag);
-        }
-        return t;
-      }));
-    }
-    // 创建子级别
-    else if (defaultTagForm.parentId) {
-      setTags(deepMap(tags, (t) => {
-        if (t.id === defaultTagForm.parentId) {
-          createdTag.children = []
-          return Object.assign({}, t, {
-            children: [createdTag, ...t.children],
-          });
-        }
-        return t;
-      }));
-    }
-    // 创建第一级
-    else {
-      createdTag.children = []
-      setTags([...tags, createdTag])
-    }
     setCreateTagDialogOpen(false);
   };
+
+  const handleCreateTag = (name: string) => {
+
+  }
 
   return (
     <Dialog open={createTagDialogOpen} onOpenChange={setCreateTagDialogOpen}>
@@ -115,7 +121,25 @@ export const CreateTagDialog = ({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="flex gap-4">
+            <FormField
+              control={form.control}
+              name="parentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Parent Tag</FormLabel>
+                  <FormControl>
+                    <Combobox
+                      {...field}
+                      disabled={defaultTagForm.level === 3}
+                      options={tagOptions}
+                      multiple={false}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex gap-4 mt-4">
               <FormField
                 control={form.control}
                 name="icon"
@@ -126,16 +150,13 @@ export const CreateTagDialog = ({
                       <IconPicker
                         onChange={field.onChange}
                       >
-                        <Button
-                          type="button"
-                          className="mt-0 border border-dashed border-gray-300"
-                          variant="ghost"
-                          size="icon"
+                        <div
+                          className="mt-0 border border-dashed border-gray-300 w-9 h-9 flex items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
                         >
                           <AsyncIcon
                             name={(field.value as IconName) || "plus"}
                           />
-                        </Button>
+                        </div>
                       </IconPicker>
                     </FormControl>
                     <FormMessage />

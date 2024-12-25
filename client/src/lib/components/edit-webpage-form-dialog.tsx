@@ -3,6 +3,7 @@ import { WebpageFormDialog, WebpageFormDialogProps } from "./webpage-form-dialog
 import { f } from "../f";
 import { useStore } from "../hooks/store.hook";
 import { toast } from "sonner";
+import { useMemo } from "react";
 
 export interface EditWebpageFormDialogProps extends WebpageFormDialogProps {
   webpage: WebpageWithTags
@@ -10,6 +11,16 @@ export interface EditWebpageFormDialogProps extends WebpageFormDialogProps {
 
 export const EditWebpageFormDialog = ({ open, setOpen, children, webpage }: EditWebpageFormDialogProps) => {
   const { setWebpages, webpages, activeTag } = useStore();
+
+  const formData = useMemo(() => {
+    return {
+      title: webpage.title,
+      description: webpage.description,
+      url: webpage.url,
+      tags: webpage.tags.map((tag) => tag.id),
+      icon: webpage.icon,
+    }
+  }, [webpage])
 
   const handleSubmit = async (data: WebpageFormData) => {
     const id = webpage.id;
@@ -43,13 +54,7 @@ export const EditWebpageFormDialog = ({ open, setOpen, children, webpage }: Edit
   return <WebpageFormDialog
     open={open}
     setOpen={setOpen}
-    formData={{
-      title: webpage.title,
-      description: webpage.description,
-      url: webpage.url,
-      tags: webpage.tags.map((tag) => tag.id),
-      icon: webpage.icon,
-    }}
+    formData={formData}
     title="Edit Webpage"
     onSubmit={handleSubmit}
   >{children}</WebpageFormDialog>

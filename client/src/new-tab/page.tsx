@@ -7,7 +7,7 @@ import { WebpagesView } from "./components/webpages-view";
 import { useStore } from "@/lib/hooks/store.hook";
 import { Toaster } from "@/lib/ui/sonner";
 import { TagWithChildrenAndParentAndLevel } from "shared/tag";
-import { debounce } from "@/lib/utils";
+import { debounce, mapTagsWithLevels } from "@/lib/utils";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -17,23 +17,6 @@ import { useRef } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
 import { Sidebar } from "./components/sidebar";
 import { useSettingsStore } from "@/lib/hooks/settings.store.hook";
-
-function mapTagsWithLevels(
-  tags: TagWithChildrenAndParentAndLevel[],
-  level: number = 1
-): TagWithChildrenAndParentAndLevel[] {
-  return tags.map((tag, index) => {
-    const result = {
-      ...tag,
-      level: level,
-      children: mapTagsWithLevels(tag.children, level + 1),
-    }
-    if (!result.sortOrder) {
-      result.sortOrder = index
-    }
-    return result
-  });
-}
 
 const NewTab = () => {
   const { session } = useAuth();
@@ -72,7 +55,7 @@ const NewTab = () => {
   }, 500);
 
   return (
-    <main className="flex flex-col sm:flex-row h-screen max-w-[1920px] mx-auto bg-white">
+    <main className="flex flex-col sm:flex-row h-screen mx-auto bg-white">
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel ref={panelRef} onResize={handleResize}>
           <Sidebar />

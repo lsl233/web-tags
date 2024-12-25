@@ -21,6 +21,7 @@ import { f } from "../f";
 import { ScrapedWebpage } from "shared/spider";
 import { useStore } from "../hooks/store.hook";
 import { TooltipContent, TooltipTrigger, Tooltip, TooltipProvider } from "@/lib/ui/tooltip";
+import { flatten } from "../utils";
 
 export interface WebpageFormProps {
   onSubmit?: (data: WebpageFormData) => Promise<void>;
@@ -29,16 +30,6 @@ export interface WebpageFormProps {
   formData?: Partial<WebpageFormData>;
 }
 
-function flatten(
-  arr: TagWithChildrenAndParentAndLevel[],
-  parentName = ""
-): Tag[] {
-  return arr.flatMap((item) => {
-    const fullName = parentName ? `${parentName}/${item.name}` : item.name;
-    const { children, name, ...rest } = item;
-    return [{ ...rest, name: fullName }, ...flatten(children || [], fullName)];
-  });
-}
 
 const defaultFormData = {
   url: "",
@@ -66,7 +57,7 @@ export const WebpageForm = ({
     },
   });
 
-  
+
 
   useEffect(() => {
     form.reset(formData)
@@ -106,7 +97,6 @@ export const WebpageForm = ({
     form.setValue("title", response.title);
     form.setValue("description", response.description);
     form.setValue("icon", response.icon);
-    console.log(form.getValues("tags"), form.getValues("url"));
   };
 
   const handleSubmit = async (data: WebpageFormData) => {

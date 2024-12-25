@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { WebpageWithTags } from "shared/webpage";
-import { Tag, TagWithChildrenAndParentAndLevel } from "shared/tag";
+import { Tag, TagWithChildrenAndParentAndLevel, TagWithLevel } from "shared/tag";
 import { ScrapedWebpage } from "shared/spider";
 
 type Store = {
@@ -24,8 +24,8 @@ type Store = {
 
   createTagDialogOpen: boolean;
   setCreateTagDialogOpen: (open: boolean) => void;
-  defaultTagForm: Partial<Tag>;
-  setDefaultTagForm: (form: Partial<Tag>) => void;
+  defaultTagForm: Partial<TagWithLevel>;
+  setDefaultTagForm: (form: Partial<TagWithLevel>) => void;
 };
 
 export const useStore = create<Store>((set) => ({
