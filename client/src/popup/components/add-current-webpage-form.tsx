@@ -77,6 +77,7 @@ export const AddCurrentWebpageForm = () => {
     });
     if (result) {
       toast.success(`Webpage ${webpageId ? "updated" : "added"} successfully`);
+      setWebpageId(result.id)
     } else {
       toast.error(`Failed to ${webpageId ? "update" : "add"} webpage`);
     }
