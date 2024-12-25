@@ -48,10 +48,6 @@ router.post("/session", async (req, res, next) => {
   if (!foundUser) {
     return next(ServerError.BadRequest("Invalid email or password"));
   }
-
-  if (guestId) {
-    await mergeUser(foundUser.id, guestId)
-  }
   // TODO use bcrypt
   const hashedPassword = crypto
     .createHash("sha256")
