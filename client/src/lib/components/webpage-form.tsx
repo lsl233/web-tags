@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { WebpageFormData, webpageFormData } from "shared/webpage";
 import { useForm } from "react-hook-form";
 import { Bot, Download, Eraser } from "lucide-react";
-import { Tag, TagWithChildrenAndParentAndLevel } from "shared/tag";
+import { Tag, TagType, TagWithChildrenAndParentAndLevel } from "shared/tag";
 import { useEffect, useMemo, useState } from "react";
 import { f } from "../f";
 import { ScrapedWebpage } from "shared/spider";
@@ -46,7 +46,9 @@ export const WebpageForm = ({
 }: WebpageFormProps) => {
   const tags = useStore((state) => state.tags);
   const setTags = useStore((state) => state.setTags);
-  const tagOptions = useMemo(() => flatten(tags), [tags]);
+  const tagOptions = useMemo(() => {
+    return flatten(tags).filter((tag) => tag.type === TagType.CUSTOM)
+  }, [tags]);
   const [submitting, setSubmitting] = useState(false);
 
   const form = useForm({

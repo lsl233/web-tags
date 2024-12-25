@@ -61,7 +61,7 @@ const NewTab = () => {
           <Sidebar />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel>
+        <ResizablePanel className="@container">
           {activeTag && <WebpagesView activeTag={activeTag} />}
         </ResizablePanel>
       </ResizablePanelGroup>

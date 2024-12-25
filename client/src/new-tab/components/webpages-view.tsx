@@ -128,7 +128,20 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
         )}
       </div>
       <ScrollArea className="flex-1 w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 auto-cols-auto gap-2 p-2 content-start">
+        <div className="
+        grid 
+        auto-cols-auto gap-2 p-2 content-start
+        @xs:grid-cols-1 
+        @md:grid-cols-1 
+        @lg:grid-cols-2 
+        @xl:grid-cols-2 
+        @2xl:grid-cols-3 
+        @3xl:grid-cols-3 
+        @4xl:grid-cols-4 
+        @5xl:grid-cols-4
+        @6xl:grid-cols-5
+        @7xl:grid-cols-6
+        ">
           <DndContext onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCenter}>
             <SortableContext items={webpages}>
               {webpages.map((webpage) => (
