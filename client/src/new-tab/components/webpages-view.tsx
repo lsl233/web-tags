@@ -140,7 +140,7 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
         @4xl:grid-cols-4 
         @5xl:grid-cols-4
         @6xl:grid-cols-5
-        @7xl:grid-cols-6
+        @7xl:grid-cols-7
         ">
           <DndContext onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCenter}>
             <SortableContext items={webpages}>
