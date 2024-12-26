@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PageTagz - Smart Bookmark Management</title>
+  <meta name="description"
+    content="Effortlessly organize your bookmarks with PageTagz. AI-powered tagging, one-click access, and seamless browsing.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      padding-top: 70px;
+      /* Add padding to body to account for fixed header */
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Fixed Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      text-decoration: none;
+    }
+
+    .nav a {
+      margin: 0 15px;
+      color: #666;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .nav a:hover {
+      color: #000;
+    }
+
+    .btn-primary {
+      background-color: #000;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .btn-primary:hover {
+      background-color: #333;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 100px 0;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .hero-image {
+      max-width: 100%;
+      height: auto;
+      margin-top: 40px;
+    }
+
+    /* Features Section */
+    .features {
+      padding: 80px 0;
+      background-color: #f9f9f9;
+    }
+
+    .features h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 40px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .feature-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      color: #666;
+    }
+
+    /* How It Works Section */
+    .how-it-works {
+      padding: 80px 0;
+    }
+
+    .how-it-works h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 40px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step h3 {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    .step p {
+      color: #666;
+    }
+
+    /* Testimonials Section */
+    .testimonials {
+      padding: 80px 0;
+      background-color: #f9f9f9;
+    }
+
+    .testimonials h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 40px;
+    }
+
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .testimonial-card {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .testimonial-card p {
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .testimonial-card cite {
+      font-style: normal;
+      color: #333;
+    }
+
+    /* CTA Section */
+    .cta {
+      text-align: center;
+      padding: 80px 0;
+    }
+
+    .cta h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .cta p {
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 40px 0;
+      border-top: 1px solid #e5e5e5;
+      text-align: center;
+    }
+
+    .footer p {
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .footer-nav a {
+      margin: 0 10px;
+      color: #666;
+      text-decoration: none;
+    }
+
+    .footer-nav a:hover {
+      color: #000;
+    }
+
+    /* Pricing Section */
+    .pricing {
+      padding: 80px 0;
+      background-color: #f9f9f9;
+      text-align: center;
+    }
+
+    .pricing h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .pricing p {
+      color: #666;
+      margin-bottom: 40px;
+    }
+
+    .pricing-card {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .pricing-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .pricing-card .price {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #000;
+      margin-bottom: 20px;
+    }
+
+    .pricing-card .price span {
+      font-size: 1rem;
+      color: #666;
+    }
+
+    .pricing-card ul {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 30px;
+    }
+
+    .pricing-card ul li {
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .pricing-card .btn-primary {
+      width: 100%;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <a href="#" class="logo">PageTagz</a>
+      <nav class="nav">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#testimonials">Testimonials</a>
+      </nav>
+      <a href="#get-started" class="btn-primary">Get Started</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1>Organize Your Web, One Tag at a Time</h1>
+      <p>Effortlessly manage your bookmarks with AI-powered tagging and one-click access.</p>
+      <a href="#get-started" class="btn-primary">Download Now</a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="features">
+    <div class="container">
+      <h2>Why Choose PageTagz?</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Multi-Tagging</h3>
+          <p>Organize bookmarks with multiple tags for ultimate flexibility.</p>
+        </div>
+        <div class="feature-card">
+          <h3>One-Click Access</h3>
+          <p>Open all your saved pages with a single click.</p>
+        </div>
+        <div class="feature-card">
+          <h3>AI Recommendations</h3>
+          <p>Smart tag suggestions for effortless organization.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="how-it-works">
+    <div class="container">
+      <h2>How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <h3>1. Install</h3>
+          <p>Add PageTagz to your Chrome browser in seconds.</p>
+        </div>
+        <div class="step">
+          <h3>2. Tag</h3>
+          <p>Use AI-powered tagging to organize your bookmarks.</p>
+        </div>
+        <div class="step">
+          <h3>3. Access</h3>
+          <p>Enjoy one-click access to all your saved pages.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="testimonials">
+    <div class="container">
+      <h2>What Our Users Say</h2>
+      <div class="testimonial-grid">
+        <div class="testimonial-card">
+          <p>"PageTagz has completely changed how I manage my bookmarks. Highly recommend!"</p>
+          <cite>- John Doe, Web Developer</cite>
+        </div>
+        <div class="testimonial-card">
+          <p>"The AI tagging is a game-changer. So much time saved!"</p>
+          <cite>- Jane Smith, Content Creator</cite>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="pricing">
+    <div class="container">
+      <h2>Simple Pricing</h2>
+      <p>Get started with PageTagz today for just $2.99/month.</p>
+      <div class="pricing-card">
+        <h3>Monthly Plan</h3>
+        <p class="price">$2.99<span>/month</span></p>
+        <ul>
+          <li>Unlimited bookmarks</li>
+          <li>AI-powered tagging</li>
+          <li>One-click access</li>
+          <li>Cross-device sync</li>
+        </ul>
+        <a href="#get-started" class="btn-primary">Subscribe Now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section id="get-started" class="cta">
+    <div class="container">
+      <h2>Ready to Organize Your Web?</h2>
+      <p>Download PageTagz today and experience the future of bookmark management.</p>
+      <a href="#" class="btn-primary">Get Started</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2024 PageTagz. All rights reserved.</p>
+      <nav class="footer-nav">
+        <a href="terms-of-service.html">Terms of Service</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="refund-policy.html">Refund Policy</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+
+</html>
