@@ -52,7 +52,7 @@ export const CreateTagDialog = ({
       userId: "",
       type: TagType.CUSTOM,
     })
-    console.log(result)
+
     return result.filter(t => t.type === TagType.CUSTOM || t.level !== 3)
   }, [tags]);
   const [submitting, setSubmitting] = useState(false);
