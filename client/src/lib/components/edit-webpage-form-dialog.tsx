@@ -47,7 +47,7 @@ export const EditWebpageFormDialog = ({ open, setOpen, children, webpage }: Edit
       });
       setWebpages(newWebpages);
     }
-    toast.success("Webpage created successfully");
+    toast.success("Webpage edit successfully");
     setOpen?.(false);
   }
 
@@ -56,6 +56,7 @@ export const EditWebpageFormDialog = ({ open, setOpen, children, webpage }: Edit
     setOpen={setOpen}
     formData={formData}
     title="Edit Webpage"
+    submitButtonText="Update"
     onSubmit={handleSubmit}
   >{children}</WebpageFormDialog>
 };
