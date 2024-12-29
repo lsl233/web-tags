@@ -55,14 +55,16 @@ export const WebpageForm = ({
     resolver: zodResolver(webpageFormData),
     defaultValues: {
       ...defaultFormData,
-      ...formData
     },
   });
 
 
 
   useEffect(() => {
-    form.reset(formData)
+    form.reset({
+      ...defaultFormData,
+      ...formData
+    })
   }, [formData])
 
   const handleCreateTag = async (name: string) => {
