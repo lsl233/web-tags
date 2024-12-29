@@ -25,6 +25,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities"
 import { useSettingsStore } from "@/lib/hooks/settings.store.hook";
 import { EditWebpageFormDialog } from "@/lib/components/edit-webpage-form-dialog";
+import { useDeleteToast } from "@/lib/hooks/toasts.hook";
 
 // import { TagWithChildrenAndParentAndLevelAndParent } from "shared/tag";
 
@@ -36,8 +37,9 @@ export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWith
     transition,
     transform: CSS.Transform.toString(transform)
   }
-  const { setDefaultCollectForm, setCollectDialogOpen, setWebpages, webpages } =
-    useStore();
+  const { setWebpages, webpages } = useStore();
+  const { deleteToast } = useDeleteToast();
+
   const getIconURL = (webpage: WebpageWithTags) => {
     if (webpage.icon.startsWith("http")) return webpage.icon;
     if (webpage.url.startsWith("http")) {
@@ -52,39 +54,17 @@ export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWith
     chrome.tabs.create({ url, active: settings.webpageActive });
   };
 
-  const handleOpenCreateDialog = () => {
-    setEditDialogOpen(true)
-  };
-
-  const handleDeleteWebpage = async (toastId: string | number) => {
-    await f(`/api/webpage/${webpage.id}`, {
-      method: "DELETE",
-    });
-    toast.success("Webpage deleted successfully");
-    toast.dismiss(toastId);
-    setWebpages(webpages.filter((w) => w.id !== webpage.id));
-  };
-
-  const handleOpenConfirmationPopup = () => {
-    const toastId = toast(
-      <div className="flex items-center justify-between gap-2 w-full">
-        <p>Confirm Deletion?</p>
-        <div>
-          <Button
-            onClick={() => handleDeleteWebpage(toastId)}
-            variant="text"
-            className="h-5"
-            size="icon"
-          >
-            <Trash2 className="w-4 h-4 text-red-500 hover:text-red-600" />
-          </Button>
-        </div>
-      </div>,
-      {
-        duration: 100000,
-        closeButton: true,
+  const handleDelete = () => {
+    deleteToast({
+      errorMessage: "Failed to delete Webpage",
+      successMessage: 'Webpage deleted successfully',
+      onDelete: async () => {
+        await f(`/api/webpage/${webpage.id}`, {
+          method: "DELETE",
+        });
+        setWebpages(webpages.filter((w) => w.id !== webpage.id));
       }
-    );
+    })
   };
 
   return (
@@ -151,7 +131,7 @@ export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWith
           </ContextMenuItem>
           <ContextMenuItem className="p-0">
             <Button
-              onClick={handleOpenConfirmationPopup}
+              onClick={handleDelete}
               variant="ghost"
               size="sm"
               className="w-full justify-start text-red-500"

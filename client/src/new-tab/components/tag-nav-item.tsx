@@ -16,6 +16,7 @@ import { cn, mapTagsWithLevels } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities"
 import { TagsNav } from "./tags-nav";
+import { useDeleteToast } from "@/lib/hooks/toasts.hook";
 
 interface TagNavItemProps {
   tag: TagWithChildrenAndParentAndLevel;
@@ -35,6 +36,7 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
     setDefaultTagForm,
   } = useStore();
   const [isExpanded, setIsExpanded] = useState(false);
+  const { deleteToast } = useDeleteToast()
 
   const style = {
     transition,
@@ -42,39 +44,26 @@ export const TagNavItem = ({ tag, isActive, onClick }: TagNavItemProps) => {
   }
 
   const handleDeleteTag = async () => {
-    const toastId = toast(
-      <div className="flex items-center justify-between gap-2 w-full">
-        <p>Confirm Deletion?</p>
-        <div>
-          <Button
-            onClick={() => confirmDeleteTag(toastId)}
-            variant="text"
-            className="h-5"
-            size="icon"
-          >
-            <Trash2 className="w-4 h-4 text-red-500 hover:text-red-600" />
-          </Button>
-        </div>
-      </div>,
-      {
-        duration: 100000,
-        closeButton: true,
+    deleteToast({
+      successMessage: "Tag deleted successfully",
+      errorMessage: "Failed to delete tag",
+      async onDelete() {
+        await f(`/api/tag/${tag.id}`, {
+          method: "DELETE",
+        });
+        if (activeTag?.id === tag.id) {
+          setActiveTag(null);
+          setWebpages([]);
+        }
+        const res = await f("/api/tag?includeWebPagesAndTags=true");
+        setTags(mapTagsWithLevels(res));
       }
-    );
+    })
   };
 
   const confirmDeleteTag = async (toastId: string | number) => {
     try {
-      await f(`/api/tag/${tag.id}`, {
-        method: "DELETE",
-      });
-      toast.success("Tag deleted successfully");
-      if (activeTag?.id === tag.id) {
-        setActiveTag(null);
-        setWebpages([]);
-      }
-      const res = await f("/api/tag?includeWebPagesAndTags=true");
-      setTags(mapTagsWithLevels(res));
+
     } catch (error) {
       toast.error("Failed to delete tag");
     } finally {

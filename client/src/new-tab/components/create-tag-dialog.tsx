@@ -87,11 +87,6 @@ export const CreateTagDialog = ({
 
   const onSubmit = async (data: z.infer<typeof tagSchema>) => {
     setSubmitting(true)
-    console.log({
-      ...data,
-      parentId: data.parentId?.[0],
-      id: defaultTagForm.id,
-    })
     const createdTag = await f("/api/tag", {
       method: "POST",
       body: {
