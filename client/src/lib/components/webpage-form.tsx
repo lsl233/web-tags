@@ -22,6 +22,7 @@ import { ScrapedWebpage } from "shared/spider";
 import { useStore } from "../hooks/store.hook";
 import { TooltipContent, TooltipTrigger, Tooltip, TooltipProvider } from "@/lib/ui/tooltip";
 import { flatten } from "../utils";
+import { toast } from "sonner";
 
 export interface WebpageFormProps {
   onSubmit?: (data: WebpageFormData) => Promise<void>;
@@ -50,6 +51,7 @@ export const WebpageForm = ({
     return flatten(tags).filter((tag) => tag.type === TagType.CUSTOM)
   }, [tags]);
   const [submitting, setSubmitting] = useState(false);
+  const [recommending, setRecommending] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(webpageFormData),
@@ -110,6 +112,31 @@ export const WebpageForm = ({
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const fetchRecommendTags = async () => {
+    setRecommending(true)
+    const recommendTags = await f("/api/tag/recommend", {
+      method: "POST",
+      body: {
+        title: form.getValues("title"),
+        description: form.getValues("description"),
+        tags: tagOptions.map(item => item.name)
+      }
+    })
+
+    const tags: string[] = []
+    for (const tag of tagOptions) {
+      if (recommendTags.includes(tag.name)) {
+        tags.push(tag.id)
+      }
+    }
+    if (tags.length) {
+      form.setValue("tags", tags)
+    } else {
+      toast.warning("There are no recommended tags.") 
+    }
+    setRecommending(false)
   }
 
   return (
@@ -211,6 +238,25 @@ export const WebpageForm = ({
                     options={tagOptions}
                     onCreate={handleCreateTag}
                   />
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          loading={recommending}
+                          variant="secondary"
+                          onClick={fetchRecommendTags}
+                          size="icon"
+                          className="h-9 w-9 flex-shrink-0"
+                        >
+                          <Bot className="w-6 h-6" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>AI recommend tags</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </FormControl>
               <FormMessage />

@@ -21,26 +21,6 @@ export const AddCurrentWebpageForm = () => {
     initFormData()
   }, [])
 
-  const fetchRecommendTags = async (title: string, description: string, flattenedTags: TagWithLevel[]) => {
-    const recommendTags = await f("/api/tag/recommend", {
-      method: "POST",
-      body: {
-        title,
-        description,
-        tags: flattenedTags.map(item => item.name)
-      }
-    })
-    console.log(recommendTags, '111')
-    const tags: string[] = []
-    for (const tag of flattenedTags) {
-      if (recommendTags.includes(tag.name)) {
-        tags.push(tag.id)
-      }
-    }
-    console.log(recommendTags, tags)
-    setFormData((data) => ({...data, tags}))
-  }
-
   const initFormData = async () => {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTab = tabs[0]
@@ -86,15 +66,6 @@ export const AddCurrentWebpageForm = () => {
       })
     } else {
       setFormData(data)
-      const unsubscribe = useStore.subscribe(
-        (state) => {
-          console.log(11111, state)
-          if (state.flattenedTags.length) {
-            fetchRecommendTags(data.title, data.description, state.flattenedTags)
-            unsubscribe()
-          }
-        },
-      )
     }
     setInitializing(false)
   }
