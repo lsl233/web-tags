@@ -1,7 +1,3 @@
-
-
-
-
 export async function recommendTags(title: string, description: string, existingTags: string[]) {
   const prompt = `Based on the following text, recommend the most relevant tags from the list: ${existingTags.join(', ')}. Return only the tag names that exist in the list, as a comma-separated list, for example: AI, Machine Learning, Data Science.\n\nText: ${title}. ${description}`;
   const response = await fetch(

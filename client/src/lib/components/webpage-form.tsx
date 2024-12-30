@@ -63,7 +63,6 @@ export const WebpageForm = ({
       ...defaultFormData,
       ...formData
     })
-    console.log('formData', formData)
   }, [formData])
 
   const handleCreateTag = async (name: string) => {
