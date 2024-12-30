@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { WebpageWithTags } from "shared/webpage";
-import { Tag, TagWithChildrenAndParentAndLevel, TagWithLevel } from "shared/tag";
+import { Tag, TagType, TagWithChildrenAndParentAndLevel, TagWithLevel } from "shared/tag";
 import { ScrapedWebpage } from "shared/spider";
+import { flatten } from "../utils";
 
 type Store = {
   webpages: WebpageWithTags[];
@@ -12,6 +13,7 @@ type Store = {
   setActiveTag: (tag: TagWithChildrenAndParentAndLevel | null) => void;
 
   tags: TagWithChildrenAndParentAndLevel[];
+  flattenedTags: TagWithLevel[];
   setTags: (tags: TagWithChildrenAndParentAndLevel[]) => void;
 
   signDialogOpen: boolean;
@@ -28,7 +30,7 @@ type Store = {
   setDefaultTagForm: (form: Partial<TagWithLevel>) => void;
 };
 
-export const useStore = create<Store>((set) => ({
+export const useStore = create<Store>((set, get) => ({
   webpages: [],
   setWebpages: (webpages) => set({ webpages }),
   insertWebpages: (webpages) => set((state) => ({ webpages: [...state.webpages, ...webpages] })),
@@ -36,7 +38,8 @@ export const useStore = create<Store>((set) => ({
   setActiveTag: (tag) => set({ activeTag: tag }),
 
   tags: [],
-  setTags: (tags) => set({ tags }),
+  flattenedTags: [],
+  setTags: (tags) => set({ tags, flattenedTags: flatten(tags).filter((tag) => tag.type === TagType.CUSTOM) }),
 
   signDialogOpen: false,
   setSignDialogOpen: (open) => set({ signDialogOpen: open }),

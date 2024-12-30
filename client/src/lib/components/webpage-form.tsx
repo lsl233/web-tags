@@ -58,13 +58,12 @@ export const WebpageForm = ({
     },
   });
 
-
-
   useEffect(() => {
     form.reset({
       ...defaultFormData,
       ...formData
     })
+    console.log('formData', formData)
   }, [formData])
 
   const handleCreateTag = async (name: string) => {

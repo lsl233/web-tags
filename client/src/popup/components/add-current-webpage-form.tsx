@@ -1,15 +1,17 @@
 import { WebpageForm } from "@/lib/components/webpage-form";
 import { f } from "@/lib/f";
 import { useEffect, useRef, useState } from "react";
-import { Tag } from "shared/tag";
+import { Tag, TagWithLevel } from "shared/tag";
 import { WebpageFormData, WebpageWithTags } from "shared/webpage";
 import { isInternalPage } from "@/lib/utils";
 import { toast } from "sonner";
 import { Skeleton } from "@/lib/ui/skeleton";
+import { useStore } from "@/lib/hooks/store.hook";
 
 export const AddCurrentWebpageForm = () => {
   const mounted = useRef(false);
-  const [formData, setFormData] = useState<WebpageFormData>();
+  const flattenedTags = useStore(state => state.flattenedTags)
+  const [formData, setFormData] = useState<Partial<WebpageFormData>>({});
   const [webpageId, setWebpageId] = useState<string | undefined>();
   const [initializing, setInitializing] = useState(true);
 
@@ -18,6 +20,26 @@ export const AddCurrentWebpageForm = () => {
     mounted.current = true;
     initFormData()
   }, [])
+
+  const fetchRecommendTags = async (title: string, description: string, flattenedTags: TagWithLevel[]) => {
+    const recommendTags = await f("/api/tag/recommend", {
+      method: "POST",
+      body: {
+        title,
+        description,
+        tags: flattenedTags.map(item => item.name)
+      }
+    })
+    console.log(recommendTags, '111')
+    const tags: string[] = []
+    for (const tag of flattenedTags) {
+      if (recommendTags.includes(tag.name)) {
+        tags.push(tag.id)
+      }
+    }
+    console.log(recommendTags, tags)
+    setFormData((data) => ({...data, tags}))
+  }
 
   const initFormData = async () => {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
@@ -44,6 +66,7 @@ export const AddCurrentWebpageForm = () => {
             tags: [],
           }
           mergeRemoteFormData(_formData)
+
         }
       });
     }
@@ -63,6 +86,15 @@ export const AddCurrentWebpageForm = () => {
       })
     } else {
       setFormData(data)
+      const unsubscribe = useStore.subscribe(
+        (state) => {
+          console.log(11111, state)
+          if (state.flattenedTags.length) {
+            fetchRecommendTags(data.title, data.description, state.flattenedTags)
+            unsubscribe()
+          }
+        },
+      )
     }
     setInitializing(false)
   }

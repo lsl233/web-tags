@@ -3,6 +3,7 @@ import ServerError from "@/lib/error.js";
 import { includeTagLevel } from "@/lib/helper.js";
 import { Prisma } from "@prisma/client";
 import express from "express";
+import * as tagServices from '../services/tag.js'
 
 const router = express.Router();
 
@@ -154,48 +155,15 @@ router.delete("/:id", async (req, res, next) => {
 });
 
 // TODO ai generate tag
-router.post("/ai", async (req, res, next) => {
+router.post("/recommend", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
-  const { name, description } = req.body;
+  const { title, description, tags } = req.body;
 
-  const foundTags = await db.tag.findMany({
-    where: {
-      userId: req.user.id,
-    },
-  });
+  const recommendTags = await tagServices.recommendTags(title, description, tags)
+  res.json(recommendTags)
 
-  const response = await fetch(
-    "https://spark-api-open.xf-yun.com/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.XFYUN_AI_PASSWORD}`,
-      },
-      body: JSON.stringify({
-        model: "4.0Ultra",
-        messages: [
-          {
-            role: "system",
-            content: `
-            你是一个标签分类大师，我会给你name、desc，请根据name、desc内容，从 ${foundTags.map((tag) => tag.name).join(",")}这几个标签中，
-            选择一个（或多个用,分割）最合适的标签并且加上相关理由（不要随机选择）如果没有匹配的标签，返回null"
-                      `,
-          },
-          {
-            role: "user",
-            content: `name: ${name}, desc: ${description}`,
-          },
-        ],
-        stream: false,
-      }),
-    }
-  );
-  const data = await response.json();
-
-  res.send({ message: data.choices[0].message.content });
 });
 
 router.post("/sort-order", async (req, res, next) => {

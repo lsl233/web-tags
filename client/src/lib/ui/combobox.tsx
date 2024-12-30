@@ -51,6 +51,10 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
     count: 0,
   });
 
+  useEffect(() => {
+    setInternalValues(value)
+  }, [value])
+
   // Handle selection
   const handleSelect = React.useCallback((currentValue: string) => {
     if (!multiple) {
