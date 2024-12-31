@@ -116,27 +116,31 @@ export const WebpageForm = ({
 
   const fetchRecommendTags = async () => {
     setRecommending(true)
-    const recommendTags = await f("/api/tag/recommend", {
-      method: "POST",
-      body: {
-        title: form.getValues("title"),
-        description: form.getValues("description"),
-        tags: tagOptions.map(item => item.name)
+    try {
+      const recommendTags = await f("/api/tag/recommend", {
+        method: "POST",
+        body: {
+          title: form.getValues("title"),
+          description: form.getValues("description"),
+          tags: tagOptions.map(item => item.name)
+        }
+      })
+      const tags: string[] = []
+      for (const tag of tagOptions) {
+        if (recommendTags.includes(tag.name)) {
+          tags.push(tag.id)
+        }
       }
-    })
-
-    const tags: string[] = []
-    for (const tag of tagOptions) {
-      if (recommendTags.includes(tag.name)) {
-        tags.push(tag.id)
+      if (tags.length) {
+        form.setValue("tags", tags)
+      } else {
+        toast.warning("There are no recommended tags.")
       }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setRecommending(false)
     }
-    if (tags.length) {
-      form.setValue("tags", tags)
-    } else {
-      toast.warning("There are no recommended tags.") 
-    }
-    setRecommending(false)
   }
 
   return (
@@ -191,8 +195,6 @@ export const WebpageForm = ({
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-
-
                 </div>
               </FormControl>
               <FormMessage />
