@@ -16,7 +16,7 @@ const envKeys = Object.keys(env).reduce((prev, next) => {
 module.exports = {
   entry: {
     popup: path.join(srcDir, "popup/page.tsx"),
-    options: path.join(srcDir, "options.tsx"),
+    // options: path.join(srcDir, "options.tsx"),
     "new-tab": path.join(srcDir, "new-tab/page.tsx"),
     background: path.join(srcDir, "background.ts"),
     "content-script": path.join(srcDir, "content-script.tsx"),

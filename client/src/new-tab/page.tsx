@@ -31,12 +31,13 @@ const NewTab = () => {
           setActiveTag({ ...res[0] });
         }
       });
-
-      chrome.storage.local.get("newTabPanelSize", (data) => {
-        panelRef.current?.resize(data.newTabPanelSize || 18);
-      });
       fetchSettings()
     }
+
+    chrome.storage.local.get("newTabPanelSize", (data) => {
+      console.log(data, 'newTabPanelSize')
+      panelRef.current?.resize(data.newTabPanelSize || 18);
+    });
   }, [session]);
 
   const fetchSettings = async () => {
