@@ -3,9 +3,7 @@ const { fontFamily } = require("tailwindcss/defaultTheme")
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
-  content: [
-    './src/**/*.{js,jsx,ts,tsx}', // 指定包含 Tailwind CSS 的文件
-  ],
+  content: ["entrypoints/**", "lib/**"],
   theme: {
     container: {
       center: true,
