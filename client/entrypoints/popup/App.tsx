@@ -116,7 +116,7 @@ const App = () => {
           <Button
             onClick={() => {
               chrome.tabs.create({
-                url: chrome.runtime.getURL("new-tab.html"),
+                url: chrome.runtime.getURL('options.html'),
               });
             }}
           >
