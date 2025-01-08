@@ -1,7 +1,7 @@
 import { WebpageForm } from "@/lib/components/webpage-form";
 import { f } from "@/lib/f";
 import { useEffect, useRef, useState } from "react";
-import { Tag, TagWithLevel } from "shared/tag";
+import { Tag, TagType, TagWithLevel } from "shared/tag";
 import { WebpageFormData, WebpageWithTags } from "shared/webpage";
 import { isInternalPage } from "@/lib/utils";
 import { toast } from "sonner";
@@ -56,7 +56,7 @@ export const AddCurrentWebpageForm = () => {
     const foundWebpage = await f("/api/webpage/exist", { query: { url: encodeURIComponent(data.url) } })
     if (foundWebpage) {
       setWebpageId(foundWebpage.id)
-      const tags = foundWebpage.tags.length > 0 ? foundWebpage.tags.map((tag: Tag) => tag.id) : data.tags
+      const tags = foundWebpage.tags.length > 0 ? foundWebpage.tags.filter((tag: Tag) => tag.type === TagType.CUSTOM).map((tag: Tag) => tag.id) : data.tags
       setFormData({
         url: foundWebpage.url,
         title: foundWebpage.title || data.title,

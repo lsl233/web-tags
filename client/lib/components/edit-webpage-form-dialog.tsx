@@ -4,6 +4,7 @@ import { f } from "../f";
 import { useStore } from "../hooks/store.hook";
 import { toast } from "sonner";
 import { useMemo } from "react";
+import { TagType } from "shared/tag";
 
 export interface EditWebpageFormDialogProps extends WebpageFormDialogProps {
   webpage: WebpageWithTags
@@ -17,7 +18,7 @@ export const EditWebpageFormDialog = ({ open, setOpen, children, webpage }: Edit
       title: webpage.title,
       description: webpage.description,
       url: webpage.url,
-      tags: webpage.tags.map((tag) => tag.id),
+      tags: webpage.tags.filter(tag => tag.type === TagType.CUSTOM).map((tag) => tag.id),
       icon: webpage.icon,
     }
   }, [webpage])

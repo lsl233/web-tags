@@ -1,7 +1,7 @@
 import { db } from "@/lib/db.js";
 import ServerError from "@/lib/error.js";
 import { includeTagLevel } from "@/lib/helper.js";
-import { WebPage } from "@prisma/client";
+import { $Enums, WebPage } from "@prisma/client";
 import express from "express";
 import { CreateWebpage } from "shared/webpage.js";
 
