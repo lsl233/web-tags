@@ -3,11 +3,11 @@ import { WebPage as PrismaWebpage, Prisma } from "server/node_modules/@prisma/cl
 import { TagWithChildrenAndParentAndLevel } from "./tag";
 
 export const webpageFormData = object({
-  url: string().url({ message: "网址格式错误" }),
-  title: string().min(1, { message: "标题至少1个字符" }),
-  description: string().min(1, { message: "描述至少1个字符" }),
+  url: string().url({ message: "The URL format is incorrect." }),
+  title: string().min(1),
+  description: string().min(1),
   icon: string().optional(),
-  tags: array(string()).min(1, { message: "至少选择一个标签" }),
+  tags: array(string()).min(1, { message: "Please select at least one tag." }),
 });
 
 export type WebpageFormData = z.infer<typeof webpageFormData>
