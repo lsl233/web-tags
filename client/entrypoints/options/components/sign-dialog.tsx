@@ -26,6 +26,8 @@ import { ArrowRight } from "lucide-react";
 import { f } from "@/lib/f";
 import { useAuth } from "@/lib/components/auth-provider"
 import { useStore } from "@/lib/hooks/store.hook";
+import { Toaster } from "@/lib/ui/sonner";
+import { toast } from "sonner";
 
 interface SignDialogProps {
   children?: React.ReactNode;
@@ -63,8 +65,6 @@ export const SignDialog = ({ children, type }: SignDialogProps) => {
         setSignType("in");
       }
       chrome.storage.local.remove("guestId")
-    } catch (err) {
-      console.error(err);
     } finally {
       setLoading(false);
     }

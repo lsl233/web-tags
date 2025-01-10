@@ -55,7 +55,7 @@ router.post("/session", async (req, res, next) => {
     .digest("hex");
 
   if (hashedPassword !== foundUser.password) {
-    return next(ServerError.Unauthorized("Unauthorized"));
+    return next(ServerError.BadRequest("The email or password is incorrect."));
   }
 
   const token = jwt.sign(

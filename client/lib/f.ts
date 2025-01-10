@@ -99,7 +99,7 @@ export const f = async <T = any>(
         useStore.getState().setSignDialogOpen(true);
         break;
       default:
-        alert(json.message);
+        toast.error(json.message)
     }
     throw new FetchResponseError(res, json.message);
   }
