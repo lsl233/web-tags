@@ -1,5 +1,5 @@
 import { object, string, array, z } from "zod";
-import { WebPage as PrismaWebpage, Prisma } from "server/node_modules/@prisma/client";
+import type { WebPage as PrismaWebpage, Prisma } from "server/node_modules/@prisma/client";
 import { TagWithChildrenAndParentAndLevel } from "./tag";
 
 export const webpageFormData = object({

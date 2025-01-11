@@ -1,4 +1,4 @@
-import { Tag as PrismaTag, Prisma } from "server/node_modules/@prisma/client";
+import type { Tag as PrismaTag, Prisma } from "server/node_modules/@prisma/client";
 import { z } from "zod";
 
 export type TagWithWebpagesAndTags = Prisma.TagGetPayload<{

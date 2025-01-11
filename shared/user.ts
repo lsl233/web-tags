@@ -1,8 +1,11 @@
-import { $Enums } from "server/node_modules/@prisma/client";
+import type { UserType as PrismaUserType } from "server/node_modules/@prisma/client";
 
-export const UserType = $Enums.UserType
+export enum UserType {
+  NORMAL = "NORMAL",
+  GUEST = "GUEST"
+}
 export interface UserPayload {
   id: string;
-  type: $Enums.UserType;
+  type: PrismaUserType;
   email: string;
 }

@@ -2,7 +2,7 @@
   "name": "PageTagz",
   "description": "Tag, Organize, Access – Smarter Web Browsing.",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
