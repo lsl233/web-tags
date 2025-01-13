@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/ui/tabs";
 import { CollectMultiWebpageForm } from "@/lib/components/collect-multi-webpage.form";
 import { AddCurrentWebpageForm } from "./components/add-current-webpage-form";
 import { Toaster } from "@/lib/ui/sonner";
+import { ArrowRight } from "lucide-react";
 
 const App = () => {
   const { setTags } = useStore();
@@ -92,25 +93,34 @@ const App = () => {
       {loading ? (
         <SkeletonList />
       ) : session ? (
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="collect-webpage-form">Current Page</TabsTrigger>
-            <TabsTrigger value="collect-multi-webpage-form">
-              All Tab Pages
-            </TabsTrigger>
-          </TabsList>
+        <>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="collect-webpage-form">Current Page</TabsTrigger>
+              <TabsTrigger value="collect-multi-webpage-form">
+                All Tab Pages
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent className="flex-1" value="collect-webpage-form">
-            <AddCurrentWebpageForm />
-          </TabsContent>
-          <TabsContent value="collect-multi-webpage-form" className="mt-0">
-            {/* <ScrollArea className="w-full h-[200px]"> */}
-            <div className="w-full h-full">
-              <CollectMultiWebpageForm submitSuccess={handleSubmitSuccess} />
-            </div>
-            {/* </ScrollArea> */}
-          </TabsContent>
-        </Tabs>
+            <TabsContent className="flex-1" value="collect-webpage-form">
+              <AddCurrentWebpageForm />
+            </TabsContent>
+            <TabsContent value="collect-multi-webpage-form" className="mt-0">
+              {/* <ScrollArea className="w-full h-[200px]"> */}
+              <div className="w-full h-full">
+                <CollectMultiWebpageForm submitSuccess={handleSubmitSuccess} />
+              </div>
+              {/* </ScrollArea> */}
+            </TabsContent>
+          </Tabs>
+          <div className="flex justify-end">
+            <Button className="mt-2 text-gray-600 pr-0" onClick={() => {
+              chrome.tabs.create({
+                url: chrome.runtime.getURL('options.html'),
+              });
+            }} variant="link">Go to options page<ArrowRight size={16} /></Button>
+          </div>
+        </>
       ) : (
         <div className="flex justify-center items-center min-h-full">
           <Button

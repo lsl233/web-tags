@@ -200,7 +200,7 @@ export const CollectMultiWebpageForm = ({
           <div className="w-2/5">Title</div>
           <div className="w-3/5">Tags</div>
         </div>
-        <ScrollArea className="h-[400px] -m-1">
+        <ScrollArea className="h-[375px] -m-1">
           <div className="flex flex-col gap-4 p-1">
             {fields.map((field, index) => (
               <div key={index} className="flex gap-2">
