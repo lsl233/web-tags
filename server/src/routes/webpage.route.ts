@@ -121,8 +121,11 @@ router.post('/multi', async (req, res, next) => {
   const webpages: CreateWebpage[] = req.body
 
   const createdWebpages = await db.$transaction(webpages.map((webpage) => {
-    return db.webPage.create({
-      data: {
+    return db.webPage.upsert({
+      where: {
+        id: webpage.id || ""
+      },
+      create: {
         url: webpage.url,
         title: webpage.title,
         description: webpage.description,
@@ -131,6 +134,13 @@ router.post('/multi', async (req, res, next) => {
           connect: webpage.tags.map((id: string) => ({ id })),
         },
         userId: req.user.id,
+      },
+      update: {
+        title: webpage.title,
+        description: webpage.description,
+        tags: {
+          connect: webpage.tags.map((id: string) => ({ id })),
+        },
       }
     })
   }))

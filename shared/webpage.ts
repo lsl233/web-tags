@@ -3,6 +3,7 @@ import type { WebPage as PrismaWebpage, Prisma } from "server/node_modules/@pris
 import { TagWithChildrenAndParentAndLevel } from "./tag";
 
 export const webpageFormData = object({
+  id: string().optional(),
   url: string().url({ message: "The URL format is incorrect." }),
   title: string().min(1),
   description: string().min(1),

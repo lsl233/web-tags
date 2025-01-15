@@ -100,6 +100,7 @@ export const CollectMultiWebpageForm = ({
         );
         if (foundWebpage) {
           return {
+            id: foundWebpage.id,
             url: foundWebpage.url,
             title: foundWebpage.title,
             description: foundWebpage.description,
@@ -126,21 +127,28 @@ export const CollectMultiWebpageForm = ({
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setSubmitting(true);
-    const createdWebpages = await f("/api/webpage/multi", {
-      method: "POST",
-      body: data.items.map(item => {
-        item.tags = [...data.tags, ...item.tags]
-        return item
-      })
-    });
-    setSubmitting(false);
-    submitSuccess();
-    chrome.runtime.sendMessage(
-      { type: "close-current-window-tabs" },
-      (e) => {
-        console.log(e);
-      }
-    );
+    try {
+      await f("/api/webpage/multi", {
+        method: "POST",
+        body: data.items.map(item => {
+          item.tags = [...data.tags, ...item.tags]
+          return item
+        })
+      });
+
+      submitSuccess();
+      chrome.runtime.sendMessage(
+        { type: "close-current-window-tabs" },
+        (e) => {
+          console.log(e);
+        }
+      );
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setSubmitting(false);
+    }
+
 
   };
 

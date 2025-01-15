@@ -97,23 +97,12 @@ export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWith
               {webpage.description}
             </div>
 
-            {showTags && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger className="max-w-full">
-                    <div className="flex max-w-full gap-2 mt-2 flex-nowrap truncate">
-                      {webpage?.tags.map((tag) => (
-                        <TagBadge key={tag.id} tag={tag}></TagBadge>
-                      ))}
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent className="flex flex-wrap gap-1 p-2">
-                    {webpage?.tags.map((tag) => (
-                      <TagBadge key={tag.id} tag={tag}></TagBadge>
-                    ))}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+            {showTags && webpage.tags && (
+              <div className="flex max-w-full gap-2 mt-2 flex-nowrap truncate" title={webpage.tags.map(tag => tag.name).join(', ')}>
+                {webpage.tags.map((tag) => (
+                  <TagBadge key={tag.id} tag={tag}></TagBadge>
+                ))}
+              </div>
             )}
           </div>
         </ContextMenuTrigger>

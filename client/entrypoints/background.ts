@@ -57,7 +57,7 @@ export default defineBackground(() => {
 
     if (messageType === "close-current-window-tabs") {
       chrome.tabs.query({}, (tabs) => {
-        chrome.tabs.create({ url: chrome.runtime.getURL('new-tab.html') });
+        chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
         chrome.tabs.remove(tabs.map((tab) => tab.id!));
         sendResponse(true);
       });

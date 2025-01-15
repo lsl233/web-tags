@@ -74,7 +74,7 @@ const App = () => {
   return (
     <div
       className={cn(
-        " p-4 relative bg-white min-h-[400px]",
+        "p-4 pb-0 relative bg-white min-h-[400px]",
         "w-[620px]"
       )}
     >
@@ -110,7 +110,7 @@ const App = () => {
             </TabsContent>
           </Tabs>
           <div className="flex justify-end">
-            <Button className="mt-2 text-gray-600 pr-0" onClick={() => {
+            <Button className="text-gray-600 pr-0" onClick={() => {
               chrome.tabs.create({
                 url: chrome.runtime.getURL('options.html'),
               });
