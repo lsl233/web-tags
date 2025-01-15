@@ -51,6 +51,8 @@ export const Combobox = React.forwardRef<HTMLDivElement, CommandSelectProps<any>
     count: 0,
   });
 
+  console.log('options', options)
+
   useEffect(() => {
     setInternalValues(value)
   }, [value])

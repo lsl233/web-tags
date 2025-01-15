@@ -55,7 +55,7 @@ router.post("/", async (req, res, next) => {
   if (!req.user) {
     return next(ServerError.Unauthorized("Unauthorized"));
   }
-  const { name, id, icon, type, parentId } = req.body;
+  const { name, id, icon = '', type, parentId } = req.body;
 
   if (id) {
     // 更新现有标签

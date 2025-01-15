@@ -5,6 +5,7 @@ import {
   FormItem,
   FormControl,
   FormMessage,
+  FormLabel,
 } from "@/lib/ui/form";
 import { Input } from "@/lib/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,19 +16,22 @@ import {
 } from "shared/webpage";
 import { z } from "zod";
 import { Combobox } from "../ui/combobox";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "../hooks/store.hook";
-import { flattenChildren, uniqueArrayByKey } from "../utils";
+import { uniqueArrayByKey } from "../utils";
 import { f } from "../f";
 import { Button } from "../ui/button-loading";
-import { TagType, TagWithId } from "shared/tag";
+import { TagWithId } from "shared/tag";
 import dayjs from "dayjs";
 import { useAuth } from "@/lib/components/auth-provider";
 import { ScrollArea } from "@/lib/ui/scroll-area";
-import { Checkbox } from "../ui/checkbox";
+import { Separator } from "../ui/separator";
 
 const formSchema = z.object({
-  items: z.array(webpageFormData).min(1, "At least one item is required"),
+  tags: z.array(z.string()).min(1, { message: "Please select at least one tag." }),
+  items: z.array(webpageFormData.extend({
+    tags: z.array(z.string())
+  })).min(1, "At least one item is required"),
 });
 
 interface CollectMultiWebpageFormProps {
@@ -41,10 +45,7 @@ export const CollectMultiWebpageForm = ({
   if (!session) return null;
   const setTags = useStore((state) => state.setTags);
   const tags = useStore((state) => state.tags);
-  const [defaultTag, setDefaultTag] = useState<TagWithId | null>(null);
-  const tagOptions = useMemo(() => {
-    return [...flattenChildren(tags), defaultTag];
-  }, [tags, defaultTag]);
+  const flattenedTags = useStore((state) => state.flattenedTags)
   const [submitting, setSubmitting] = useState(false);
   const [isCloseAllPages, setIsCloseAllPages] = useState(false);
   const isMounted = useRef(false)
@@ -53,10 +54,11 @@ export const CollectMultiWebpageForm = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       items: [],
+      tags: []
     } as z.infer<typeof formSchema>,
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields: itemFields, append, remove } = useFieldArray({
     control: form.control,
     name: "items",
   });
@@ -74,29 +76,17 @@ export const CollectMultiWebpageForm = ({
           tags: [],
         } as WebpageFormData;
       });
-      const _defaultTag = generateDefaultTag();
-      setDefaultTag(_defaultTag);
 
       const result = await generateDefaultForm(
-        currentWindowWebpages,
-        _defaultTag
+        currentWindowWebpages
       );
+      console.log('result', result)
       append(uniqueArrayByKey(result, "url"));
     });
   }, []);
 
-  const generateDefaultTag = () => {
-    const _defaultTag: TagWithId = {
-      name: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-      icon: "calendar-days",
-      id: "-1",
-    };
-    return _defaultTag;
-  };
-
   const generateDefaultForm = async (
-    currentWindowWebpages: WebpageFormData[],
-    defaultTag: TagWithId
+    currentWindowWebpages: WebpageFormData[]
   ) => {
     let result: WebpageFormData[];
     const foundWebpages = await f<WebpageWithTags[]>("/api/webpage/multi", {
@@ -114,19 +104,13 @@ export const CollectMultiWebpageForm = ({
             title: foundWebpage.title,
             description: foundWebpage.description,
             icon: foundWebpage.icon,
-            tags: [defaultTag.id],
+            tags: foundWebpage.tags.map(tag => tag.id),
           } as WebpageFormData;
-        }
-        if (defaultTag) {
-          item.tags = [defaultTag.id];
         }
         return item;
       });
     } else {
-      result = currentWindowWebpages.map((item: WebpageFormData) => {
-        item.tags = [defaultTag.id];
-        return item;
-      });
+      result = currentWindowWebpages
     }
 
     result = result.filter(
@@ -141,43 +125,23 @@ export const CollectMultiWebpageForm = ({
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    const foundTag = data.items.find((item) => item.tags.includes("-1"));
-    if (foundTag && defaultTag) {
-      const inboxTag = tags.find((tag) => tag.type === TagType.INBOX);
-      if (!inboxTag) return;
-      setSubmitting(true);
-      const result = await f("/api/tag", {
-        method: "POST",
-        body: {
-          name: defaultTag.name,
-          icon: defaultTag.icon,
-          type: TagType.DATE,
-          parentId: inboxTag.id,
-        },
-      });
-
-      data.items = data.items.map((item) => {
-        item.tags = item.tags.map((id) => (id === "-1" ? result.id : id));
-        return item;
-      });
-
-      
-      const createdWebpages = await f("/api/webpage/multi", {
-        method: "POST",
-        body: uniqueArrayByKey(data.items, "url"),
-      });
-      setSubmitting(false);
-      submitSuccess();
-
-      if (isCloseAllPages) {
-        chrome.runtime.sendMessage(
-          { type: "close-current-window-tabs" },
-          (e) => {
-            console.log(e);
-          }
-        );
+    setSubmitting(true);
+    const createdWebpages = await f("/api/webpage/multi", {
+      method: "POST",
+      body: data.items.map(item => {
+        item.tags = [...data.tags, ...item.tags]
+        return item
+      })
+    });
+    setSubmitting(false);
+    submitSuccess();
+    chrome.runtime.sendMessage(
+      { type: "close-current-window-tabs" },
+      (e) => {
+        console.log(e);
       }
-    }
+    );
+
   };
 
   const handleCreateTag = async (name: string) => {
@@ -198,11 +162,11 @@ export const CollectMultiWebpageForm = ({
       >
         <div className="flex gap-2 mt-2 pb-2 text-sm font-medium leading-none">
           <div className="w-2/5">Title</div>
-          <div className="w-3/5">Tags</div>
+          <div className="w-3/5">Description</div>
         </div>
-        <ScrollArea className="h-[375px] -m-1">
+        <ScrollArea className="h-[315px] -m-1">
           <div className="flex flex-col gap-4 p-1">
-            {fields.map((field, index) => (
+            {itemFields.map((field, index) => (
               <div key={index} className="flex gap-2">
                 <FormField
                   control={form.control}
@@ -218,15 +182,11 @@ export const CollectMultiWebpageForm = ({
                 />
                 <FormField
                   control={form.control}
-                  name={`items.${index}.tags`}
+                  name={`items.${index}.description`}
                   render={({ field }) => (
                     <FormItem className="w-3/5">
                       <FormControl>
-                        <Combobox
-                          {...field}
-                          options={tagOptions}
-                          onCreate={handleCreateTag}
-                        />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -236,8 +196,25 @@ export const CollectMultiWebpageForm = ({
             ))}
           </div>
         </ScrollArea>
-
-        <div className="mt-4 flex items-center gap-1">
+        <Separator className="mb-2 mt-[5px]"></Separator>
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tags</FormLabel>
+              <FormControl>
+                <Combobox
+                  {...field}
+                  options={flattenedTags}
+                  onCreate={handleCreateTag}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* <div className="mt-4 flex items-center gap-1">
           <Checkbox
             id="terms1"
             onCheckedChange={() => setIsCloseAllPages(!isCloseAllPages)}
@@ -249,7 +226,7 @@ export const CollectMultiWebpageForm = ({
           >
             Submitted and close all pages
           </label>
-        </div>
+        </div> */}
         <Button loading={submitting} type="submit" className="mt-4">
           Submit
         </Button>

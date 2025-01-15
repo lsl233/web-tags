@@ -15,6 +15,7 @@ import { CollectMultiWebpageForm } from "@/lib/components/collect-multi-webpage.
 import { AddCurrentWebpageForm } from "./components/add-current-webpage-form";
 import { Toaster } from "@/lib/ui/sonner";
 import { ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 
 const App = () => {
   const { setTags } = useStore();
@@ -32,13 +33,8 @@ const App = () => {
   };
 
   const handleSubmitSuccess = () => {
-    setShowSlogan(true);
-    timeoutId = setTimeout(() => {
-      setShowSlogan(false);
-    }, 2000);
+    toast.success("successfully")
   };
-
-
 
   useEffect(() => {
     // chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
