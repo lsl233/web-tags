@@ -17,7 +17,9 @@ import { useEffect } from "react";
 import { SettingsStore, useSettingsStore } from "@/lib/hooks/settings.store.hook";
 
 const schema = z.object({
-  focus: z.boolean(),
+  webpageActive: z.boolean(),
+  webpageVisibleDescription: z.boolean(),
+  webpageVisibleTags: z.boolean()
 });
 
 export const BasicForm = ({ settings }: { settings: Omit<SettingsStore, "setSettings"> }) => {
@@ -25,9 +27,7 @@ export const BasicForm = ({ settings }: { settings: Omit<SettingsStore, "setSett
 
   const form = useForm({
     resolver: zodResolver(schema),
-    defaultValues: {
-      webpageActive: settings.webpageActive,
-    },
+    defaultValues: settings,
   });
 
   useEffect(() => {
@@ -50,11 +50,47 @@ export const BasicForm = ({ settings }: { settings: Omit<SettingsStore, "setSett
         control={form.control}
         name="webpageActive"
         render={({ field }) => (
-          <FormItem className="flex items-center justify-between w-full space-y-0">
+          <FormItem className="flex items-center justify-between w-full space-y-8">
             <div>
               <FormLabel>Whether or not to focus?</FormLabel>
               <FormDescription>
                 Whether to focus on the open page after opening the page
+              </FormDescription>
+              <FormMessage />
+            </div>
+            <FormControl className="mt-0">
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="webpageVisibleDescription"
+        render={({ field }) => (
+          <FormItem className="flex items-center justify-between w-full space-y-8">
+            <div>
+              <FormLabel>Visible description</FormLabel>
+              <FormDescription>
+              Visible description in card
+              </FormDescription>
+              <FormMessage />
+            </div>
+            <FormControl className="mt-0">
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+       <FormField
+        control={form.control}
+        name="webpageVisibleTags"
+        render={({ field }) => (
+          <FormItem className="flex items-center justify-between w-full space-y-8">
+            <div>
+              <FormLabel>Visible tags</FormLabel>
+              <FormDescription>
+              Visible tags in card
               </FormDescription>
               <FormMessage />
             </div>

@@ -90,14 +90,18 @@ export const WebpageCard = ({ webpage, showTags = true }: { webpage: WebpageWith
               </div>
             </Button>
 
-            <div
-              className="text-sm text-gray-500 truncate w-full mt-2"
-              title={webpage.description}
-            >
-              {webpage.description}
-            </div>
+            {
+              settings.webpageVisibleDescription &&
+              <div
+                className="text-sm text-gray-500 truncate w-full mt-2"
+                title={webpage.description}
+              >
+                {webpage.description}
+              </div>
+            }
 
-            {showTags && webpage.tags && (
+
+            {settings.webpageVisibleTags && (
               <div className="flex max-w-full gap-2 mt-2 flex-nowrap truncate" title={webpage.tags.map(tag => tag.name).join(', ')}>
                 {webpage.tags.map((tag) => (
                   <TagBadge key={tag.id} tag={tag}></TagBadge>
