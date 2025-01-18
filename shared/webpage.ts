@@ -6,7 +6,7 @@ export const webpageFormData = object({
   id: string().optional(),
   url: string().url({ message: "The URL format is incorrect." }),
   title: string().min(1),
-  description: string().min(1),
+  description: string().optional(),
   icon: string().optional(),
   tags: array(string()).min(1, { message: "Please select at least one tag." }),
 });

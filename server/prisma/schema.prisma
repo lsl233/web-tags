@@ -44,7 +44,7 @@ model Settings {
 model WebPage {
   id          String   @id @default(uuid())
   title       String
-  description String   @db.Text
+  description String?   @db.Text
   url         String   @db.Text
   icon        String   @db.Text
   sortOrder   Int?     @default(0)
