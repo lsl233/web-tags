@@ -15,13 +15,19 @@ import { cn, debounce, flattenChildrenKey } from "@/lib/utils";
 import { Skeleton } from "@/lib/ui/skeleton";
 import { WebpageFormDialog } from "@/lib/components/webpage-form-dialog";
 
+interface Query {
+  page: number
+  pageSize: number
+}
+
 export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParentAndLevel }) => {
   const { setDefaultCollectForm, webpages, setWebpages, insertWebpages } = useStore();
 
-  const [query, setQuery] = useState({ page: 1, pageSize: 50 });
+  const [query, setQuery] = useState<Query>({ page: 1, pageSize: 50 });
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false)
   const scrollFooterElement = useRef<HTMLDivElement>(null);
+  const observed = useRef(false)
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 5
@@ -30,12 +36,13 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
 
   const sensors = useSensors(pointerSensor)
 
-  useEffect(() => {
+  const observerLoadMore = () => {
+    if (observed.current) return
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            fetchWebpages()
+            setQuery(prev => ({ ...prev, page: prev.page++ }));
           }
         });
       },
@@ -47,6 +54,7 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
 
     if (scrollFooterElement.current) {
       observer.observe(scrollFooterElement.current);
+      observed.current = true
     }
 
     return () => {
@@ -54,17 +62,25 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
         observer.unobserve(scrollFooterElement.current);
       }
     };
-  }, [query]);
+  }
 
   useEffect(() => {
     setWebpages([])
     setHasMore(true)
-    if (query.page !== 1) {
-      setQuery(prev => ({ ...prev, page: 1 }));
-    }
+    setQuery(prev => ({ ...prev, page: 1 }));
   }, [activeTag])
 
-  const fetchWebpages = async () => {
+  useEffect(() => {
+    const abortController = new AbortController();
+    fetchWebpages(abortController).then(() => {
+      observerLoadMore()
+    })
+    return () => {
+      abortController.abort()
+    }
+  }, [query])
+
+  const fetchWebpages = async (abortController: AbortController) => {
     if (!hasMore) return;
     setLoading(true)
     const tagsId = flattenChildrenKey([activeTag], "id");
@@ -72,16 +88,16 @@ export const WebpagesView = ({ activeTag }: { activeTag: TagWithChildrenAndParen
       query: {
         tagsId: tagsId.join(","),
         ...query
-      }
+      },
+      signal: abortController.signal
     });
     if (res) {
       setHasMore(res.length === query.pageSize);
-      setQuery(prev => ({ ...prev, page: prev.page + 1 }));
+      // setQuery(prev => ({ ...prev, page: prev.page + 1 }));
       insertWebpages(res);
     }
 
     setLoading(false);
-    return res || [];
   };
 
   const handleOpenAllTabs = (webpages: WebpageWithTags[]) => {
